@@ -267,65 +267,92 @@
 
     <!-- 粒子效果 -->
     <script>
-        // 创建粒子效果（优化版）
-        function createParticles() {
+        // 背景粒子效果
+        function createBackgroundParticles() {
             const particlesContainer = document.getElementById('particles');
-            const particleCount = 20; // 减少粒子数量
+            const particleCount = 30; // 背景粒子数量
 
             for (let i = 0; i < particleCount; i++) {
                 const particle = document.createElement('div');
-                particle.className = 'particle';
+                particle.className = 'particle bg-particle';
                 particle.style.left = Math.random() * 100 + '%';
                 particle.style.animationDelay = Math.random() * 15 + 's';
-                particle.style.animationDuration = (20 + Math.random() * 10) + 's'; // 减慢动画
-                particle.style.opacity = '0.3'; // 降低透明度
+                particle.style.animationDuration = (20 + Math.random() * 10) + 's';
+                particle.style.opacity = '0.2';
                 particlesContainer.appendChild(particle);
             }
         }
 
-        // 3D 鼠标跟踪效果（优化版本）
-        function initMouseTrack() {
-            const container = document.querySelector('.login-container');
-            let isHovered = false;
-            let rafId = null;
-            let lastX = 0, lastY = 0;
+        // 鼠标跟随粒子效果
+        function initMouseFollowParticles() {
+            const canvas = document.createElement('canvas');
+            canvas.id = 'mouse-canvas';
+            // 使用CSS设置样式
+            document.body.appendChild(canvas);
 
-            container.addEventListener('mouseenter', () => {
-                isHovered = true;
-                container.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-            });
+            const ctx = canvas.getContext('2d');
+            const particles = [];
+            const mouse = { x: 0, y: 0 };
 
-            container.addEventListener('mouseleave', () => {
-                isHovered = false;
-                if (rafId) cancelAnimationFrame(rafId);
-                container.style.transform = 'rotateX(5deg) rotateY(-5deg)';
-            });
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize);
 
-            // 使用 requestAnimationFrame 优化性能
+            // 鼠标移动事件
             document.addEventListener('mousemove', (e) => {
-                if (!isHovered || (Math.abs(e.clientX - lastX) < 5 && Math.abs(e.clientY - lastY) < 5)) return;
+                mouse.x = e.clientX;
+                mouse.y = e.clientY;
 
-                lastX = e.clientX;
-                lastY = e.clientY;
-
-                if (rafId) return;
-
-                rafId = requestAnimationFrame(() => {
-                    const rect = container.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-
-                    const centerX = rect.width / 2;
-                    const centerY = rect.height / 2;
-
-                    // 减小旋转角度，减少震动
-                    const rotateX = (y - centerY) / 50;
-                    const rotateY = (centerX - x) / 50;
-
-                    container.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-5px)`;
-                    rafId = null;
-                });
+                // 在鼠标位置创建新粒子
+                for (let i = 0; i < 5; i++) {
+                    particles.push({
+                        x: mouse.x,
+                        y: mouse.y,
+                        vx: (Math.random() - 0.5) * 2,
+                        vy: (Math.random() - 0.5) * 2,
+                        life: 1,
+                        size: Math.random() * 3 + 2
+                    });
+                }
             });
+
+            // 动画循环
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // 绘制粒子
+                particles.forEach((particle, index) => {
+                    particle.x += particle.vx;
+                    particle.y += particle.vy;
+                    particle.life -= 0.02;
+
+                    if (particle.life <= 0) {
+                        particles.splice(index, 1);
+                        return;
+                    }
+
+                    const alpha = particle.life;
+                    const gradient = ctx.createRadialGradient(
+                        particle.x, particle.y, 0,
+                        particle.x, particle.y, particle.size * 2
+                    );
+                    gradient.addColorStop(0, `rgba(102, 126, 234, ${alpha})`);
+                    gradient.addColorStop(0.5, `rgba(240, 147, 251, ${alpha * 0.5})`);
+                    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                requestAnimationFrame(animate);
+            }
+
+            animate();
         }
 
         // 输入框动画效果（简化版）
@@ -361,8 +388,8 @@
 
         // 页面加载完成后初始化所有效果
         window.addEventListener('load', () => {
-            createParticles();
-            initMouseTrack();
+            createBackgroundParticles();
+            initMouseFollowParticles();
             initInputAnimation();
         });
     </script>

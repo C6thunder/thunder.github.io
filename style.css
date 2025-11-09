@@ -24,7 +24,6 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    perspective: 1000px;
 }
 
 /* ==================== 动态背景粒子 ==================== */
@@ -44,6 +43,17 @@ body {
     filter: blur(60px);
     opacity: 0.5;
     will-change: transform;
+}
+
+/* 鼠标粒子画布 */
+#mouse-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
 }
 
 .orb-1 {
@@ -163,28 +173,27 @@ body {
     }
 }
 
-/* ==================== 3D 容器 ==================== */
+/* ==================== 容器 ==================== */
 .container {
     position: relative;
     z-index: 1;
     max-width: 480px;
     width: 90%;
     animation: fadeInUp 1s ease-out;
-    transform-style: preserve-3d;
 }
 
 @keyframes fadeInUp {
     from {
         opacity: 0;
-        transform: translateY(50px) rotateX(10deg);
+        transform: translateY(30px);
     }
     to {
         opacity: 1;
-        transform: translateY(0) rotateX(0);
+        transform: translateY(0);
     }
 }
 
-/* ==================== 3D 玻璃态卡片 ==================== */
+/* ==================== 玻璃态卡片 ==================== */
 .login-container {
     position: relative;
     background: var(--glass-bg);
@@ -195,8 +204,7 @@ body {
     box-shadow:
         0 20px 60px rgba(0, 0, 0, 0.5),
         inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    transform: rotateX(5deg) rotateY(-5deg);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+    transition: box-shadow 0.3s ease;
     overflow: hidden;
     will-change: transform;
 }
@@ -218,7 +226,7 @@ body {
 }
 
 .login-container:hover {
-    transform: rotateX(0) rotateY(0) translateY(-10px);
+    transform: translateY(-5px);
     box-shadow:
         0 30px 80px rgba(102, 126, 234, 0.4),
         0 20px 60px rgba(0, 0, 0, 0.5),
@@ -453,7 +461,7 @@ body {
     width: 100%;
 }
 
-/* ==================== 3D 登录按钮 ==================== */
+/* ==================== 登录按钮 ==================== */
 .login-btn {
     width: 100%;
     padding: 18px;
@@ -473,7 +481,6 @@ body {
         0 10px 30px rgba(102, 126, 234, 0.3),
         0 4px 10px rgba(0, 0, 0, 0.2);
     animation: slideInLeft 0.6s ease-out 0.8s both;
-    transform-style: preserve-3d;
     will-change: transform;
 }
 
