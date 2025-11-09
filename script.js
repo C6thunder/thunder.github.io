@@ -577,15 +577,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('rememberMe').checked = true;
     }
 
-    // 检查 URL 参数，如果表单已提交则跳转
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('form-submitted') || urlParams.has('submitted')) {
-        const email = urlParams.get('email') || rememberedEmail || '';
-        blogLogin.showNotification('✅ 登录成功！正在跳转...', 'success');
-        setTimeout(() => {
-            window.location.href = `blog.html${email ? '?email=' + encodeURIComponent(email) : ''}`;
-        }, 1000);
-    }
+    // 注意：表单提交后的重定向现在由 Netlify _redirects 文件处理
 
     // Add some demo credentials helper
     console.log('%c🔑 Demo Login Credentials', 'font-size: 16px; font-weight: bold; color: #667eea;');
