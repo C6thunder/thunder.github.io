@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub配置 - 个人笔记网站</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .setup-container { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
+        .setup-title { font-size: 3rem; font-weight: 700; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-align: center; margin-bottom: 20px; }
+        .config-section { background: rgba(255,255,255,0.1); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 40px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; color: #fff; font-weight: 600; }
+        .form-group input { width: 100%; padding: 12px; border: 2px solid rgba(255,255,255,0.2); border-radius: 10px; background: rgba(255,255,255,0.1); color: #fff; }
+        .btn { padding: 15px 30px; border: none; border-radius: 10px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: 600; cursor: pointer; margin-top: 20px; }
+        .warning { background: rgba(251, 191, 36, 0.2); border: 2px solid #fbbf24; border-radius: 10px; padding: 20px; margin-bottom: 30px; color: #fbbf24; }
+    </style>
+</head>
+<body data-theme="violet">
+    <div class="container">
+        <div class="setup-container">
+            <h1 class="setup-title"><i class="fab fa-github"></i> GitHub 配置</h1>
+            
+            <div class="warning">
+                <h3><i class="fas fa-exclamation-triangle"></i> 重要提示</h3>
+                <p><strong>强烈推荐使用 Fine-grained tokens（更安全）</strong></p>
+                <p>Token格式：<code>github_pat_</code> 开头（Fine-grained）</p>
+            </div>
+
+            <div class="config-section">
+                <h2 style="color: #fff; margin-bottom: 20px;"><i class="fas fa-cog"></i> GitHub 仓库配置</h2>
+                
+                <div class="form-group">
+                    <label><i class="fab fa-github"></i> GitHub 用户名</label>
+                    <input type="text" id="owner" placeholder="例如: yourusername">
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-folder"></i> 仓库名</label>
+                    <input type="text" id="repo" placeholder="例如: yourusername.github.io">
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-code-branch"></i> 分支名</label>
+                    <input type="text" id="branch" value="main" placeholder="main">
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-key"></i> GitHub Fine-grained Token</label>
+                    <input type="password" id="token" placeholder="github_pat_xxxxxxxxxxxxxxxxxxxx">
+                    <small style="color: #aaa; display: block; margin-top: 5px;">
+                        <a href="https://github.com/settings/tokens" target="_blank" style="color: #667eea;">创建Fine-grained token</a> - 
+                        选择 Fine-grained token → Only select repositories → Contents: Read and Write
+                    </small>
+                </div>
+
+                <button class="btn" onclick="saveConfig()">
+                    <i class="fas fa-save"></i> 保存配置
+                </button>
+
+                <div id="result" style="margin-top: 20px; padding: 15px; border-radius: 10px; display: none;"></div>
+            </div>
+
+            <p style="text-align: center; margin-top: 30px; color: #aaa;">
+                <a href="index.html" style="color: #667eea;">返回首页</a>
+            </p>
+        </div>
+    </div>
+
+    <script src="github-api.js"></script>
+    <script>
+        function saveConfig() {
+            const owner = document.getElementById('owner').value.trim();
+            const repo = document.getElementById('repo').value.trim();
+            const branch = document.getElementById('branch').value.trim() || 'main';
+            const token = document.getElementById('token').value.trim();
+
+            if (!owner || !repo || !token) {
+                alert('请填写所有必填字段');
+                return;
+            }
+
+            try {
+                githubNoteManager.setConfig(owner, repo, branch, token);
+                const result = document.getElementById('result');
+                result.style.display = 'block';
+                result.style.background = 'rgba(74, 222, 128, 0.2)';
+                result.style.border = '1px solid #4ade80';
+                result.style.color = '#4ade80';
+                result.innerHTML = '<i class="fas fa-check-circle"></i> 配置已保存！';
+                alert('配置已保存！\n\n现在您可以写笔记和评论了。');
+                setTimeout(() => window.location.href = 'index.html', 1500);
+            } catch (error) {
+                alert('保存失败: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
