@@ -133,17 +133,16 @@
         let tags = [];
         let noteType = 'markdown';
 
-        function checkGitHubConfig() {
+        // 在tokenLoaded事件后启用提交按钮
+        window.addEventListener('tokenLoaded', () => {
             const statusDiv = document.getElementById('githubStatus');
             const submitBtn = document.getElementById('submitBtn');
-
-            // 现在使用加密token，无需用户配置
             statusDiv.style.background = 'rgba(74, 222, 128, 0.2)';
             statusDiv.style.borderColor = '#4ade80';
             statusDiv.style.color = '#4ade80';
             statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> 系统已配置加密token，笔记将保存到云端';
             submitBtn.disabled = false;
-        }
+        });
 
         // 切换笔记格式
         function switchNoteType() {

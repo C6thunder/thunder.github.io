@@ -504,14 +504,7 @@ class GitHubNoteManager {
 // 导出单例
 const githubNoteManager = new GitHubNoteManager();
 
-// 自动初始化（尝试从加密配置加载token）
-githubNoteManager.init().then(() => {
-    console.log('GitHub Note Manager 初始化完成');
-}).catch(err => {
-    console.error('初始化失败:', err);
-});
-
-// 全局函数：在页面加载后自动配置加密token
+// 全局函数：配置加密token并初始化
 // 调用方式：window.setupEncryptedToken(encryptedConfig);
 /**
  * 设置加密token配置
@@ -524,7 +517,7 @@ window.setupEncryptedToken = function (encryptedConfig) {
     githubNoteManager.setEncryptedConfig(encryptedConfig);
     console.log('📋 已设置 encryptedConfig');
 
-    // 重新初始化以加载加密token
+    // 初始化以加载加密token
     console.log('🔄 开始初始化...');
     githubNoteManager.init().then(() => {
         console.log('✅ 初始化完成');
