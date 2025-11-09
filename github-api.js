@@ -358,7 +358,8 @@ class GitHubNoteManager {
             });
 
             if (response.status === 404) {
-                return []; // 文件夹不存在
+                // 文件夹不存在，返回空数组（静默处理）
+                return [];
             }
 
             if (!response.ok) {
@@ -388,7 +389,7 @@ class GitHubNoteManager {
 
             return notes;
         } catch (error) {
-            console.warn(`扫描文件夹 ${folderPath} 失败:`, error.message);
+            // 静默处理错误，不显示警告
             return [];
         }
     }
