@@ -109,21 +109,38 @@ class GitHubNoteManager {
                 tokenBytes
             );
 
+            console.log('✅ Token解密成功');
             return new TextDecoder().decode(decrypted);
         } catch (error) {
-            console.error('Token解密失败:', error);
+            console.error('❌ Token解密失败:', error.message);
+            console.error('详细信息:', error);
             return null;
         }
     }
 
     // 辅助函数：base64转字节数组
     base64ToBytes(base64) {
-        const binaryString = atob(base64);
-        const bytes = new Uint8Array(binaryString.length);
-        for (let i = 0; i < binaryString.length; i++) {
-            bytes[i] = binaryString.charCodeAt(i);
+        try {
+            // 转换urlsafe base64为标准base64
+            // urlsafe base64使用 - 和 _，标准base64使用 + 和 /
+            base64 = base64.replace(/-/g, '+').replace(/_/g, '/');
+
+            // 添加缺失的padding
+            while (base64.length % 4 !== 0) {
+                base64 += '=';
+            }
+
+            // 解码
+            const binaryString = atob(base64);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return bytes;
+        } catch (error) {
+            console.error('Base64解码失败:', { original: base64, error: error.message });
+            throw new Error('无效的base64编码: ' + error.message);
         }
-        return bytes;
     }
 
     // 初始化（只使用加密token）
