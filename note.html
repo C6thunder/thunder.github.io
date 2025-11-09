@@ -382,11 +382,27 @@
     </div>
 
     <script src="script.js"></script>
+    <script src="github-api.js"></script>
 
     <script>
         // 全局变量
         let currentNote = null;
         let comments = [];
+
+        // 检查GitHub配置
+        githubNoteManager.loadConfig();
+        if (!githubNoteManager.config.owner || !githubNoteManager.config.repo || !githubNoteManager.config.token) {
+            // 如果未配置，显示提示
+            setTimeout(() => {
+                const nav = document.querySelector('.header-nav');
+                if (nav) {
+                    const tip = document.createElement('div');
+                    tip.style.cssText = 'background: #fbbf24; color: #000; padding: 8px 15px; border-radius: 5px; margin-left: 10px; font-size: 0.85rem;';
+                    tip.innerHTML = '<i class="fas fa-exclamation-triangle"></i> 请先 <a href="setup.html" style="color: #000; text-decoration: underline;">配置GitHub</a>';
+                    nav.appendChild(tip);
+                }
+            }, 500);
+        }
 
         // 背景粒子效果
         function createBackgroundParticles() {
