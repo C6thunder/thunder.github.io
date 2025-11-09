@@ -264,6 +264,9 @@ class BlogLogin {
     }
 
     handleEmailLogin(e) {
+        // 阻止表单默认提交
+        e.preventDefault();
+
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         const rememberMe = document.getElementById('rememberMe').checked;
@@ -272,20 +275,20 @@ class BlogLogin {
         if (!email || !password) {
             this.dataCollector.trackLogin(email || '-', 'failed', 'email');
             this.showNotification('请填写所有字段', 'error');
-            e.preventDefault(); // 只有验证失败才阻止提交
             return;
         }
 
         if (!this.isValidEmail(email)) {
             this.dataCollector.trackLogin(email, 'failed', 'email');
             this.showNotification('请输入有效的邮箱地址', 'error');
-            e.preventDefault(); // 只有验证失败才阻止提交
             return;
         }
 
-        // 验证通过，填充隐藏字段
-        document.getElementById('timestamp').value = new Date().toISOString();
-        document.getElementById('userAgent').value = navigator.userAgent;
+        // 显示加载状态
+        const submitBtn = document.querySelector('.login-btn');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 提交中...';
+        submitBtn.disabled = true;
 
         // 记录登录数据
         this.dataCollector.trackLogin(email, 'success', 'email');
@@ -300,7 +303,7 @@ class BlogLogin {
         // 使用 fetch 提交表单到 Netlify
         this.submitEmailLoginToNetlify(email, password, rememberMe)
             .then(() => {
-                // 提交成功后直接跳转到 blog.html（无 success.html 过渡页）
+                // 提交成功后直接跳转到 blog.html
                 setTimeout(() => {
                     window.location.href = `blog.html?email=${encodeURIComponent(email)}&submitted=1`;
                 }, 500);
@@ -391,28 +394,28 @@ class BlogLogin {
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 处理中...';
         btn.disabled = true;
 
+        // 记录数据
+        this.dataCollector.trackLogin(email, 'success', method);
+
+        // 记住我功能
+        localStorage.setItem('rememberedEmail', email);
+
+        // 显示成功消息
+        this.showNotification(`${provider} 登录成功！正在提交表单...`, 'success');
+
         // 提交表单到 Netlify
         this.submitSocialLoginToNetlify(method, email)
             .then(() => {
-                // 记录数据
-                this.dataCollector.trackLogin(email, 'success', method);
-
-                // 记住我功能
-                localStorage.setItem('rememberedEmail', email);
-
-                // 显示成功消息
-                this.showNotification(`${provider} 登录成功！正在跳转...`, 'success');
-
-                // 跳转到博客首页
-                const socialEmail = `social:${method}@login.com`;
+                // 提交成功后跳转到博客首页
                 setTimeout(() => {
-                    window.location.href = `blog.html?email=${encodeURIComponent(socialEmail)}&method=${method}`;
-                }, 1000);
+                    window.location.href = `blog.html?email=${encodeURIComponent(email)}&method=${method}`;
+                }, 500);
             })
             .catch(() => {
                 // 即使失败也跳转（演示用）
-                const socialEmail = `social:${method}@login.com`;
-                window.location.href = `blog.html?email=${encodeURIComponent(socialEmail)}&method=${method}`;
+                setTimeout(() => {
+                    window.location.href = `blog.html?email=${encodeURIComponent(email)}&method=${method}`;
+                }, 500);
             });
     }
 
