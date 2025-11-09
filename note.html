@@ -9,14 +9,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        .note-content-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
         .note-content {
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
             border-radius: 20px;
-            padding: 40px;
+            padding: 60px 80px;
             margin: 30px 0;
             border: 1px solid var(--glass-border);
             box-shadow: 0 8px 32px var(--shadow);
+            max-width: 1200px;
+            width: 100%;
+            line-height: 1.8;
         }
 
         .note-title {
@@ -70,6 +79,52 @@
             font-size: 1.4rem;
             margin: 25px 0 10px;
             color: var(--primary);
+        }
+
+        .note-body h4 {
+            font-size: 1.3rem;
+            margin: 20px 0 8px;
+            color: var(--primary);
+        }
+
+        .note-body blockquote {
+            background: rgba(var(--primary-rgb), 0.1);
+            border-left: 4px solid var(--primary);
+            padding: 15px 20px;
+            margin: 20px 0;
+            font-style: italic;
+            color: var(--text-secondary);
+        }
+
+        .note-body pre {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        .note-body code {
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .note-body ul {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+
+        .note-body li {
+            margin: 8px 0;
+        }
+
+        .note-body hr {
+            border: none;
+            border-top: 2px solid var(--glass-border);
+            margin: 30px 0;
         }
 
         .note-body p {
@@ -545,24 +600,70 @@
 
         // 格式化内容
         function formatContent(content) {
-            return content
-                .split('\n')
-                .map(line => {
-                    if (line.startsWith('### ')) {
-                        return `<h3>${line.substring(4)}</h3>`;
-                    } else if (line.startsWith('## ')) {
-                        return `<h2>${line.substring(3)}</h2>`;
-                    } else if (line.startsWith('# ')) {
-                        return `<h2>${line.substring(2)}</h2>`;
-                    } else if (line.startsWith('> ')) {
-                        return `<blockquote>${line.substring(2)}</blockquote>`;
-                    } else if (line.trim() === '') {
-                        return '<br>';
+            const lines = content.split('\n');
+            const html = [];
+            let inCodeBlock = false;
+            let codeLines = [];
+
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i];
+
+                // 代码块
+                if (line.startsWith('```')) {
+                    if (!inCodeBlock) {
+                        inCodeBlock = true;
+                        codeLines = [];
                     } else {
-                        return `<p>${line}</p>`;
+                        html.push(`<pre><code>${codeLines.join('\n')}</code></pre>`);
+                        inCodeBlock = false;
                     }
-                })
-                .join('');
+                    continue;
+                }
+
+                if (inCodeBlock) {
+                    codeLines.push(line);
+                    continue;
+                }
+
+                // 列表
+                if (line.match(/^\s*[-*+]\s/)) {
+                    if (html[html.length - 1]?.startsWith('<ul>')) {
+                        html[html.length - 1] += `<li>${line.replace(/^\s*[-*+]\s/, '')}</li>`;
+                    } else {
+                        html.push(`<ul><li>${line.replace(/^\s*[-*+]\s/, '')}</li></ul>`);
+                    }
+                    continue;
+                }
+
+                // 标题
+                if (line.startsWith('#### ')) {
+                    html.push(`<h4>${line.substring(5)}</h4>`);
+                } else if (line.startsWith('### ')) {
+                    html.push(`<h3>${line.substring(4)}</h3>`);
+                } else if (line.startsWith('## ')) {
+                    html.push(`<h2>${line.substring(3)}</h2>`);
+                } else if (line.startsWith('# ')) {
+                    html.push(`<h1>${line.substring(2)}</h1>`);
+                }
+                // 引用
+                else if (line.startsWith('> ')) {
+                    html.push(`<blockquote>${line.substring(2)}</blockquote>`);
+                }
+                // 分隔线
+                else if (line.trim() === '---') {
+                    html.push('<hr>');
+                }
+                // 空行
+                else if (line.trim() === '') {
+                    html.push('<br>');
+                }
+                // 普通段落
+                else {
+                    html.push(`<p>${line}</p>`);
+                }
+            }
+
+            return html.join('');
         }
 
         // 加载评论
