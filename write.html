@@ -10,25 +10,45 @@
     <style>
         .write-container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
         .write-title { font-size: 3rem; font-weight: 700; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-align: center; margin-bottom: 30px; }
-        .write-form { background: rgba(255,255,255,0.1); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 50px; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; color: #fff; font-weight: 600; }
-        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 15px; border: 2px solid rgba(255,255,255,0.2); border-radius: 10px; background: rgba(255,255,255,0.1); color: #fff; font-family: inherit; }
-        .form-group textarea { min-height: 400px; resize: vertical; }
-        .btn { padding: 15px 30px; border: none; border-radius: 10px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: 600; cursor: pointer; margin-top: 20px; }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .warning { background: rgba(248, 113, 113, 0.2); border: 1px solid #f87171; border-radius: 10px; padding: 15px; margin-bottom: 20px; color: #f87171; }
+        .write-form { background: rgba(255,255,255,0.1); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 40px; }
+        .form-group { margin-bottom: 25px; }
+        .form-group label { display: block; margin-bottom: 10px; color: #fff; font-weight: 600; font-size: 1.05rem; }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%; padding: 14px 16px; border: 2px solid rgba(255,255,255,0.2); border-radius: 10px;
+            background: rgba(255,255,255,0.1); color: #fff; font-family: inherit; font-size: 1rem;
+            box-sizing: border-box;
+        }
+        .form-group textarea { min-height: 450px; resize: vertical; }
+        .btn { padding: 15px 35px; border: none; border-radius: 10px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: 600; cursor: pointer; margin-top: 25px; font-size: 1.05rem; transition: all 0.3s ease; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .warning { background: rgba(74, 222, 128, 0.2); border: 1px solid #4ade80; border-radius: 10px; padding: 15px; margin-bottom: 25px; color: #4ade80; }
         .nav { margin-bottom: 30px; }
-        .nav a { color: #667eea; text-decoration: none; }
+        .nav a { color: #667eea; text-decoration: none; font-weight: 500; }
+        .html-editor-wrapper {
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            background: rgba(255,255,255,0.1);
+        }
         .html-editor-toolbar {
-            display: flex; gap: 8px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 10px 10px 0 0; border: 1px solid rgba(255,255,255,0.2); border-bottom: none;
+            display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 15px; background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid rgba(255,255,255,0.2);
         }
         .html-editor-toolbar button {
-            padding: 8px 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: #fff; cursor: pointer; transition: all 0.3s ease;
+            padding: 8px 14px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 6px; color: #fff; cursor: pointer; transition: all 0.3s ease; font-size: 0.95rem;
         }
-        .html-editor-toolbar button:hover { background: rgba(255,255,255,0.2); }
+        .html-editor-toolbar button:hover {
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-1px);
+        }
+        .html-editor-toolbar button:active {
+            transform: translateY(0);
+        }
         .html-editor {
-            min-height: 500px; padding: 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); border-radius: 0 0 10px 10px; color: #fff; line-height: 1.8; outline: none; overflow-y: auto;
+            min-height: 500px; padding: 25px; background: rgba(255,255,255,0.05); color: #fff;
+            line-height: 1.8; outline: none; overflow-y: auto; font-size: 1rem;
         }
         .html-editor:empty:before {
             content: attr(placeholder); color: var(--text-secondary);
@@ -38,9 +58,14 @@
         .html-editor ul, .html-editor ol { margin: 15px 0 15px 30px; }
         .html-editor li { margin: 8px 0; }
         .html-editor a { color: var(--primary); text-decoration: underline; }
-        .html-editor code { background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace; }
-        .html-editor pre { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; overflow-x: auto; }
+        .html-editor code { background: rgba(0,0,0,0.3); padding: 3px 8px; border-radius: 4px; font-family: 'Courier New', monospace; }
+        .html-editor pre { background: rgba(0,0,0,0.3); padding: 20px; border-radius: 8px; overflow-x: auto; margin: 20px 0; }
         .html-editor pre code { background: none; padding: 0; }
+        @media (max-width: 768px) {
+            .write-form { padding: 25px; }
+            .html-editor-toolbar { padding: 10px; }
+            .html-editor-toolbar button { padding: 6px 10px; font-size: 0.9rem; }
+        }
     </style>
 </head>
 <body data-theme="violet">
@@ -94,21 +119,23 @@
 
                 <div class="form-group" id="htmlContentGroup" style="display: none;">
                     <label><i class="fas fa-code"></i> 笔记内容（HTML）</label>
-                    <div class="html-editor-toolbar">
-                        <button type="button" onclick="document.execCommand('bold', false, null)"><i class="fas fa-bold"></i></button>
-                        <button type="button" onclick="document.execCommand('italic', false, null)"><i class="fas fa-italic"></i></button>
-                        <button type="button" onclick="document.execCommand('underline', false, null)"><i class="fas fa-underline"></i></button>
-                        <span style="margin: 0 8px; color: var(--text-secondary);">|</span>
-                        <button type="button" onclick="document.execCommand('formatBlock', false, 'h1')">H1</button>
-                        <button type="button" onclick="document.execCommand('formatBlock', false, 'h2')">H2</button>
-                        <button type="button" onclick="document.execCommand('formatBlock', false, 'h3')">H3</button>
-                        <span style="margin: 0 8px; color: var(--text-secondary);">|</span>
-                        <button type="button" onclick="document.execCommand('insertUnorderedList', false, null)"><i class="fas fa-list-ul"></i></button>
-                        <button type="button" onclick="document.execCommand('insertOrderedList', false, null)"><i class="fas fa-list-ol"></i></button>
-                        <span style="margin: 0 8px; color: var(--text-secondary);">|</span>
-                        <button type="button" onclick="document.execCommand('createLink', false, prompt('请输入链接URL:'))"><i class="fas fa-link"></i></button>
+                    <div class="html-editor-wrapper">
+                        <div class="html-editor-toolbar">
+                            <button type="button" onclick="document.execCommand('bold', false, null)"><i class="fas fa-bold"></i></button>
+                            <button type="button" onclick="document.execCommand('italic', false, null)"><i class="fas fa-italic"></i></button>
+                            <button type="button" onclick="document.execCommand('underline', false, null)"><i class="fas fa-underline"></i></button>
+                            <span style="margin: 0 8px; color: var(--text-secondary);">|</span>
+                            <button type="button" onclick="document.execCommand('formatBlock', false, 'h1')">H1</button>
+                            <button type="button" onclick="document.execCommand('formatBlock', false, 'h2')">H2</button>
+                            <button type="button" onclick="document.execCommand('formatBlock', false, 'h3')">H3</button>
+                            <span style="margin: 0 8px; color: var(--text-secondary);">|</span>
+                            <button type="button" onclick="document.execCommand('insertUnorderedList', false, null)"><i class="fas fa-list-ul"></i></button>
+                            <button type="button" onclick="document.execCommand('insertOrderedList', false, null)"><i class="fas fa-list-ol"></i></button>
+                            <span style="margin: 0 8px; color: var(--text-secondary);">|</span>
+                            <button type="button" onclick="document.execCommand('createLink', false, prompt('请输入链接URL:'))"><i class="fas fa-link"></i></button>
+                        </div>
+                        <div id="htmlContent" class="html-editor" contenteditable="true" placeholder="在这里编写您的HTML笔记..."></div>
                     </div>
-                    <div id="htmlContent" class="html-editor" contenteditable="true" placeholder="在这里编写您的HTML笔记..."></div>
                 </div>
 
                 <button type="submit" class="btn" id="submitBtn" disabled>
