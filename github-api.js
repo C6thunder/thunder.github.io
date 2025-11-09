@@ -44,7 +44,24 @@ class GitHubNoteManager {
 
     // 设置加密token配置（由Python脚本生成）
     setEncryptedConfig(encryptedConfig) {
-        this.encryptedConfig = encryptedConfig;
+        // 支持传递密码或配置对象
+        if (typeof encryptedConfig === 'string') {
+            this.encryptedConfig = { token: encryptedConfig };
+        } else {
+            this.encryptedConfig = encryptedConfig;
+        }
+    }
+
+    /**
+     * 获取解密密码
+     * 优先级：encryptedConfig.password > 默认密码
+     */
+    getDecryptionPassword() {
+        if (this.encryptedConfig && this.encryptedConfig.password) {
+            return this.encryptedConfig.password;
+        }
+        // 默认解密密码（可以修改为任意值）
+        return "PublicCommentToken2024";
     }
 
     // 解密并获取token
@@ -55,9 +72,9 @@ class GitHubNoteManager {
         }
 
         try {
-            // 公共解密密码（这里可以动态生成或从服务器获取）
-            // 注意：这是演示用，生产中应使用更安全的方式
-            const password = "PublicCommentToken2024";  // 可公开的密码，前端可看到
+            // 获取解密密码
+            const password = this.getDecryptionPassword();
+            console.log('🔑 使用解密密码:', password.replace(/./g, '*'));
 
             const encryptedData = this.encryptedConfig;
 
@@ -187,60 +204,91 @@ class GitHubNoteManager {
         this.validateConfig();
         const url = `${this.apiBase}/repos/${this.config.owner}/${this.config.repo}/contents/${path}?ref=${this.config.branch}`;
 
-        const response = await fetch(url, {
-            headers: this.getHeaders()
-        });
+        try {
+            const response = await fetch(url, {
+                headers: this.getHeaders()
+            });
 
-        if (response.status === 404) {
-            return null; // 文件不存在
+            if (response.status === 404) {
+                return null; // 文件不存在
+            }
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                // 只有在非404错误时才打印详细信息
+                if (response.status !== 404) {
+                    console.error('GitHub API错误:', {
+                        status: response.status,
+                        statusText: response.statusText,
+                        url: url,
+                        tokenPrefix: this.config.token ? this.config.token.substring(0, 10) + '...' : '未设置',
+                        error: errorText
+                    });
+                }
+                throw new Error(`获取文件失败: ${response.status} ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            return JSON.parse(atob(data.content));
+        } catch (error) {
+            // 只在非404错误时打印异常
+            if (error.message.indexOf('404') === -1) {
+                console.error('获取文件异常:', { path, error: error.message });
+            }
+            throw error;
         }
-
-        if (!response.ok) {
-            throw new Error(`获取文件失败: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        return JSON.parse(atob(data.content));
     }
 
     // 创建或更新文件
     async saveFile(path, content, message) {
         this.validateConfig();
 
-        // 先检查文件是否存在
-        const existing = await this.getFile(path);
-        const base64Content = btoa(JSON.stringify(content, null, 2));
+        try {
+            // 先检查文件是否存在
+            const existing = await this.getFile(path);
+            const base64Content = btoa(JSON.stringify(content, null, 2));
 
-        const url = `${this.apiBase}/repos/${this.config.owner}/${this.config.repo}/contents/${path}`;
+            const url = `${this.apiBase}/repos/${this.config.owner}/${this.config.repo}/contents/${path}`;
 
-        const body = {
-            message,
-            content: base64Content,
-            branch: this.config.branch
-        };
+            const body = {
+                message,
+                content: base64Content,
+                branch: this.config.branch
+            };
 
-        // 如果文件存在，需要包含sha
-        if (existing) {
-            const fileUrl = `${this.apiBase}/repos/${this.config.owner}/${this.config.repo}/contents/${path}?ref=${this.config.branch}`;
-            const fileResponse = await fetch(fileUrl, {
-                headers: this.getHeaders()
+            // 如果文件存在，需要包含sha
+            if (existing) {
+                const fileUrl = `${this.apiBase}/repos/${this.config.owner}/${this.config.repo}/contents/${path}?ref=${this.config.branch}`;
+                const fileResponse = await fetch(fileUrl, {
+                    headers: this.getHeaders()
+                });
+                const fileData = await fileResponse.json();
+                body.sha = fileData.sha;
+            }
+
+            const response = await fetch(url, {
+                method: 'PUT',
+                headers: this.getHeaders(),
+                body: JSON.stringify(body)
             });
-            const fileData = await fileResponse.json();
-            body.sha = fileData.sha;
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('保存文件失败:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    path: path,
+                    message: message,
+                    error: errorText
+                });
+                throw new Error(`保存文件失败: ${response.status} ${response.statusText}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('保存文件异常:', { path, error: error.message });
+            throw error;
         }
-
-        const response = await fetch(url, {
-            method: 'PUT',
-            headers: this.getHeaders(),
-            body: JSON.stringify(body)
-        });
-
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(`保存文件失败: ${error.message}`);
-        }
-
-        return await response.json();
     }
 
     // 保存笔记

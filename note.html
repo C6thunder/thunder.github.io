@@ -398,7 +398,8 @@
         window.setupEncryptedToken({
             token: "Z0FBQUFBQnBFTlVkUVJxc0drekFqX3ZuVWpMVnVybjNhenZYQmFWOFpJRVRVVHZLRGV5MkNYYTRzWXdsbnQ0aGVOWUlCMzZCN1FMUVU4MVNnTzZLQTNDeEIzN2FueUhXcHRMREo4UHF6OG5laFk1cjhlcXgyMFFpalRuVWtJZVNTZENLWE1zRmNudnQ=",
             salt: "zCmPbs_3fpLHY18z89mpnA==",
-            iterations: 100000
+            iterations: 100000,
+            password: "lei20060113"
         });
     </script>
 
@@ -629,6 +630,11 @@
             submitBtn.disabled = true;
 
             try {
+                // 测试GitHub连接
+                console.log('正在测试GitHub连接...');
+                await githubNoteManager.testConnection();
+                console.log('✅ GitHub连接成功');
+
                 // 创建评论对象
                 const comment = {
                     id: `comment-${Date.now()}`,
@@ -640,7 +646,9 @@
                 };
 
                 // 保存到GitHub
+                console.log('正在保存评论...');
                 await githubNoteManager.saveComment(comment);
+                console.log('✅ 评论保存成功');
 
                 // 同时保存到本地
                 comments.unshift(comment);
