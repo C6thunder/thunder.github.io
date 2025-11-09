@@ -48,6 +48,14 @@
                 </div>
 
                 <div class="form-group">
+                    <label><i class="fas fa-key"></i> 笔记密钥（可选）</label>
+                    <input type="password" id="noteKey" placeholder="设置后修改笔记需要此密钥（留空则允许所有人修改）">
+                    <small style="color: var(--text-secondary); display: block; margin-top: 5px;">
+                        <i class="fas fa-info-circle"></i> 可选：设置一个密码来保护您的笔记，修改时需要输入此密钥
+                    </small>
+                </div>
+
+                <div class="form-group">
                     <label><i class="fas fa-align-left"></i> 笔记内容</label>
                     <textarea id="noteContent" placeholder="在这里写下您的笔记...&#10;&#10;支持Markdown语法：&#10;# 一级标题&#10;## 二级标题&#10;- 列表项&#10;> 引用" required></textarea>
                 </div>
@@ -91,6 +99,7 @@
             const title = document.getElementById('noteTitle').value.trim();
             const tagsStr = document.getElementById('noteTags').value.trim();
             const content = document.getElementById('noteContent').value.trim();
+            const noteKey = document.getElementById('noteKey').value.trim();
 
             if (!title || !content) {
                 alert('请填写标题和内容');
@@ -112,7 +121,8 @@
                     date: new Date().toISOString().split('T')[0],
                     excerpt: content.substring(0, 100) + (content.length > 100 ? '...' : ''),
                     tags: tags,
-                    content: content
+                    content: content,
+                    authorKey: noteKey || null  // 存储加密后的密钥
                 };
 
                 await githubNoteManager.saveNote(note);

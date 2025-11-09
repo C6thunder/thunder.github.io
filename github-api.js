@@ -352,6 +352,31 @@ class GitHubNoteManager {
         return await this.saveFile('notes/notes.json', notesList, `Update notes list: add ${note.title}`);
     }
 
+    // 更新笔记
+    async updateNote(noteId, updatedNote) {
+        // 1. 更新单个笔记文件
+        const filename = `notes/${noteId}.json`;
+        const message = `Update note: ${updatedNote.title}`;
+        await this.saveFile(filename, updatedNote, message);
+
+        // 2. 更新notes.json中的笔记列表
+        let notesList = await this.getFile('notes/notes.json');
+        if (notesList && notesList.notes) {
+            const noteIndex = notesList.notes.findIndex(note => note.id === noteId);
+            if (noteIndex !== -1) {
+                // 更新列表中的笔记
+                notesList.notes[noteIndex] = {
+                    ...updatedNote,
+                    // 确保列表中只包含摘要信息，不需要完整content
+                    excerpt: updatedNote.excerpt || updatedNote.content.substring(0, 100) + (updatedNote.content.length > 100 ? '...' : '')
+                };
+                await this.saveFile('notes/notes.json', notesList, `Update notes list: modify ${updatedNote.title}`);
+            }
+        }
+
+        return { success: true };
+    }
+
     // 批量获取评论
     async getComments(noteId) {
         // TODO: 从comments目录读取所有评论并按noteId过滤

@@ -579,9 +579,19 @@
         // 渲染笔记
         function renderNote() {
             const noteContainer = document.getElementById('noteContainer');
+            const hasKey = currentNote.authorKey;
+
             noteContainer.innerHTML = `
                 <div class="note-content">
-                    <h1 class="note-title">${currentNote.title}</h1>
+                    <div class="note-title-section">
+                        <h1 class="note-title">${currentNote.title}</h1>
+                        <div class="note-actions">
+                            ${hasKey
+                                ? '<button class="action-btn edit-btn" onclick="showKeyForm()"><i class="fas fa-key"></i> 输入密钥</button>'
+                                : '<button class="action-btn edit-btn" onclick="showEditForm()"><i class="fas fa-edit"></i> 修改笔记</button>'
+                            }
+                        </div>
+                    </div>
                     <div class="note-meta">
                         <div class="note-date">
                             <i class="fas fa-calendar"></i>
@@ -595,6 +605,40 @@
                         ${formatContent(currentNote.content)}
                     </div>
                 </div>
+
+                ${!hasKey ? `
+                <div class="edit-form" id="editForm" style="display: none;">
+                    <h3><i class="fas fa-edit"></i> 修改笔记</h3>
+                    <div class="form-group">
+                        <label>标题</label>
+                        <input type="text" id="editTitle" value="${currentNote.title}">
+                    </div>
+                    <div class="form-group">
+                        <label>标签（用逗号分隔）</label>
+                        <input type="text" id="editTags" value="${currentNote.tags.join(', ')}">
+                    </div>
+                    <div class="form-group">
+                        <label>内容</label>
+                        <textarea id="editContent">${currentNote.content}</textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn" onclick="submitEdit()"><i class="fas fa-save"></i> 保存修改</button>
+                        <button class="btn btn-secondary" onclick="hideEditForm()"><i class="fas fa-times"></i> 取消</button>
+                    </div>
+                </div>
+                ` : `
+                <div class="key-form" id="keyForm" style="display: none;">
+                    <h3><i class="fas fa-key"></i> 输入笔记密钥</h3>
+                    <div class="form-group">
+                        <label>请输入修改密钥</label>
+                        <input type="password" id="noteKeyInput" placeholder="输入笔记密钥">
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn" onclick="verifyKey()"><i class="fas fa-unlock"></i> 验证密钥</button>
+                        <button class="btn btn-secondary" onclick="hideKeyForm()"><i class="fas fa-times"></i> 取消</button>
+                    </div>
+                </div>
+                `}
             `;
         }
 
@@ -890,6 +934,83 @@
                 setTimeout(() => {
                     body.style.transition = '';
                 }, 500);
+            }
+        }
+
+        // 显示修改表单
+        function showEditForm() {
+            const editForm = document.getElementById('editForm');
+            if (editForm) {
+                editForm.style.display = 'block';
+            }
+        }
+
+        // 隐藏修改表单
+        function hideEditForm() {
+            const editForm = document.getElementById('editForm');
+            if (editForm) {
+                editForm.style.display = 'none';
+            }
+        }
+
+        // 提交修改
+        async function submitEdit() {
+            const title = document.getElementById('editTitle').value.trim();
+            const tagsStr = document.getElementById('editTags').value.trim();
+            const content = document.getElementById('editContent').value.trim();
+
+            if (!title || !content) {
+                alert('请填写标题和内容');
+                return;
+            }
+
+            const tags = tagsStr ? tagsStr.split(',').map(t => t.trim()).filter(t => t) : [];
+
+            const updatedNote = {
+                ...currentNote,
+                title,
+                content,
+                tags,
+                excerpt: content.substring(0, 100) + (content.length > 100 ? '...' : ''),
+                date: new Date().toISOString().split('T')[0]
+            };
+
+            try {
+                await githubNoteManager.updateNote(currentNote.id, updatedNote);
+                alert('笔记修改成功！');
+                window.location.reload();
+            } catch (error) {
+                console.error('修改失败:', error);
+                alert('修改失败: ' + error.message);
+            }
+        }
+
+        // 显示密钥输入表单
+        function showKeyForm() {
+            const keyForm = document.getElementById('keyForm');
+            if (keyForm) {
+                keyForm.style.display = 'block';
+            }
+        }
+
+        // 隐藏密钥输入表单
+        function hideKeyForm() {
+            const keyForm = document.getElementById('keyForm');
+            if (keyForm) {
+                keyForm.style.display = 'none';
+            }
+        }
+
+        // 验证密钥
+        function verifyKey() {
+            const inputKey = document.getElementById('noteKeyInput').value.trim();
+
+            if (inputKey === currentNote.authorKey) {
+                hideKeyForm();
+                showEditForm();
+            } else {
+                alert('密钥错误！');
+                document.getElementById('noteKeyInput').value = '';
             }
         }
 
