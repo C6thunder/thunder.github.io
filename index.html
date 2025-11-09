@@ -4,10 +4,263 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>个人笔记网站 - 我的笔记</title>
+    <title>个人笔记网站 - 开始</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .start-container {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .main-title {
+            font-size: 5rem;
+            font-weight: 900;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease-in-out infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .subtitle {
+            font-size: 1.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 60px;
+            font-weight: 300;
+        }
+
+        .start-button-container {
+            margin: 80px 0;
+        }
+
+        .start-button {
+            position: relative;
+            padding: 25px 80px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 60px;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
+            transform: perspective(1000px);
+        }
+
+        .start-button::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb, #667eea);
+            background-size: 300% 300%;
+            border-radius: 60px;
+            z-index: -1;
+            animation: borderGradient 3s linear infinite;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        @keyframes borderGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .start-button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .start-button:hover::before {
+            opacity: 1;
+        }
+
+        .start-button:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.6);
+        }
+
+        .start-button:hover::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        .start-button:active {
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        .start-button i {
+            margin-left: 15px;
+            animation: arrowMove 1.5s ease-in-out infinite;
+        }
+
+        @keyframes arrowMove {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(10px); }
+        }
+
+        .features-preview {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 80px;
+            flex-wrap: wrap;
+        }
+
+        .feature-item {
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.7;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .feature-item:nth-child(2) .feature-icon {
+            animation-delay: 0.5s;
+        }
+
+        .feature-item:nth-child(3) .feature-icon {
+            animation-delay: 1s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .feature-text {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .floating-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .floating-particle {
+            position: absolute;
+            background: linear-gradient(135deg, #667eea, #f093fb);
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: floatAround 20s linear infinite;
+        }
+
+        @keyframes floatAround {
+            0% {
+                transform: translateY(100vh) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.1;
+            }
+            90% {
+                opacity: 0.1;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .version-badge {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            padding: 10px 20px;
+            border-radius: 20px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .footer-text {
+            margin-top: 100px;
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .footer-text i {
+            color: var(--danger);
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 3rem;
+            }
+
+            .subtitle {
+                font-size: 1.2rem;
+                margin-bottom: 40px;
+            }
+
+            .start-button {
+                padding: 20px 50px;
+                font-size: 1.3rem;
+            }
+
+            .features-preview {
+                gap: 20px;
+            }
+
+            .feature-icon {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-title {
+                font-size: 2rem;
+            }
+
+            .start-button {
+                padding: 18px 40px;
+                font-size: 1.1rem;
+            }
+        }
+    </style>
 </head>
 
 <body data-theme="violet">
@@ -20,129 +273,55 @@
     </div>
     <div class="particles" id="particles"></div>
 
-    <!-- 主题切换器 -->
-    <div class="theme-switcher">
-        <button class="theme-toggle-btn" id="themeToggle" title="切换主题">
-            <i class="fas fa-palette"></i>
-        </button>
-        <div class="theme-panel" id="themePanel">
-            <h3><i class="fas fa-magic"></i> 选择主题</h3>
-            <div class="theme-options">
-                <div class="theme-option" data-theme="violet" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" title="紫罗兰梦境">
-                    <div class="theme-label">紫罗兰</div>
-                </div>
-                <div class="theme-option" data-theme="cyber" style="background: linear-gradient(135deg, #00f0ff 0%, #ff00ff 100%);" title="霓虹赛博">
-                    <div class="theme-label">赛博</div>
-                </div>
-                <div class="theme-option" data-theme="minimal" style="background: linear-gradient(135deg, #ffffff 0%, #888888 100%);" title="极简黑白">
-                    <div class="theme-label">极简</div>
-                </div>
-                <div class="theme-option" data-theme="sunset" style="background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);" title="日落暖阳">
-                    <div class="theme-label">暖阳</div>
-                </div>
-                <div class="theme-option" data-theme="ocean" style="background: linear-gradient(135deg, #00bfff 0%, #1e90ff 100%);" title="深海幽蓝">
-                    <div class="theme-label">深海</div>
-                </div>
-            </div>
-        </div>
+    <!-- 浮动粒子背景 -->
+    <div class="floating-particles" id="floatingParticles"></div>
+
+    <!-- 版本标识 -->
+    <div class="version-badge">
+        v1.0.0
     </div>
 
     <div class="container">
-        <header class="header">
-            <div class="profile-section">
-                <div class="avatar-container">
-                    <img src="https://avatars.githubusercontent.com/u/000000?v=4" alt="个人头像" class="avatar" id="avatarImg">
-                    <div class="avatar-ring"></div>
-                </div>
-                <h1 class="title">
-                    <span class="title-gradient">我的个人笔记</span>
-                </h1>
-                <p class="subtitle" id="profileBio">分享知识，记录生活</p>
-                <div class="profile-stats">
-                    <div class="stat-item">
-                        <i class="fas fa-sticky-note"></i>
-                        <span id="noteCount">0</span>
-                        <label>篇笔记</label>
-                    </div>
-                    <div class="stat-item">
-                        <i class="fas fa-eye"></i>
-                        <span id="viewCount">0</span>
-                        <label>次阅读</label>
-                    </div>
-                </div>
-            </div>
-        </header>
+        <div class="start-container">
+            <h1 class="main-title">个人笔记</h1>
+            <p class="subtitle">记录思考，分享知识</p>
 
-        <div class="content-section">
-            <!-- 搜索栏 -->
-            <div class="search-container">
-                <div class="search-box">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" id="searchInput" placeholder="搜索笔记、标签或内容...">
-                    <button class="search-btn" id="searchBtn">
+            <div class="start-button-container">
+                <button class="start-button" id="startButton">
+                    开始探索
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+
+            <div class="features-preview">
+                <div class="feature-item">
+                    <div class="feature-icon">
                         <i class="fas fa-search"></i>
-                    </button>
+                    </div>
+                    <div class="feature-text">智能搜索</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-tags"></i>
+                    </div>
+                    <div class="feature-text">标签分类</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div class="feature-text">互动评论</div>
                 </div>
             </div>
 
-            <!-- 快捷操作 -->
-            <div class="quick-actions">
-                <a href="notes.html" class="action-card">
-                    <div class="action-icon">
-                        <i class="fas fa-book"></i>
-                    </div>
-                    <div class="action-content">
-                        <h3>所有笔记</h3>
-                        <p>浏览所有笔记内容</p>
-                    </div>
-                    <i class="fas fa-chevron-right"></i>
-                </a>
-
-                <button class="action-card" id="randomNoteBtn">
-                    <div class="action-icon">
-                        <i class="fas fa-random"></i>
-                    </div>
-                    <div class="action-content">
-                        <h3>随机笔记</h3>
-                        <p>发现有趣的内容</p>
-                    </div>
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-
-                <button class="action-card" id="recentNotesBtn">
-                    <div class="action-icon">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                    <div class="action-content">
-                        <h3>最近更新</h3>
-                        <p>查看最新笔记</p>
-                    </div>
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
-
-            <!-- 最近笔记 -->
-            <div class="section-header">
-                <h2><i class="fas fa-star"></i> 最近笔记</h2>
-                <a href="notes.html" class="view-all">查看全部 <i class="fas fa-arrow-right"></i></a>
-            </div>
-            <div class="notes-grid" id="recentNotes">
-                <div class="loading">加载中...</div>
-            </div>
-
-            <!-- 热门标签 -->
-            <div class="section-header">
-                <h2><i class="fas fa-tags"></i> 热门标签</h2>
-            </div>
-            <div class="tags-container" id="tagsContainer">
-                <div class="loading">加载中...</div>
-            </div>
+            <p class="footer-text">
+                Made with <i class="fas fa-heart"></i> for everyone
+            </p>
         </div>
     </div>
 
     <script src="script.js"></script>
 
-    <!-- 粒子效果 -->
     <script>
         // 背景粒子效果
         function createBackgroundParticles() {
@@ -227,132 +406,82 @@
             animate();
         }
 
-        // 搜索功能
-        function initSearch() {
-            const searchInput = document.getElementById('searchInput');
-            const searchBtn = document.getElementById('searchBtn');
+        // 创建浮动粒子
+        function createFloatingParticles() {
+            const container = document.getElementById('floatingParticles');
+            const particleCount = 15;
 
-            function performSearch() {
-                const query = searchInput.value.trim();
-                if (query) {
-                    window.location.href = `notes.html?search=${encodeURIComponent(query)}`;
-                }
-            }
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'floating-particle';
 
-            searchBtn.addEventListener('click', performSearch);
-            searchInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    performSearch();
-                }
-            });
-        }
+                const size = Math.random() * 20 + 10;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 15) + 's';
 
-        // 加载笔记数据
-        async function loadNotes() {
-            try {
-                // 从本地JSON文件加载笔记列表
-                const response = await fetch('./notes/notes.json');
-                const data = await response.json();
-
-                // 更新统计
-                document.getElementById('noteCount').textContent = data.notes.length;
-
-                // 显示最近笔记（前3篇）
-                const recentNotesContainer = document.getElementById('recentNotes');
-                if (data.notes.length === 0) {
-                    recentNotesContainer.innerHTML = '<div class="empty-state"><i class="fas fa-sticky-note"></i><p>暂无笔记</p></div>';
-                } else {
-                    const recentNotes = data.notes.slice(0, 3);
-                    recentNotesContainer.innerHTML = recentNotes.map(note => `
-                        <div class="note-card" onclick="location.href='note.html?id=${note.id}'">
-                            <div class="note-header">
-                                <h3>${note.title}</h3>
-                                <span class="note-date">${note.date}</span>
-                            </div>
-                            <p class="note-excerpt">${note.excerpt}</p>
-                            <div class="note-tags">
-                                ${note.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
-                            </div>
-                        </div>
-                    `).join('');
-                }
-
-                // 提取所有标签
-                const allTags = new Set();
-                data.notes.forEach(note => {
-                    note.tags.forEach(tag => allTags.add(tag));
-                });
-
-                // 显示标签（前10个）
-                const tagsContainer = document.getElementById('tagsContainer');
-                const topTags = Array.from(allTags).slice(0, 10);
-                if (topTags.length === 0) {
-                    tagsContainer.innerHTML = '<div class="empty-state"><i class="fas fa-tags"></i><p>暂无标签</p></div>';
-                } else {
-                    tagsContainer.innerHTML = topTags.map(tag => `
-                        <span class="tag-cloud" onclick="location.href='notes.html?tag=${encodeURIComponent(tag)}'">
-                            ${tag}
-                        </span>
-                    `).join('');
-                }
-
-            } catch (error) {
-                console.error('加载笔记失败:', error);
-                document.getElementById('recentNotes').innerHTML = '<div class="error-state"><i class="fas fa-exclamation-circle"></i><p>加载失败，请稍后重试</p></div>';
-                document.getElementById('tagsContainer').innerHTML = '<div class="error-state"><i class="fas fa-exclamation-circle"></i><p>加载失败</p></div>';
+                container.appendChild(particle);
             }
         }
 
-        // 主题切换器
-        function initThemeSwitcher() {
-            const themeToggle = document.getElementById('themeToggle');
-            const themePanel = document.getElementById('themePanel');
-            const themeOptions = document.querySelectorAll('.theme-option');
-            const body = document.body;
+        // 开始按钮点击事件
+        function initStartButton() {
+            const startButton = document.getElementById('startButton');
 
-            const savedTheme = localStorage.getItem('theme') || 'violet';
-            setTheme(savedTheme);
+            startButton.addEventListener('click', function(e) {
+                // 创建点击波纹效果
+                const ripple = document.createElement('span');
+                ripple.style.position = 'absolute';
+                ripple.style.borderRadius = '50%';
+                ripple.style.background = 'rgba(255, 255, 255, 0.6)';
+                ripple.style.transform = 'scale(0)';
+                ripple.style.animation = 'ripple 0.6s linear';
+                ripple.style.left = (e.offsetX - 10) + 'px';
+                ripple.style.top = (e.offsetY - 10) + 'px';
+                ripple.style.width = '20px';
+                ripple.style.height = '20px';
 
-            themeToggle.addEventListener('click', (e) => {
-                e.stopPropagation();
-                themePanel.classList.toggle('open');
-            });
+                this.appendChild(ripple);
 
-            themeOptions.forEach(option => {
-                option.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const theme = option.dataset.theme;
-                    setTheme(theme);
-                    themePanel.classList.remove('open');
-                });
-            });
+                setTimeout(() => ripple.remove(), 600);
 
-            document.addEventListener('click', () => {
-                themePanel.classList.remove('open');
-            });
-
-            function setTheme(theme) {
-                body.setAttribute('data-theme', theme);
-                localStorage.setItem('theme', theme);
-
-                themeOptions.forEach(opt => {
-                    opt.classList.toggle('active', opt.dataset.theme === theme);
-                });
-
-                body.style.transition = 'background 0.5s ease';
+                // 添加点击动画
+                this.style.transform = 'translateY(-2px) scale(1.02)';
                 setTimeout(() => {
-                    body.style.transition = '';
-                }, 500);
-            }
+                    this.style.transition = 'all 0.3s ease';
+                    this.style.transform = '';
+                }, 100);
+
+                // 延迟跳转以显示动画
+                setTimeout(() => {
+                    window.location.href = 'notes.html';
+                }, 300);
+            });
+        }
+
+        // 添加波纹动画样式
+        function addRippleAnimation() {
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes ripple {
+                    to {
+                        transform: scale(4);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
         }
 
         // 页面加载完成后初始化
         window.addEventListener('load', () => {
             createBackgroundParticles();
             initMouseFollowParticles();
-            initSearch();
-            loadNotes();
-            initThemeSwitcher();
+            createFloatingParticles();
+            initStartButton();
+            addRippleAnimation();
         });
     </script>
 </body>
