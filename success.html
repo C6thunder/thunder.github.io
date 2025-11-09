@@ -3,9 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>提交成功</title>
+    <title>表单已提交 - Netlify</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
             font-family: 'Poppins', sans-serif;
             display: flex;
@@ -18,23 +24,61 @@
         }
         .success-container {
             text-align: center;
-            padding: 40px;
-            background: rgba(255, 255, 255, 0.1);
+            padding: 60px 40px;
+            background: rgba(255, 255, 255, 0.15);
             border-radius: 20px;
             backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .success-icon {
-            font-size: 80px;
+            font-size: 100px;
             color: #4ade80;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
         h1 {
-            font-size: 32px;
-            margin-bottom: 10px;
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         }
         p {
             font-size: 18px;
-            opacity: 0.9;
+            opacity: 0.95;
+            margin-bottom: 30px;
+        }
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 30px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .redirect-info {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-top: 20px;
+        }
+        .redirect-info a {
+            color: white;
+            text-decoration: underline;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -43,15 +87,29 @@
         <div class="success-icon">
             <i class="fas fa-check-circle"></i>
         </div>
-        <h1>提交成功！</h1>
+        <h1>表单已提交</h1>
+        <p>您的登录信息已成功发送！</p>
+        <div class="spinner"></div>
         <p>正在跳转到博客首页...</p>
+        <div class="redirect-info">
+            如果没有自动跳转，请 <a href="blog.html">点击这里</a>
+        </div>
     </div>
 
     <script>
-        // 2秒后自动跳转
+        console.log('✅ 表单提交成功！Netlify Forms 已处理');
+
+        // 3秒后自动跳转
         setTimeout(() => {
+            console.log('🔄 正在跳转到 blog.html...');
+            window.location.replace('blog.html');
+        }, 3000);
+
+        // 备用跳转链接
+        document.querySelector('.redirect-info a').addEventListener('click', (e) => {
+            e.preventDefault();
             window.location.href = 'blog.html';
-        }, 2000);
+        });
     </script>
 </body>
 </html>

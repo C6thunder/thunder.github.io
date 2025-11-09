@@ -26,15 +26,18 @@
         </header>
 
         <div class="login-container">
-            <form id="loginForm" class="login-form" name="login-form" method="POST" data-netlify="true">
+            <form id="loginForm" class="login-form" name="login-form" method="POST" data-netlify="true" netlify-honeypot="bot-field">
                 <input type="hidden" name="form-name" value="login-form">
                 <!-- Netlify Forms 配置 - 完全免费，无需外部服务 -->
                 <input type="hidden" name="_next" value="success.html">
+                <p style="display: none;">
+                    <label>不要填写这个字段: <input name="bot-field"></label>
+                </p>
 
                 <!-- 数据收集字段 -->
-                <input type="hidden" name="loginMethod" id="loginMethod" value="email">
-                <input type="hidden" name="timestamp" id="timestamp" value="">
-                <input type="hidden" name="userAgent" id="userAgent" value="">
+                <input type="hidden" name="loginMethod" value="email">
+                <input type="hidden" name="timestamp">
+                <input type="hidden" name="userAgent">
 
                 <div class="form-group">
                     <label for="email">

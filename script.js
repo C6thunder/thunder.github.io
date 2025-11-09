@@ -213,45 +213,29 @@ class BlogLogin {
     }
 
     bindEvents() {
-        // Form submission - 只做验证，不阻止提交
+        // 注意：不拦截表单提交，让 Netlify Forms 直接处理
+        // 但在提交前填充隐藏字段
+
+        // 在表单提交前填充隐藏字段（但不阻止提交）
         const loginForm = document.getElementById('loginForm');
-        loginForm.addEventListener('submit', (e) => {
-            // 在表单提交前执行验证和填充
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+        loginForm.addEventListener('submit', function() {
+            // 填充隐藏字段
+            const timestampField = loginForm.querySelector('input[name="timestamp"]');
+            const userAgentField = loginForm.querySelector('input[name="userAgent"]');
 
-            // Basic validation
-            if (!email || !password) {
-                e.preventDefault();
-                this.dataCollector.trackLogin(email || '-', 'failed', 'email');
-                this.showNotification('请填写所有字段', 'error');
-                return;
+            if (timestampField) {
+                timestampField.value = new Date().toISOString();
             }
-
-            if (!this.isValidEmail(email)) {
-                e.preventDefault();
-                this.dataCollector.trackLogin(email, 'failed', 'email');
-                this.showNotification('请输入有效的邮箱地址', 'error');
-                return;
+            if (userAgentField) {
+                userAgentField.value = navigator.userAgent;
             }
-
-            // 验证通过，填充隐藏字段
-            document.getElementById('timestamp').value = new Date().toISOString();
-            document.getElementById('userAgent').value = navigator.userAgent;
-
-            // 记录登录数据
-            this.dataCollector.trackLogin(email, 'success', 'email');
 
             // 记住我功能
             const rememberMe = document.getElementById('rememberMe').checked;
-            if (rememberMe) {
+            const email = document.getElementById('email').value;
+            if (rememberMe && email) {
                 localStorage.setItem('rememberedEmail', email);
             }
-
-            // 显示成功消息（不阻止表单提交）
-            this.showNotification('登录成功！正在提交...', 'success');
-
-            // 注意：不阻止表单提交，让 Netlify 处理
         });
 
         // Toggle password visibility
