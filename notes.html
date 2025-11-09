@@ -376,7 +376,7 @@
             // 按标签筛选
             if (currentFilter) {
                 filteredNotes = filteredNotes.filter(note =>
-                    note.tags.includes(currentFilter)
+                    (note.tags || []).includes(currentFilter)
                 );
             }
 
@@ -384,26 +384,26 @@
             if (currentSearch) {
                 const query = currentSearch.toLowerCase();
                 filteredNotes = filteredNotes.filter(note =>
-                    note.title.toLowerCase().includes(query) ||
-                    note.excerpt.toLowerCase().includes(query) ||
-                    note.content.toLowerCase().includes(query) ||
-                    note.tags.some(tag => tag.toLowerCase().includes(query))
+                    (note.title || '').toLowerCase().includes(query) ||
+                    (note.excerpt || '').toLowerCase().includes(query) ||
+                    (note.content || '').toLowerCase().includes(query) ||
+                    (note.tags || []).some(tag => (tag || '').toLowerCase().includes(query))
                 );
             }
 
             // 排序
             switch (currentSort) {
                 case 'date-desc':
-                    filteredNotes.sort((a, b) => new Date(b.date) - new Date(a.date));
+                    filteredNotes.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
                     break;
                 case 'date-asc':
-                    filteredNotes.sort((a, b) => new Date(a.date) - new Date(b.date));
+                    filteredNotes.sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
                     break;
                 case 'title-asc':
-                    filteredNotes.sort((a, b) => a.title.localeCompare(b.title));
+                    filteredNotes.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
                     break;
                 case 'title-desc':
-                    filteredNotes.sort((a, b) => b.title.localeCompare(a.title));
+                    filteredNotes.sort((a, b) => (b.title || '').localeCompare(a.title || ''));
                     break;
             }
 
@@ -432,12 +432,12 @@
             notesGrid.innerHTML = pageNotes.map(note => `
                 <div class="note-card" onclick="location.href='note.html?id=${note.id}'">
                     <div class="note-header">
-                        <h3>${note.title}</h3>
-                        <span class="note-date">${note.date}</span>
+                        <h3>${note.title || '无标题'}</h3>
+                        <span class="note-date">${note.date || ''}</span>
                     </div>
-                    <p class="note-excerpt">${note.excerpt}</p>
+                    <p class="note-excerpt">${note.excerpt || '无摘要'}</p>
                     <div class="note-tags">
-                        ${note.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                        ${(note.tags || []).map(tag => `<span class="tag">${tag}</span>`).join('')}
                     </div>
                     <div class="note-footer">
                         <span class="read-more">
