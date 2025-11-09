@@ -346,7 +346,14 @@
 
                 tags.forEach(tag => {
                     const activeClass = currentFilter === tag ? 'active' : '';
-                    html += `<span class="tag ${activeClass}" data-tag="${tag}">${tag}</span>`;
+                    // 转义特殊字符，防止XSS和乱码
+                    const escapedTag = tag
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#39;');
+                    html += `<span class="tag ${activeClass}" data-tag="${tag}">${escapedTag}</span>`;
                 });
 
                 filterTagsContainer.innerHTML = html;
@@ -430,15 +437,26 @@
             const end = start + notesPerPage;
             const pageNotes = validNotes.slice(start, end);
 
+            // 转义HTML特殊字符
+            const escapeHtml = (str) => {
+                if (!str) return '';
+                return str
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
+            };
+
             notesGrid.innerHTML = pageNotes.map(note => `
                 <div class="note-card" onclick="location.href='note.html?id=${note.id}'">
                     <div class="note-header">
-                        <h3>${note.title || '无标题'}</h3>
-                        <span class="note-date">${note.date || ''}</span>
+                        <h3>${escapeHtml(note.title) || '无标题'}</h3>
+                        <span class="note-date">${escapeHtml(note.date) || ''}</span>
                     </div>
-                    <p class="note-excerpt">${note.excerpt || '无摘要'}</p>
+                    <p class="note-excerpt">${escapeHtml(note.excerpt) || '无摘要'}</p>
                     <div class="note-tags">
-                        ${(note.tags || []).map(tag => `<span class="tag">${tag}</span>`).join('')}
+                        ${(note.tags || []).map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('')}
                     </div>
                     <div class="note-footer">
                         <span class="read-more">
