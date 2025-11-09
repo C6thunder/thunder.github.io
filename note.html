@@ -10,20 +10,20 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .note-content-container {
-            max-width: 1400px;
+            max-width: 1800px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 0 40px;
         }
 
         .note-content {
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 60px 80px;
-            margin: 30px 0;
+            border-radius: 24px;
+            padding: 70px 90px;
+            margin: 40px 0;
             border: 1px solid var(--glass-border);
-            box-shadow: 0 8px 32px var(--shadow);
-            max-width: 1400px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 1800px;
             width: 100%;
             line-height: 1.8;
         }
@@ -409,9 +409,28 @@
             opacity: 0.5;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 1600px) {
+            .note-content-container {
+                padding: 0 30px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .note-content-container {
+                padding: 0 25px;
+            }
             .note-content {
-                padding: 20px;
+                padding: 50px 60px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .note-content-container {
+                padding: 0 15px;
+            }
+            .note-content {
+                padding: 30px 25px;
+                margin: 20px 0;
             }
 
             .note-title {

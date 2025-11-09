@@ -121,7 +121,7 @@
     <script src="github-api.js"></script>
 
     <script>
-        // 添加last-update样式
+        // 添加自定义样式
         const style = document.createElement('style');
         style.textContent = `
             .last-update {
@@ -138,6 +138,29 @@
             @keyframes spin {
                 from { transform: rotate(0deg); }
                 to { transform: rotate(360deg); }
+            }
+            /* 宽屏笔记网格优化 */
+            .notes-grid {
+                grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+                gap: 25px;
+                margin: 30px 0;
+                max-width: 1800px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            .note-card {
+                padding: 30px;
+                min-height: 220px;
+            }
+            @media (max-width: 1600px) {
+                .notes-grid {
+                    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+                }
+            }
+            @media (max-width: 1200px) {
+                .notes-grid {
+                    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                }
             }
         `;
         document.head.appendChild(style);
