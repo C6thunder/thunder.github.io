@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>快速恢复笔记 - 个人笔记网站</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: white;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #fff 0%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subtitle {
+            text-align: center;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+        .status {
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .status-item {
+            margin-bottom: 8px;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        .status-pending {
+            background: rgba(255,255,255,0.1);
+        }
+        .status-success {
+            background: rgba(74, 222, 128, 0.2);
+            color: #4ade80;
+        }
+        .status-error {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+        .progress {
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .progress-bar {
+            width: 0%;
+            height: 30px;
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+            border-radius: 15px;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        .actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .note-list {
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .note-list h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #4ade80;
+        }
+        .note-item {
+            padding: 10px 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border-left: 3px solid #667eea;
+        }
+        .note-title {
+            font-weight: 600;
+            color: #fff;
+        }
+        .note-meta {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.6);
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1><i class="fas fa-sync"></i> 快速恢复笔记</h1>
+        <p class="subtitle">使用新的正确UTF-8编码方法恢复所有笔记</p>
+
+        <div class="note-list">
+            <h3><i class="fas fa-list"></i> 将要恢复的笔记</h3>
+            <div id="noteList"></div>
+        </div>
+
+        <div class="progress">
+            <div class="progress-bar" id="progressBar">0%</div>
+        </div>
+
+        <div class="status" id="statusLog">
+            准备开始恢复...
+        </div>
+
+        <div class="actions">
+            <button class="btn" id="startBtn">
+                <i class="fas fa-play"></i> 开始恢复
+            </button>
+            <button class="btn" id="viewBtn" style="display: none;">
+                <i class="fas fa-eye"></i> 查看所有笔记
+            </button>
+        </div>
+    </div>
+
+    <script src="github-api.js"></script>
+    <script>
+        // 配置加密token
+        window.setupEncryptedToken({
+            token: "lNR9YHMTLt0NT4G74I8p3qDY+Qxf7XJAf1ZupELPZpORCw+VQyk7wQ4JIN467U1t3bpXCwa/PKW+H89k7sUFL2mtyU+74rof+MkdLfBTWLFRl4ABnitXNeG4fNo0PToItXVIGvotqhIEJbdWnw==",
+            iv: "qNWMHi6UqGFcdWee",
+            salt: "P3RiVIlxU1RLiUV8YbefVQ==",
+            iterations: 100000,
+            password: "lei20060113"
+        });
+
+        const notesToRestore = [
+            {
+                id: "note-001",
+                title: "我的第一篇笔记",
+                date: "2025-11-10",
+                excerpt: "欢迎来到我的个人笔记网站！这里是第一篇笔记，介绍网站的基本功能和使用方法。",
+                tags: ["入门", "介绍"],
+                content: "# 欢迎使用个人笔记网站\n\n这是我的第一篇笔记！\n\n## 主要功能\n\n- 查看所有笔记\n- 搜索笔记内容\n- 发表评论\n- 多主题切换\n\n## 使用方法\n\n您可以：\n\n1. 浏览所有笔记\n2. 点击标签筛选内容\n3. 在笔记页面发表评论\n\n希望您喜欢这个网站！\n\n> 持续更新中...",
+                authorKey: null,
+                type: "markdown"
+            },
+            {
+                id: "note-002",
+                title: "学习笔记：JavaScript基础",
+                date: "2025-11-09",
+                excerpt: "整理了JavaScript的核心概念，包括变量、函数、对象等基础知识点。",
+                tags: ["JavaScript", "编程", "学习"],
+                content: "# JavaScript 基础学习笔记\n\n## 变量声明\n\nJavaScript中有三种声明变量的方式：\n\n### 1. var\n- 函数作用域\n- 可以重复声明\n- 有变量提升\n\n### 2. let\n- 块级作用域\n- 不能重复声明\n- 暂存死区\n\n### 3. const\n- 块级作用域\n- 必须初始化\n- 不能重新赋值\n\n## 函数\n\n函数是JavaScript的基础构件。\n\n### 函数声明\n\n```javascript\nfunction greet(name) {\n    return `Hello, ${name}!`;\n}\n```\n\n### 箭头函数\n\n```javascript\nconst greet = (name) => `Hello, ${name}!`;\n```\n\n## 对象\n\n对象是JavaScript中重要的数据结构。\n\n```javascript\nconst person = {\n    name: '张三',\n    age: 25,\n    greet() {\n        return `Hello, I'm ${this.name}`;\n    }\n};\n```\n\n## 总结\n\n掌握这些基础知识对学习JavaScript非常重要。\n\n> 持续学习中...",
+                authorKey: "js2024",
+                type: "markdown"
+            },
+            {
+                id: "note-003",
+                title: "读书笔记：《代码整洁之道》",
+                date: "2025-11-08",
+                excerpt: "读后感和关键要点总结，学习如何编写高质量的代码。",
+                tags: ["读书", "编程", "最佳实践"],
+                content: "# 《代码整洁之道》读书笔记\n\n## 核心思想\n\n> 代码质量与整洁度直接影响项目的可维护性。\n\n## 关键原则\n\n### 1. 有意义的命名\n\n- 使用能表达意图的名字\n- 避免使用误导性的名称\n- 区分概念不同的变量\n\n### 2. 函数设计\n\n- 保持函数短小\n- 一个函数只做一件事\n- 减少参数数量\n\n### 3. 注释\n\n- 最好的注释是好的代码\n- 解释为什么，而不是是什么\n- 避免注释重复的代码\n\n### 4. 代码格式\n\n- 保持一致的格式\n- 合理的空行使用\n- 团队遵守相同的规范\n\n## 实践建议\n\n1. **TDD（测试驱动开发）**\n   - 先写测试，再写实现\n   - 确保代码质量\n\n2. **重构**\n   - 持续改进代码\n   - 小步快跑\n\n3. **代码审查**\n   - 团队合作\n   - 知识共享\n\n## 总结\n\n编写整洁的代码是一种习惯，需要持续练习。\n\n> 让我们一起成为更好的程序员！",
+                authorKey: "clean-code",
+                type: "markdown"
+            },
+            {
+                id: "note-004",
+                title: "Git使用指南",
+                date: "2025-11-07",
+                excerpt: "Git版本控制系统的常用命令和最佳实践，适合初学者学习。",
+                tags: ["Git", "工具", "版本控制"],
+                content: "# Git 使用指南\n\n## 基本概念\n\nGit是一个分布式版本控制系统。\n\n### 三个区域\n\n1. **工作区（Working Directory）**\n   - 实际的文件目录\n\n2. **暂存区（Staging Area）**\n   - 临时存储将要提交的文件\n\n3. **版本库（Repository）**\n   - 存储所有版本信息\n\n## 常用命令\n\n### 初始化仓库\n\n```bash\ngit init\n```\n\n### 克隆仓库\n\n```bash\ngit clone [url]\n```\n\n### 添加文件\n\n```bash\ngit add [file]\ngit add .\n```\n\n### 提交更改\n\n```bash\ngit commit -m \"提交信息\"\n```\n\n### 查看状态\n\n```bash\ngit status\n```\n\n### 查看历史\n\n```bash\ngit log\n```\n\n### 分支操作\n\n```bash\n# 创建分支\ngit branch [branch-name]\n\n# 切换分支\ngit checkout [branch-name]\n\n# 创建并切换\ngit checkout -b [branch-name]\n```\n\n### 合并分支\n\n```bash\ngit merge [branch]\n```\n\n### 推送远程\n\n```bash\ngit push origin [branch]\n```\n\n### 拉取更新\n\n```bash\ngit pull\n```\n\n## 最佳实践\n\n1. **频繁提交**\n   - 小步提交，便于回滚\n\n2. **清晰的提交信息**\n   - 使用规范化的格式\n   - 说明变更原因\n\n3. **使用分支**\n   - 功能开发使用独立分支\n   - 保护主分支\n\n4. **代码审查**\n   - Pull Request机制\n   - 团队协作\n\n## 总结\n\n掌握Git是程序员的必备技能，多练习才能熟练运用。\n\n> Keep coding!",
+                authorKey: "git2024",
+                type: "markdown"
+            },
+            {
+                id: "note-005",
+                title: "我的兴趣爱好",
+                date: "2025-11-06",
+                excerpt: "记录平时喜欢做的事情，包括阅读、音乐、运动等。",
+                tags: ["生活", "兴趣", "个人"],
+                content: "# 我的兴趣爱好\n\n## 阅读\n\n我喜欢阅读各种类型的书籍：\n\n### 技术类\n- 编程相关书籍\n- 技术博客\n- 开源项目文档\n\n### 文学类\n- 小说\n- 诗歌\n- 散文\n\n> 阅读让我开拓视野，增长知识。\n\n## 音乐\n\n音乐是我的精神食粮：\n\n### 喜欢的类型\n- 古典音乐\n- 轻音乐\n- 流行音乐\n\n### 学习乐器\n正在学习吉他，体会到音乐的魅力。\n\n## 运动\n\n保持健康的身体很重要：\n\n1. **跑步**\n   - 每周3-4次\n   - 增强体质\n\n2. **游泳**\n   - 全身运动\n   - 锻炼心肺\n\n3. **瑜伽**\n   - 放松身心\n   - 提高柔韧性\n\n## 总结\n\n培养多样的兴趣爱好，让生活更加丰富多彩。\n\n> 保持好奇心，持续学习！",
+                authorKey: null,
+                type: "markdown"
+            },
+            {
+                id: "note-1762717409057",
+                title: "测试笔记",
+                date: "2025-11-09",
+                excerpt: "这是一个测试笔记",
+                tags: ["测试"],
+                content: "测试内容",
+                authorKey: "ts",
+                type: "markdown"
+            }
+        ];
+
+        let currentIndex = 0;
+        let successCount = 0;
+        let failedCount = 0;
+
+        function updateStatus(message, type = 'pending') {
+            const statusLog = document.getElementById('statusLog');
+            const div = document.createElement('div');
+            div.className = `status-item status-${type}`;
+            const timestamp = new Date().toLocaleTimeString('zh-CN');
+            div.innerHTML = `<strong>[${timestamp}]</strong> ${message}`;
+            statusLog.appendChild(div);
+            statusLog.scrollTop = statusLog.scrollHeight;
+        }
+
+        function updateProgress() {
+            const percent = Math.round((currentIndex / notesToRestore.length) * 100);
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = percent + '%';
+            progressBar.textContent = percent + '% (' + currentIndex + '/' + notesToRestore.length + ')';
+        }
+
+        function renderNoteList() {
+            const noteList = document.getElementById('noteList');
+            noteList.innerHTML = notesToRestore.map(note => `
+                <div class="note-item">
+                    <div class="note-title">${note.title}</div>
+                    <div class="note-meta">标签: ${note.tags.join(', ')} | 日期: ${note.date}</div>
+                </div>
+            `).join('');
+        }
+
+        async function restoreNote(note) {
+            try {
+                updateStatus(`正在恢复: ${note.title}`, 'pending');
+
+                // 使用正确的方法保存笔记
+                const timestamp = Date.now();
+                const noteWithId = {
+                    ...note,
+                    id: note.id
+                };
+
+                await githubNoteManager.saveNote(noteWithId);
+                await githubNoteManager.updateNotesList(noteWithId);
+
+                successCount++;
+                updateStatus(`✅ 成功恢复: ${note.title}`, 'success');
+                return true;
+            } catch (error) {
+                failedCount++;
+                updateStatus(`❌ 恢复失败: ${note.title} - ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function startRestore() {
+            const startBtn = document.getElementById('startBtn');
+            startBtn.disabled = true;
+            startBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 恢复中...';
+
+            updateStatus('=== 开始恢复笔记 ===', 'pending');
+
+            for (let i = 0; i < notesToRestore.length; i++) {
+                currentIndex = i + 1;
+                const note = notesToRestore[i];
+                await restoreNote(note);
+                updateProgress();
+
+                // 添加小延迟避免API限制
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+
+            updateStatus('=== 恢复完成 ===', 'pending');
+            updateStatus(`✅ 成功: ${successCount} 个`, 'success');
+            updateStatus(`❌ 失败: ${failedCount} 个`, failedCount > 0 ? 'error' : 'success');
+            updateStatus('可以点击"查看所有笔记"按钮浏览笔记', 'success');
+
+            startBtn.style.display = 'none';
+            document.getElementById('viewBtn').style.display = 'inline-block';
+        }
+
+        // 页面加载时显示笔记列表
+        window.addEventListener('load', () => {
+            renderNoteList();
+            updateStatus('准备就绪，点击开始恢复按钮', 'pending');
+        });
+
+        document.getElementById('startBtn').addEventListener('click', startRestore);
+        document.getElementById('viewBtn').addEventListener('click', () => {
+            window.location.href = 'notes.html';
+        });
+
+        // token加载完成后提示
+        window.addEventListener('tokenLoaded', () => {
+            updateStatus('✅ GitHub token 加载成功', 'success');
+        });
+    </script>
+</body>
+
+</html>

@@ -147,26 +147,35 @@ class GitHubNoteManager {
         return new TextEncoder().encode(str);
     }
 
-    // 辅助函数：UTF-8字符串直接转base64
+    // 辅助函数：UTF-8转base64
     utf8ToBase64(str) {
-        const bytes = new TextEncoder().encode(str);
-        let binary = '';
-        for (let i = 0; i < bytes.length; i++) {
-            binary += String.fromCharCode(bytes[i]);
-        }
-        return btoa(binary);
-    }
-
-    // 辅助函数：base64转UTF-8字符串
-    base64ToUtf8(base64) {
-        const bytes = this.base64ToBytes(base64);
-        if (bytes.length === 0) {
+        try {
+            // 使用现代API：TextEncoder
+            const bytes = new TextEncoder().encode(str);
+            let binary = '';
+            for (let i = 0; i < bytes.length; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return btoa(binary);
+        } catch (error) {
+            console.error('编码失败:', error);
             return '';
         }
+    }
+
+    // 辅助函数：base64转UTF-8
+    base64ToUtf8(base64) {
         try {
+            // 解码base64为二进制字符串
+            const binary = atob(base64);
+            const bytes = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i++) {
+                bytes[i] = binary.charCodeAt(i);
+            }
+            // 使用TextDecoder解码为UTF-8字符串
             return new TextDecoder('utf-8').decode(bytes);
         } catch (error) {
-            console.error('UTF-8解码失败:', error);
+            console.error('解码失败:', error);
             return '';
         }
     }
