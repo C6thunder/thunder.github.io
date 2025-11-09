@@ -98,7 +98,8 @@
             padding: 0;
         }
 
-        .note-body ul, .note-body ol {
+        .note-body ul,
+        .note-body ol {
             margin: 15px 0 15px 30px;
         }
 
@@ -307,19 +308,24 @@
         <div class="theme-panel" id="themePanel">
             <h3><i class="fas fa-magic"></i> 选择主题</h3>
             <div class="theme-options">
-                <div class="theme-option" data-theme="violet" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" title="紫罗兰梦境">
+                <div class="theme-option" data-theme="violet"
+                    style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" title="紫罗兰梦境">
                     <div class="theme-label">紫罗兰</div>
                 </div>
-                <div class="theme-option" data-theme="cyber" style="background: linear-gradient(135deg, #00f0ff 0%, #ff00ff 100%);" title="霓虹赛博">
+                <div class="theme-option" data-theme="cyber"
+                    style="background: linear-gradient(135deg, #00f0ff 0%, #ff00ff 100%);" title="霓虹赛博">
                     <div class="theme-label">赛博</div>
                 </div>
-                <div class="theme-option" data-theme="minimal" style="background: linear-gradient(135deg, #ffffff 0%, #888888 100%);" title="极简黑白">
+                <div class="theme-option" data-theme="minimal"
+                    style="background: linear-gradient(135deg, #ffffff 0%, #888888 100%);" title="极简黑白">
                     <div class="theme-label">极简</div>
                 </div>
-                <div class="theme-option" data-theme="sunset" style="background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);" title="日落暖阳">
+                <div class="theme-option" data-theme="sunset"
+                    style="background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);" title="日落暖阳">
                     <div class="theme-label">暖阳</div>
                 </div>
-                <div class="theme-option" data-theme="ocean" style="background: linear-gradient(135deg, #00bfff 0%, #1e90ff 100%);" title="深海幽蓝">
+                <div class="theme-option" data-theme="ocean"
+                    style="background: linear-gradient(135deg, #00bfff 0%, #1e90ff 100%);" title="深海幽蓝">
                     <div class="theme-label">深海</div>
                 </div>
             </div>
@@ -360,7 +366,8 @@
                         <div class="form-group">
                             <label for="commentAuthor">昵称（可选）</label>
                             <input type="text" id="commentAuthor" placeholder="请输入您的昵称（或留空）">
-                            <small style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 5px; display: block;">
+                            <small
+                                style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 5px; display: block;">
                                 <i class="fas fa-info-circle"></i> 可匿名评论，不填写昵称将以"匿名用户"显示
                             </small>
                         </div>
@@ -388,24 +395,20 @@
     <script src="github-api.js"></script>
 
     <script>
+        window.setupEncryptedToken({
+            token: "Z0FBQUFBQnBFTlVkUVJxc0drekFqX3ZuVWpMVnVybjNhenZYQmFWOFpJRVRVVHZLRGV5MkNYYTRzWXdsbnQ0aGVOWUlCMzZCN1FMUVU4MVNnTzZLQTNDeEIzN2FueUhXcHRMREo4UHF6OG5laFk1cjhlcXgyMFFpalRuVWtJZVNTZENLWE1zRmNudnQ=",
+            salt: "zCmPbs_3fpLHY18z89mpnA==",
+            iterations: 100000
+        });
+    </script>
+
+    <script>
         // 全局变量
         let currentNote = null;
         let comments = [];
 
-        // 检查GitHub配置
+        // 加载仓库配置（仅用于显示，不使用本地token）
         githubNoteManager.loadConfig();
-        if (!githubNoteManager.config.owner || !githubNoteManager.config.repo || !githubNoteManager.config.token) {
-            // 如果未配置，显示提示
-            setTimeout(() => {
-                const nav = document.querySelector('.header-nav');
-                if (nav) {
-                    const tip = document.createElement('div');
-                    tip.style.cssText = 'background: #fbbf24; color: #000; padding: 8px 15px; border-radius: 5px; margin-left: 10px; font-size: 0.85rem;';
-                    tip.innerHTML = '<i class="fas fa-exclamation-triangle"></i> 请先 <a href="setup.html" style="color: #000; text-decoration: underline;">配置GitHub</a>';
-                    nav.appendChild(tip);
-                }
-            }, 500);
-        }
 
         // 背景粒子效果
         function createBackgroundParticles() {
@@ -617,13 +620,7 @@
                 return;
             }
 
-            // 检查GitHub配置
-            githubNoteManager.loadConfig();
-            if (!githubNoteManager.config.owner || !githubNoteManager.config.repo || !githubNoteManager.config.token) {
-                alert('请先在设置页面配置GitHub信息');
-                window.location.href = 'setup.html';
-                return;
-            }
+            // 现在使用加密token，无需用户配置
 
             // 显示提交中状态
             const submitBtn = document.querySelector('.submit-btn');
@@ -661,7 +658,7 @@
 
             } catch (error) {
                 console.error('评论提交失败:', error);
-                alert('评论提交失败: ' + error.message + '\\n\\n请检查GitHub配置。');
+                alert('评论提交失败: ' + error.message + '\\n\\n请稍后重试或联系管理员。');
             } finally {
                 // 恢复按钮状态
                 submitBtn.innerHTML = originalText;
