@@ -126,6 +126,20 @@ class GitHubNoteManager {
         }
     }
 
+    // 辅助函数：字符串转UTF-8字节数组
+    stringToBytes(str) {
+        return new TextEncoder().encode(str);
+    }
+
+    // 辅助函数：字节数组转base64
+    bytesToBase64(bytes) {
+        let binary = '';
+        for (let i = 0; i < bytes.length; i++) {
+            binary += String.fromCharCode(bytes[i]);
+        }
+        return btoa(binary);
+    }
+
     // 辅助函数：base64转字节数组
     base64ToBytes(base64) {
         try {
@@ -246,7 +260,8 @@ class GitHubNoteManager {
         try {
             // 先检查文件是否存在
             const existing = await this.getFile(path);
-            const base64Content = btoa(JSON.stringify(content, null, 2));
+            const jsonString = JSON.stringify(content, null, 2);
+            const base64Content = this.bytesToBase64(this.stringToBytes(jsonString));
 
             const url = `${this.apiBase}/repos/${this.config.owner}/${this.config.repo}/contents/${path}`;
 
