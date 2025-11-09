@@ -390,4 +390,22 @@ window.setupEncryptedToken = function (encryptedConfig) {
 };
 
 // 导出给全局使用
-window.githubNoteManager = githubNoteManager;
+try {
+    window.githubNoteManager = githubNoteManager;
+
+    // 验证导出是否成功
+    if (typeof window.githubNoteManager === 'undefined') {
+        console.error('❌ 导出 githubNoteManager 失败');
+    } else {
+        console.log('✅ GitHub Note Manager 已成功加载');
+    }
+} catch (error) {
+    console.error('❌ 加载 GitHub API 时出错:', error);
+}
+
+// 添加全局错误处理
+window.addEventListener('error', function(e) {
+    if (e.filename && e.filename.includes('github-api.js')) {
+        console.error('❌ GitHub API 脚本错误:', e.error);
+    }
+});
