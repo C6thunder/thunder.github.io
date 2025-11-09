@@ -147,19 +147,16 @@ class GitHubNoteManager {
         return new TextEncoder().encode(str);
     }
 
-    // 辅助函数：字节数组转base64 (强制UTF-8)
+    // 辅助函数：字节数组转base64
     bytesToBase64(bytes) {
-        // 使用更安全的方法处理UTF-8字节
         let binary = '';
-        const chunkSize = 0x8000; // 32KB chunks
-        for (let i = 0; i < bytes.length; i += chunkSize) {
-            const chunk = bytes.subarray(i, i + chunkSize);
-            binary += String.fromCharCode.apply(null, chunk);
+        for (let i = 0; i < bytes.length; i++) {
+            binary += String.fromCharCode(bytes[i]);
         }
         return btoa(binary);
     }
 
-    // 辅助函数：base64转字节数组 (强制UTF-8)
+    // 辅助函数：base64转字节数组
     base64ToBytes(base64) {
         try {
             // 转换urlsafe base64为标准base64
@@ -170,24 +167,11 @@ class GitHubNoteManager {
                 base64 += '=';
             }
 
-            // 解码为二进制字符串
+            // 解码
             const binaryString = atob(base64);
             const bytes = new Uint8Array(binaryString.length);
-
-            // 安全地转换每个字符为字节
             for (let i = 0; i < binaryString.length; i++) {
-                const charCode = binaryString.charCodeAt(i);
-                if (charCode > 255) {
-                    // 如果遇到非Latin1字符，使用更安全的方法
-                    const binary = btoa(binaryString);
-                    const rawBytes = atob(binary);
-                    const result = new Uint8Array(rawBytes.length);
-                    for (let j = 0; j < rawBytes.length; j++) {
-                        result[j] = rawBytes.charCodeAt(j);
-                    }
-                    return result;
-                }
-                bytes[i] = charCode;
+                bytes[i] = binaryString.charCodeAt(i);
             }
             return bytes;
         } catch (error) {
@@ -234,34 +218,6 @@ class GitHubNoteManager {
         };
     }
 
-    // 清理和验证内容，确保UTF-8安全
-    sanitizeContent(content) {
-        // 递归清理对象中的所有字符串
-        if (typeof content === 'string') {
-            // 确保字符串是有效的UTF-8
-            try {
-                const encoder = new TextEncoder();
-                const decoder = new TextDecoder('utf-8', { fatal: false });
-                const bytes = encoder.encode(content);
-                return decoder.decode(bytes);
-            } catch (e) {
-                // 如果失败，尝试重新编码
-                return new TextDecoder().decode(
-                    new TextEncoder().encode(content)
-                );
-            }
-        } else if (Array.isArray(content)) {
-            return content.map(item => this.sanitizeContent(item));
-        } else if (content !== null && typeof content === 'object') {
-            const result = {};
-            for (const [key, value] of Object.entries(content)) {
-                result[key] = this.sanitizeContent(value);
-            }
-            return result;
-        }
-        return content;
-    }
-
     // 验证配置
     validateConfig() {
         if (!this.config.token) {
@@ -302,35 +258,10 @@ class GitHubNoteManager {
             }
 
             const data = await response.json();
-            // 强制UTF-8解码
+            // 简化的UTF-8解码
             const contentBytes = this.base64ToBytes(data.content);
-            // 使用多个解码策略确保成功
-            let contentString;
-            try {
-                // 策略1: 使用TextDecoder UTF-8
-                contentString = new TextDecoder('utf-8', { fatal: false }).decode(contentBytes);
-            } catch (e) {
-                // 策略2: 使用默认解码
-                contentString = new TextDecoder().decode(contentBytes);
-            }
-
-            // 验证解码结果
-            if (!contentString || contentString.length === 0) {
-                throw new Error('文件内容解码失败');
-            }
-
-            // 解析JSON
-            try {
-                const parsed = JSON.parse(contentString);
-                // 再次清理确保UTF-8安全
-                return this.sanitizeContent(parsed);
-            } catch (parseError) {
-                console.error('JSON解析失败:', {
-                    error: parseError.message,
-                    contentPreview: contentString.substring(0, 200)
-                });
-                throw new Error('JSON格式错误: ' + parseError.message);
-            }
+            const contentString = new TextDecoder('utf-8').decode(contentBytes);
+            return JSON.parse(contentString);
         } catch (error) {
             // 只在非404错误时打印异常
             if (error.message.indexOf('404') === -1) {
@@ -348,24 +279,9 @@ class GitHubNoteManager {
             // 先检查文件是否存在
             const existing = await this.getFile(path);
 
-            // 深度处理UTF-8编码
-            // 1. 确保内容是纯文本
-            const sanitizedContent = this.sanitizeContent(content);
-
-            // 2. 序列化为JSON字符串
-            const jsonString = JSON.stringify(sanitizedContent, null, 2);
-
-            // 3. 强制UTF-8编码 - 使用TextEncoder
+            // 简化的UTF-8处理
+            const jsonString = JSON.stringify(content, null, 2);
             const utf8Bytes = new TextEncoder().encode(jsonString);
-
-            // 4. 验证UTF-8编码正确性
-            const decoder = new TextDecoder('utf-8', { fatal: false });
-            const testDecode = decoder.decode(utf8Bytes);
-            if (testDecode !== jsonString) {
-                throw new Error('UTF-8编码验证失败');
-            }
-
-            // 5. 转换为base64
             const base64Content = this.bytesToBase64(utf8Bytes);
 
             const url = `${this.apiBase}/repos/${this.config.owner}/${this.config.repo}/contents/${path}`;
