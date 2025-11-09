@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>博客登录 - 欢迎回来</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="background">
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+        <div class="gradient-orb orb-3"></div>
+    </div>
+
+    <div class="container">
+        <header class="header">
+            <h1 class="title">
+                <span class="title-gradient">欢迎回来</span>
+            </h1>
+            <p class="subtitle">登录您的博客账户</p>
+        </header>
+
+        <div class="login-container">
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="email">
+                        <i class="fas fa-envelope"></i>
+                        邮箱地址
+                    </label>
+                    <input type="email" id="email" placeholder="请输入您的邮箱" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fas fa-lock"></i>
+                        密码
+                    </label>
+                    <div class="password-wrapper">
+                        <input type="password" id="password" placeholder="请输入您的密码" required>
+                        <button type="button" class="toggle-password" id="togglePassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-options">
+                    <label class="checkbox-wrapper">
+                        <input type="checkbox" id="rememberMe">
+                        <span class="checkmark"></span>
+                        记住我
+                    </label>
+                    <a href="#" class="forgot-password">忘记密码？</a>
+                </div>
+
+                <button type="submit" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    登录
+                </button>
+
+                <div class="divider">
+                    <span>或者</span>
+                </div>
+
+                <div class="social-login">
+                    <button type="button" class="social-btn google-btn">
+                        <i class="fab fa-google"></i>
+                        使用 Google 登录
+                    </button>
+                    <button type="button" class="social-btn github-btn">
+                        <i class="fab fa-github"></i>
+                        使用 GitHub 登录
+                    </button>
+                </div>
+
+                <p class="register-link">
+                    还没有账户？ <a href="#">立即注册</a>
+                </p>
+            </form>
+
+            <div class="login-success" id="loginSuccess" style="display: none;">
+                <div class="success-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2>登录成功！</h2>
+                <p>正在为您跳转到博客首页...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 数据收集面板切换按钮 -->
+    <button class="data-panel-toggle" id="dataPanelToggle" title="查看数据统计">
+        <i class="fas fa-chart-bar"></i>
+    </button>
+
+    <!-- 数据收集面板 -->
+    <div class="data-panel" id="dataPanel">
+        <div class="data-panel-header">
+            <h2>
+                <i class="fas fa-chart-line"></i>
+                数据统计面板
+            </h2>
+            <button class="close-panel-btn" id="closePanelBtn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="data-panel-content">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon users-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="totalLogins">0</div>
+                        <div class="stat-label">总登录次数</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon success-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="successfulLogins">0</div>
+                        <div class="stat-label">成功登录</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon failed-icon">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="failedLogins">0</div>
+                        <div class="stat-label">失败尝试</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon visit-icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="totalVisits">0</div>
+                        <div class="stat-label">页面访问量</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="data-section">
+                <h3>
+                    <i class="fas fa-clock"></i>
+                    最近登录记录
+                </h3>
+                <div class="log-list" id="loginLogs">
+                    <div class="log-item empty">
+                        <i class="fas fa-info-circle"></i>
+                        暂无登录记录
+                    </div>
+                </div>
+            </div>
+
+            <div class="data-section">
+                <h3>
+                    <i class="fas fa-globe"></i>
+                    浏览器信息
+                </h3>
+                <div class="browser-info">
+                    <div class="info-item">
+                        <span class="info-label">浏览器：</span>
+                        <span class="info-value" id="browserName">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">操作系统：</span>
+                        <span class="info-value" id="osName">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">屏幕分辨率：</span>
+                        <span class="info-value" id="screenResolution">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">时区：</span>
+                        <span class="info-value" id="timezone">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="data-section">
+                <h3>
+                    <i class="fas fa-chart-pie"></i>
+                    登录方式统计
+                </h3>
+                <div class="method-stats">
+                    <div class="method-item">
+                        <span class="method-name">
+                            <i class="fas fa-envelope"></i>
+                            邮箱登录
+                        </span>
+                        <div class="method-bar">
+                            <div class="method-fill" id="emailLoginBar" style="width: 0%"></div>
+                        </div>
+                        <span class="method-count" id="emailLoginCount">0</span>
+                    </div>
+                    <div class="method-item">
+                        <span class="method-name">
+                            <i class="fab fa-google"></i>
+                            Google 登录
+                        </span>
+                        <div class="method-bar">
+                            <div class="method-fill" id="googleLoginBar" style="width: 0%"></div>
+                        </div>
+                        <span class="method-count" id="googleLoginCount">0</span>
+                    </div>
+                    <div class="method-item">
+                        <span class="method-name">
+                            <i class="fab fa-github"></i>
+                            GitHub 登录
+                        </span>
+                        <div class="method-bar">
+                            <div class="method-fill" id="githubLoginBar" style="width: 0%"></div>
+                        </div>
+                        <span class="method-count" id="githubLoginCount">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="data-actions">
+                <button class="action-btn secondary" id="exportData">
+                    <i class="fas fa-download"></i>
+                    导出数据
+                </button>
+                <button class="action-btn danger" id="clearData">
+                    <i class="fas fa-trash-alt"></i>
+                    清空数据
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
