@@ -56,11 +56,11 @@
         </header>
 
         <div class="login-container">
-            <form id="loginForm" class="login-form" name="login-form" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+            <form id="loginForm" class="login-form" name="login-form" method="POST" action="/" data-netlify="true" netlify-honeypot="bot-field">
                 <input type="hidden" name="form-name" value="login-form">
                 <!-- Netlify Forms 配置 - 完全免费，无需外部服务 -->
                 <!-- 跳转到 blog.html -->
-                <input type="hidden" name="_next" value="blog.html">
+                <input type="hidden" name="_next" value="/blog.html">
                 <p style="display: none;">
                     <label>不要填写这个字段: <input name="bot-field"></label>
                 </p>

@@ -1,0 +1,15 @@
+[build]
+  # 构建配置
+  publish = "."
+
+# 注意：使用 netlify.toml 可能会影响正常页面访问
+# 建议使用 _next 字段处理表单重定向
+# 如果 _next 不工作，请检查 Netlify 控制台的表单设置
+
+# 临时解决方案：只对表单成功页面进行重定向
+# 但这个配置可能会影响所有访问，需要谨慎使用
+# [[redirects]]
+#   from = "/"
+#   to = "/blog.html"
+#   status = 302
+#   force = false
