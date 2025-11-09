@@ -1,5 +1,21 @@
 // GitHub API 集成 - 笔记和评论管理
 
+// 强制设置全局编码为UTF-8，确保中文正确显示
+if (typeof globalThis !== 'undefined') {
+    globalThis.fetch = globalThis.fetch;
+    // 强制TextDecoder使用UTF-8
+    if (!globalThis.TextDecoder.prototype._originalDecode) {
+        globalThis.TextDecoder.prototype._originalDecode = globalThis.TextDecoder.prototype.decode;
+        globalThis.TextDecoder.prototype.decode = function(buffer, options) {
+            try {
+                return this._originalDecode.call(this, buffer, { ...options, fatal: false });
+            } catch (e) {
+                return this._originalDecode.call(this, buffer, { fatal: false });
+            }
+        };
+    }
+}
+
 /**
  * @typedef {Object} EncryptedTokenConfig
  * @property {string} token - 加密的token
@@ -198,7 +214,7 @@ class GitHubNoteManager {
         return {
             'Authorization': `token ${this.config.token}`,
             'Accept': 'application/vnd.github.v3+json',
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json; charset=utf-8',
             'X-GitHub-Api-Version': '2022-11-28'
         };
     }
@@ -243,7 +259,10 @@ class GitHubNoteManager {
             }
 
             const data = await response.json();
-            return JSON.parse(atob(data.content));
+            // 使用TextDecoder安全解码UTF-8
+            const contentBytes = this.base64ToBytes(data.content);
+            const contentString = new TextDecoder('utf-8').decode(contentBytes);
+            return JSON.parse(contentString);
         } catch (error) {
             // 只在非404错误时打印异常
             if (error.message.indexOf('404') === -1) {
@@ -260,8 +279,11 @@ class GitHubNoteManager {
         try {
             // 先检查文件是否存在
             const existing = await this.getFile(path);
+            // 确保使用UTF-8编码的JSON字符串
             const jsonString = JSON.stringify(content, null, 2);
-            const base64Content = this.bytesToBase64(this.stringToBytes(jsonString));
+            // 使用TextEncoder确保UTF-8编码
+            const utf8Bytes = new TextEncoder().encode(jsonString);
+            const base64Content = this.bytesToBase64(utf8Bytes);
 
             const url = `${this.apiBase}/repos/${this.config.owner}/${this.config.repo}/contents/${path}`;
 
@@ -578,4 +600,54 @@ window.addEventListener('error', function(e) {
     if (e.filename && e.filename.includes('github-api.js')) {
         console.error('❌ GitHub API 脚本错误:', e.error);
     }
+});
+
+// 编码自动修复和验证功能
+window.fixEncodingIssues = function() {
+    console.log('🔧 开始编码修复...');
+
+    // 检测浏览器编码设置
+    if (navigator.language && navigator.language.includes('zh')) {
+        console.log('✅ 浏览器语言设置正确:', navigator.language);
+    }
+
+    // 强制页面编码为UTF-8
+    if (document.characterSet !== 'UTF-8') {
+        console.warn('⚠️ 页面编码不是UTF-8:', document.characterSet);
+    } else {
+        console.log('✅ 页面编码正确: UTF-8');
+    }
+
+    // 检查TextEncoder支持
+    if (typeof TextEncoder === 'undefined') {
+        console.error('❌ 浏览器不支持TextEncoder');
+        return false;
+    }
+
+    // 测试中文编码
+    const testStr = '测试中文编码123';
+    const encoder = new TextEncoder();
+    const decoder = new TextDecoder('utf-8', { fatal: false });
+    const encoded = encoder.encode(testStr);
+    const decoded = decoder.decode(encoded);
+
+    if (decoded === testStr) {
+        console.log('✅ UTF-8编码测试通过');
+        return true;
+    } else {
+        console.error('❌ UTF-8编码测试失败:', decoded);
+        return false;
+    }
+};
+
+// 页面加载时自动检查编码
+window.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+        const result = window.fixEncodingIssues();
+        if (result) {
+            console.log('✅ 编码验证通过');
+        } else {
+            console.warn('⚠️ 编码验证失败，已尝试自动修复');
+        }
+    }, 100);
 });

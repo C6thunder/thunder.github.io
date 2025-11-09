@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>笔记详情 - 个人笔记网站</title>
     <link rel="stylesheet" href="style.css">
@@ -10,28 +11,28 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .note-content-container {
-            max-width: 1800px;
+            max-width: 2400px;
             margin: 0 auto;
-            padding: 0 40px;
+            padding: clamp(30px, 4vw, 60px);
         }
 
         .note-content {
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 70px 90px;
+            border-radius: clamp(16px, 2vw, 28px);
+            padding: clamp(50px, 6vw, 100px) clamp(60px, 8vw, 120px);
             margin: 40px 0;
             border: 1px solid var(--glass-border);
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 1800px;
+            max-width: 2400px;
             width: 100%;
             line-height: 1.8;
         }
 
         .note-title {
-            font-size: 2.5rem;
+            font-size: clamp(2rem, 4vw, 3.5rem);
             font-weight: 700;
-            margin-bottom: 20px;
+            margin-bottom: clamp(15px, 2vw, 25px);
             background: var(--text-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -409,38 +410,25 @@
             opacity: 0.5;
         }
 
-        @media (max-width: 1600px) {
-            .note-content-container {
-                padding: 0 30px;
-            }
-        }
-
         @media (max-width: 1200px) {
             .note-content-container {
-                padding: 0 25px;
-            }
-            .note-content {
-                padding: 50px 60px;
+                padding: clamp(25px, 3vw, 40px);
             }
         }
 
         @media (max-width: 768px) {
             .note-content-container {
-                padding: 0 15px;
+                padding: clamp(20px, 3vw, 30px);
             }
             .note-content {
-                padding: 30px 25px;
+                padding: clamp(30px, 5vw, 45px) clamp(25px, 4vw, 35px);
                 margin: 20px 0;
-            }
-
-            .note-title {
-                font-size: 1.8rem;
             }
 
             .note-meta {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 12px;
+                gap: clamp(8px, 1.5vw, 15px);
             }
         }
     </style>
@@ -767,6 +755,16 @@
 
         // 格式化内容
         function formatContent(content) {
+            // HTML转义函数
+            const escapeHtml = (text) => {
+                return String(text)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
+            };
+
             const lines = content.split('\n');
             const html = [];
             let inCodeBlock = false;
@@ -781,7 +779,7 @@
                         inCodeBlock = true;
                         codeLines = [];
                     } else {
-                        html.push(`<pre><code>${codeLines.join('\n')}</code></pre>`);
+                        html.push(`<pre><code>${escapeHtml(codeLines.join('\n'))}</code></pre>`);
                         inCodeBlock = false;
                     }
                     continue;
@@ -794,27 +792,28 @@
 
                 // 列表
                 if (line.match(/^\s*[-*+]\s/)) {
+                    const listItem = escapeHtml(line.replace(/^\s*[-*+]\s/, ''));
                     if (html[html.length - 1]?.startsWith('<ul>')) {
-                        html[html.length - 1] += `<li>${line.replace(/^\s*[-*+]\s/, '')}</li>`;
+                        html[html.length - 1] += `<li>${listItem}</li>`;
                     } else {
-                        html.push(`<ul><li>${line.replace(/^\s*[-*+]\s/, '')}</li></ul>`);
+                        html.push(`<ul><li>${listItem}</li></ul>`);
                     }
                     continue;
                 }
 
                 // 标题
                 if (line.startsWith('#### ')) {
-                    html.push(`<h4>${line.substring(5)}</h4>`);
+                    html.push(`<h4>${escapeHtml(line.substring(5))}</h4>`);
                 } else if (line.startsWith('### ')) {
-                    html.push(`<h3>${line.substring(4)}</h3>`);
+                    html.push(`<h3>${escapeHtml(line.substring(4))}</h3>`);
                 } else if (line.startsWith('## ')) {
-                    html.push(`<h2>${line.substring(3)}</h2>`);
+                    html.push(`<h2>${escapeHtml(line.substring(3))}</h2>`);
                 } else if (line.startsWith('# ')) {
-                    html.push(`<h1>${line.substring(2)}</h1>`);
+                    html.push(`<h1>${escapeHtml(line.substring(2))}</h1>`);
                 }
                 // 引用
                 else if (line.startsWith('> ')) {
-                    html.push(`<blockquote>${line.substring(2)}</blockquote>`);
+                    html.push(`<blockquote>${escapeHtml(line.substring(2))}</blockquote>`);
                 }
                 // 分隔线
                 else if (line.trim() === '---') {
@@ -826,7 +825,7 @@
                 }
                 // 普通段落
                 else {
-                    html.push(`<p>${line}</p>`);
+                    html.push(`<p>${escapeHtml(line)}</p>`);
                 }
             }
 

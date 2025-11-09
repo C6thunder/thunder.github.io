@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>写笔记 - 个人笔记网站</title>
     <link rel="stylesheet" href="style.css">
@@ -9,25 +10,25 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .write-container {
-            max-width: 1800px;
+            max-width: 2400px;
             margin: 0 auto;
-            padding: 50px 40px;
+            padding: clamp(30px, 4vw, 60px);
         }
         .write-title {
-            font-size: 3.5rem;
+            font-size: clamp(2.5rem, 5vw, 4rem);
             font-weight: 700;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: clamp(30px, 5vw, 50px);
         }
         .write-form {
             background: rgba(255,255,255,0.1);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 24px;
-            padding: 50px 60px;
+            border-radius: clamp(16px, 2vw, 28px);
+            padding: clamp(35px, 5vw, 70px) clamp(40px, 6vw, 80px);
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
         .form-group { margin-bottom: 30px; }
@@ -56,20 +57,20 @@
             outline: none;
         }
         .form-group textarea {
-            min-height: 500px;
+            min-height: clamp(400px, 60vh, 700px);
             resize: vertical;
             line-height: 1.7;
         }
         .btn {
-            padding: 18px 40px;
+            padding: clamp(14px, 2vw, 20px) clamp(30px, 4vw, 45px);
             border: none;
-            border-radius: 12px;
+            border-radius: clamp(8px, 1.5vw, 14px);
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 30px;
-            font-size: 1.1rem;
+            margin-top: clamp(25px, 3vw, 35px);
+            font-size: clamp(1rem, 1.5vw, 1.2rem);
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }

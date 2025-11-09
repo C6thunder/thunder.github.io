@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>所有笔记 - 个人笔记网站</title>
     <link rel="stylesheet" href="style.css">
@@ -153,14 +154,14 @@
             /* 宽屏笔记网格优化 */
             .notes-grid {
                 grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-                gap: 25px;
+                gap: clamp(20px, 2.5vw, 30px);
                 margin: 30px 0;
-                max-width: 1800px;
+                max-width: 2400px;
                 margin-left: auto;
                 margin-right: auto;
             }
             .note-card {
-                padding: 30px;
+                padding: clamp(25px, 3vw, 35px);
                 min-height: 220px;
             }
             @media (max-width: 1600px) {
@@ -440,12 +441,14 @@
             // 转义HTML特殊字符
             const escapeHtml = (str) => {
                 if (!str) return '';
-                return str
+                return String(str)
                     .replace(/&/g, '&amp;')
                     .replace(/</g, '&lt;')
                     .replace(/>/g, '&gt;')
                     .replace(/"/g, '&quot;')
-                    .replace(/'/g, '&#39;');
+                    .replace(/'/g, '&#39;')
+                    .replace(/`/g, '&#96;')
+                    .replace(/\|/g, '&#124;');
             };
 
             notesGrid.innerHTML = pageNotes.map(note => `
