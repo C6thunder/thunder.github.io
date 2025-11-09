@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .note-content-container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 0 20px;
         }
@@ -23,7 +23,7 @@
             margin: 30px 0;
             border: 1px solid var(--glass-border);
             box-shadow: 0 8px 32px var(--shadow);
-            max-width: 1200px;
+            max-width: 1400px;
             width: 100%;
             line-height: 1.8;
         }
@@ -168,6 +168,88 @@
             margin: 20px 0;
             color: var(--text-secondary);
             font-style: italic;
+        }
+
+        .note-type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-right: 10px;
+        }
+
+        .note-type-badge.html {
+            background: rgba(102, 126, 234, 0.2);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .note-type-badge.markdown {
+            background: rgba(74, 222, 128, 0.2);
+            color: #4ade80;
+            border: 1px solid #4ade80;
+        }
+
+        .note-body.html-note {
+            color: var(--text-primary);
+        }
+
+        .note-body.html-note h1, .note-body.html-note h2, .note-body.html-note h3 {
+            margin: 20px 0 10px;
+            color: var(--primary);
+        }
+
+        .note-body.html-note p {
+            margin: 15px 0;
+            line-height: 1.8;
+        }
+
+        .note-body.html-note ul, .note-body.html-note ol {
+            margin: 15px 0 15px 30px;
+        }
+
+        .note-body.html-note li {
+            margin: 8px 0;
+        }
+
+        .note-body.html-note a {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+
+        .note-body.html-note code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .note-body.html-note pre {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        .note-body.html-note pre code {
+            background: none;
+            padding: 0;
+        }
+
+        .html-editor {
+            min-height: 300px;
+            padding: 20px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            line-height: 1.8;
+            outline: none;
+            overflow-y: auto;
         }
 
         /* 评论区域 */
@@ -455,7 +537,7 @@
             iv: "qNWMHi6UqGFcdWee",
             salt: "P3RiVIlxU1RLiUV8YbefVQ==",
             iterations: 100000,
-            password: "lei20060113"  // 解密密码
+            password: "lei20060113"
         });
     </script>
 
@@ -558,14 +640,16 @@
             }
 
             try {
-                const response = await fetch('./notes/notes.json');
-                const data = await response.json();
-                currentNote = data.notes.find(note => note.id === noteId);
+                // 使用GitHub API获取笔记
+                const result = await githubNoteManager.getNoteById(noteId);
 
-                if (!currentNote) {
+                if (!result || !result.note) {
                     document.getElementById('noteContainer').innerHTML = '<div class="error-state"><i class="fas fa-exclamation-circle"></i><p>笔记不存在</p></div>';
                     return;
                 }
+
+                currentNote = result.note;
+                currentNote._type = result.type || 'markdown';
 
                 renderNote();
                 loadComments();
@@ -580,12 +664,21 @@
         function renderNote() {
             const noteContainer = document.getElementById('noteContainer');
             const hasKey = currentNote.authorKey;
+            const isHtml = currentNote._type === 'html';
+
+            // 获取笔记内容
+            const contentHtml = isHtml
+                ? currentNote.content  // HTML笔记直接使用内容
+                : formatContent(currentNote.content);  // Markdown笔记格式化
 
             noteContainer.innerHTML = `
                 <div class="note-content">
                     <div class="note-title-section">
                         <h1 class="note-title">${currentNote.title}</h1>
                         <div class="note-actions">
+                            <span class="note-type-badge ${isHtml ? 'html' : 'markdown'}">
+                                <i class="fas fa-${isHtml ? 'code' : 'file-alt'}"></i> ${isHtml ? 'HTML' : 'Markdown'}
+                            </span>
                             ${hasKey
                                 ? '<button class="action-btn edit-btn" onclick="showKeyForm()"><i class="fas fa-key"></i> 输入密钥</button>'
                                 : '<button class="action-btn edit-btn" onclick="showEditForm()"><i class="fas fa-edit"></i> 修改笔记</button>'
@@ -601,8 +694,8 @@
                     <div class="note-tags">
                         ${currentNote.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
                     </div>
-                    <div class="note-body">
-                        ${formatContent(currentNote.content)}
+                    <div class="note-body ${isHtml ? 'html-note' : ''}">
+                        ${contentHtml}
                     </div>
                 </div>
 
@@ -618,8 +711,19 @@
                         <input type="text" id="editTags" value="${currentNote.tags.join(', ')}">
                     </div>
                     <div class="form-group">
-                        <label>内容</label>
-                        <textarea id="editContent">${currentNote.content}</textarea>
+                        <label>笔记类型</label>
+                        <select id="editType" style="width: 100%; padding: 12px; border: 1px solid var(--glass-border); border-radius: 10px; background: var(--glass-bg); color: var(--text-primary);">
+                            <option value="markdown" ${!isHtml ? 'selected' : ''}>Markdown</option>
+                            <option value="html" ${isHtml ? 'selected' : ''}>HTML</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="markdownEditGroup" ${isHtml ? 'style="display: none;"' : ''}>
+                        <label>内容（Markdown）</label>
+                        <textarea id="editContent">${isHtml ? '' : currentNote.content}</textarea>
+                    </div>
+                    <div class="form-group" id="htmlEditGroup" ${!isHtml ? 'style="display: none;"' : ''}>
+                        <label>内容（HTML）</label>
+                        <div class="html-editor" id="editHtmlContent" contenteditable="true">${isHtml ? currentNote.content : ''}</div>
                     </div>
                     <div class="form-actions">
                         <button class="btn" onclick="submitEdit()"><i class="fas fa-save"></i> 保存修改</button>
@@ -711,10 +815,24 @@
         }
 
         // 加载评论
-        function loadComments() {
+        async function loadComments() {
             const noteId = currentNote.id;
             const storedComments = localStorage.getItem(`comments_${noteId}`);
             comments = storedComments ? JSON.parse(storedComments) : [];
+
+            try {
+                // 从GitHub获取最新评论
+                const githubComments = await githubNoteManager.getComments(noteId);
+                // 合并评论（GitHub评论优先，避免重复）
+                const localCommentIds = new Set(comments.map(c => c.id));
+                const newComments = githubComments.filter(c => !localCommentIds.has(c.id));
+                comments = [...newComments, ...comments];
+
+                // 保存合并后的评论
+                localStorage.setItem(`comments_${noteId}`, JSON.stringify(comments));
+            } catch (error) {
+                console.warn('获取GitHub评论失败:', error);
+            }
 
             renderComments();
         }
@@ -957,7 +1075,14 @@
         async function submitEdit() {
             const title = document.getElementById('editTitle').value.trim();
             const tagsStr = document.getElementById('editTags').value.trim();
-            const content = document.getElementById('editContent').value.trim();
+            const noteType = document.getElementById('editType').value;
+
+            let content = '';
+            if (noteType === 'html') {
+                content = document.getElementById('editHtmlContent').innerHTML.trim();
+            } else {
+                content = document.getElementById('editContent').value.trim();
+            }
 
             if (!title || !content) {
                 alert('请填写标题和内容');
@@ -965,13 +1090,17 @@
             }
 
             const tags = tagsStr ? tagsStr.split(',').map(t => t.trim()).filter(t => t) : [];
+            const excerpt = noteType === 'html'
+                ? content.replace(/<[^>]*>/g, '').substring(0, 100) + '...'
+                : content.substring(0, 100) + (content.length > 100 ? '...' : '');
 
             const updatedNote = {
                 ...currentNote,
                 title,
                 content,
                 tags,
-                excerpt: content.substring(0, 100) + (content.length > 100 ? '...' : ''),
+                type: noteType,
+                excerpt,
                 date: new Date().toISOString().split('T')[0]
             };
 
@@ -1018,7 +1147,27 @@
         function bindEvents() {
             const commentForm = document.getElementById('commentForm');
             commentForm.addEventListener('submit', submitComment);
+
+            // 监听类型切换
+            document.addEventListener('change', (e) => {
+                if (e.target && e.target.id === 'editType') {
+                    const noteType = e.target.value;
+                    const markdownGroup = document.getElementById('markdownEditGroup');
+                    const htmlGroup = document.getElementById('htmlEditGroup');
+
+                    if (noteType === 'markdown') {
+                        markdownGroup.style.display = 'block';
+                        htmlGroup.style.display = 'none';
+                    } else {
+                        markdownGroup.style.display = 'none';
+                        htmlGroup.style.display = 'block';
+                    }
+                }
+            });
         }
+
+        // 自动刷新评论（每30秒）
+        let commentRefreshInterval;
 
         // 页面加载完成后初始化
         window.addEventListener('load', () => {
@@ -1027,6 +1176,22 @@
             loadNote();
             bindEvents();
             initThemeSwitcher();
+
+            // 启动自动刷新评论
+            commentRefreshInterval = setInterval(async () => {
+                try {
+                    await loadComments();
+                } catch (error) {
+                    console.warn('自动刷新评论失败:', error);
+                }
+            }, 30000); // 30秒
+        });
+
+        // 页面关闭时清除定时器
+        window.addEventListener('beforeunload', () => {
+            if (commentRefreshInterval) {
+                clearInterval(commentRefreshInterval);
+            }
         });
     </script>
 </body>

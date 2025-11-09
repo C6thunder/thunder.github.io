@@ -66,6 +66,10 @@
                     <button class="action-btn" id="sortBtn">
                         <i class="fas fa-sort"></i> 排序
                     </button>
+                    <button class="action-btn" id="refreshBtn" title="刷新笔记">
+                        <i class="fas fa-sync-alt"></i> 刷新
+                    </button>
+                    <span class="last-update" id="lastUpdate"></span>
                 </div>
             </div>
 
@@ -114,6 +118,30 @@
     </div>
 
     <script src="script.js"></script>
+    <script src="github-api.js"></script>
+
+    <script>
+        // 添加last-update样式
+        const style = document.createElement('style');
+        style.textContent = `
+            .last-update {
+                color: var(--text-secondary);
+                font-size: 0.85rem;
+                margin-left: 10px;
+            }
+            #refreshBtn {
+                transition: all 0.3s ease;
+            }
+            #refreshBtn.spinning {
+                animation: spin 1s linear infinite;
+            }
+            @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
 
     <script>
         // 全局变量
@@ -211,9 +239,8 @@
         // 加载笔记数据
         async function loadNotes() {
             try {
-                const response = await fetch('./notes/notes.json');
-                const data = await response.json();
-                allNotes = data.notes;
+                // 使用GitHub API扫描所有笔记
+                allNotes = await githubNoteManager.scanAllNotes();
 
                 // 获取URL参数
                 const urlParams = new URLSearchParams(window.location.search);
@@ -230,10 +257,36 @@
 
                 filterAndSortNotes();
                 loadFilterTags();
+                updateLastUpdateTime();
 
             } catch (error) {
                 console.error('加载笔记失败:', error);
                 document.getElementById('notesGrid').innerHTML = '<div class="error-state"><i class="fas fa-exclamation-circle"></i><p>加载失败，请刷新页面重试</p></div>';
+            }
+        }
+
+        // 更新最后更新时间
+        function updateLastUpdateTime() {
+            const lastUpdateEl = document.getElementById('lastUpdate');
+            if (lastUpdateEl) {
+                const now = new Date();
+                lastUpdateEl.textContent = `最后更新: ${now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}`;
+            }
+        }
+
+        // 手动刷新
+        async function refreshNotes() {
+            const refreshBtn = document.getElementById('refreshBtn');
+            refreshBtn.classList.add('spinning');
+
+            try {
+                await loadNotes();
+                showNotification('笔记列表已更新', 'success');
+            } catch (error) {
+                console.error('刷新失败:', error);
+                showNotification('刷新失败，请重试', 'error');
+            } finally {
+                refreshBtn.classList.remove('spinning');
             }
         }
 
@@ -449,6 +502,9 @@
                 filterAndSortNotes();
             });
 
+            // 刷新按钮
+            document.getElementById('refreshBtn').addEventListener('click', refreshNotes);
+
             // 主题切换
             initThemeSwitcher();
         }
@@ -496,12 +552,80 @@
             }
         }
 
+        // 显示通知
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                <span>${message}</span>
+            `;
+
+            const style = document.createElement('style');
+            style.textContent = `
+                .notification {
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    padding: 16px 24px;
+                    border-radius: 12px;
+                    color: #fff;
+                    font-weight: 500;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    z-index: 1000;
+                    animation: slideInRight 0.3s ease-out, slideOutRight 0.3s ease-in 2.7s;
+                    max-width: 400px;
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+                    background: ${type === 'success' ? 'linear-gradient(135deg, #4ade80 0%, #22c55e 100%)' : 'linear-gradient(135deg, #f87171 0%, #ef4444 100%)'};
+                }
+                @keyframes slideInRight {
+                    from { transform: translateX(400px); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes slideOutRight {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(400px); opacity: 0; }
+                }
+            `;
+            if (!document.querySelector('style[data-notification-notes]')) {
+                style.setAttribute('data-notification-notes', 'true');
+                document.head.appendChild(style);
+            }
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // 自动刷新（每2分钟）
+        let autoRefreshInterval;
+
         // 页面加载完成后初始化
         window.addEventListener('load', () => {
             createBackgroundParticles();
             initMouseFollowParticles();
             loadNotes();
             bindEvents();
+
+            // 启动自动刷新
+            autoRefreshInterval = setInterval(async () => {
+                try {
+                    await loadNotes();
+                } catch (error) {
+                    console.warn('自动刷新失败:', error);
+                }
+            }, 120000); // 2分钟
+        });
+
+        // 页面关闭时清除定时器
+        window.addEventListener('beforeunload', () => {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+            }
         });
     </script>
 </body>

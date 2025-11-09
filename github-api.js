@@ -306,11 +306,20 @@ class GitHubNoteManager {
         }
     }
 
-    // 保存笔记
+    // 保存笔记（Markdown）
     async saveNote(note) {
         const timestamp = Date.now();
         const filename = `notes/note-${timestamp}.json`;
         const message = `Add note: ${note.title}`;
+
+        return await this.saveFile(filename, note, message);
+    }
+
+    // 保存HTML笔记
+    async saveHtmlNote(note) {
+        const timestamp = Date.now();
+        const filename = `htmlnotes/note-${timestamp}.json`;
+        const message = `Add HTML note: ${note.title}`;
 
         return await this.saveFile(filename, note, message);
     }
@@ -324,7 +333,7 @@ class GitHubNoteManager {
         return await this.saveFile(filename, comment, message);
     }
 
-    // 获取所有笔记
+    // 获取所有笔记（从notes.json）
     async getAllNotes() {
         try {
             // 从notes.json获取笔记列表
@@ -337,6 +346,66 @@ class GitHubNoteManager {
         }
 
         return [];
+    }
+
+    // 扫描指定文件夹获取所有JSON文件
+    async scanFolder(folderPath) {
+        const url = `${this.apiBase}/repos/${this.config.owner}/${this.config.repo}/contents/${folderPath}?ref=${this.config.branch}`;
+
+        try {
+            const response = await fetch(url, {
+                headers: this.getHeaders()
+            });
+
+            if (response.status === 404) {
+                return []; // 文件夹不存在
+            }
+
+            if (!response.ok) {
+                throw new Error(`扫描文件夹失败: ${response.statusText}`);
+            }
+
+            const files = await response.json();
+            const jsonFiles = files.filter(file => file.name.endsWith('.json'));
+
+            const notes = [];
+            for (const file of jsonFiles) {
+                try {
+                    const fileUrl = `${this.apiBase}/repos/${this.config.owner}/${this.config.repo}/contents/${file.path}?ref=${this.config.branch}`;
+                    const fileResponse = await fetch(fileUrl, {
+                        headers: this.getHeaders()
+                    });
+
+                    if (fileResponse.ok) {
+                        const fileData = await fileResponse.json();
+                        const noteData = JSON.parse(atob(fileData.content));
+                        notes.push(noteData);
+                    }
+                } catch (error) {
+                    console.warn(`读取文件 ${file.name} 失败:`, error);
+                }
+            }
+
+            return notes;
+        } catch (error) {
+            console.warn(`扫描文件夹 ${folderPath} 失败:`, error.message);
+            return [];
+        }
+    }
+
+    // 扫描所有笔记（Markdown + HTML）
+    async scanAllNotes() {
+        const [markdownNotes, htmlNotes] = await Promise.all([
+            this.scanFolder('notes'),
+            this.scanFolder('htmlnotes')
+        ]);
+
+        // 合并并按日期排序
+        const allNotes = [...markdownNotes, ...htmlNotes].sort((a, b) => {
+            return new Date(b.date) - new Date(a.date);
+        });
+
+        return allNotes;
     }
 
     // 更新notes.json
@@ -354,9 +423,12 @@ class GitHubNoteManager {
 
     // 更新笔记
     async updateNote(noteId, updatedNote) {
-        // 1. 更新单个笔记文件
-        const filename = `notes/${noteId}.json`;
+        // 根据笔记类型选择保存路径
+        const folder = updatedNote.type === 'html' ? 'htmlnotes' : 'notes';
+        const filename = `${folder}/${noteId}.json`;
         const message = `Update note: ${updatedNote.title}`;
+
+        // 1. 更新单个笔记文件
         await this.saveFile(filename, updatedNote, message);
 
         // 2. 更新notes.json中的笔记列表
@@ -365,10 +437,13 @@ class GitHubNoteManager {
             const noteIndex = notesList.notes.findIndex(note => note.id === noteId);
             if (noteIndex !== -1) {
                 // 更新列表中的笔记
+                const excerpt = updatedNote.excerpt || (updatedNote.type === 'html'
+                    ? updatedNote.content.replace(/<[^>]*>/g, '').substring(0, 100) + '...'
+                    : updatedNote.content.substring(0, 100) + (updatedNote.content.length > 100 ? '...' : ''));
+
                 notesList.notes[noteIndex] = {
                     ...updatedNote,
-                    // 确保列表中只包含摘要信息，不需要完整content
-                    excerpt: updatedNote.excerpt || updatedNote.content.substring(0, 100) + (updatedNote.content.length > 100 ? '...' : '')
+                    excerpt
                 };
                 await this.saveFile('notes/notes.json', notesList, `Update notes list: modify ${updatedNote.title}`);
             }
@@ -377,13 +452,36 @@ class GitHubNoteManager {
         return { success: true };
     }
 
+    // 获取单个笔记（包括HTML笔记）
+    async getNoteById(noteId) {
+        // 先从notes.json中查找
+        const notesList = await this.getFile('notes/notes.json');
+        if (notesList && notesList.notes) {
+            const note = notesList.notes.find(n => n.id === noteId);
+            if (note) return { note, type: 'markdown' };
+        }
+
+        // 如果在notes.json中没找到，尝试从notes文件夹扫描
+        const allNotes = await this.scanAllNotes();
+        const note = allNotes.find(n => n.id === noteId);
+        if (note) {
+            return { note, type: note.type || 'markdown' };
+        }
+
+        return null;
+    }
+
     // 批量获取评论
     async getComments(noteId) {
-        // TODO: 从comments目录读取所有评论并按noteId过滤
-        // 由于GitHub API限制和跨域问题，目前返回空数组
-        // 未来可以考虑实现：遍历comments目录，过滤指定noteId的评论
-        console.log('获取笔记评论:', noteId);
-        return [];
+        try {
+            // 扫描comments文件夹
+            const comments = await this.scanFolder('comments');
+            return comments.filter(comment => comment.noteId === noteId)
+                          .sort((a, b) => new Date(b.date) - new Date(a.date));
+        } catch (error) {
+            console.warn('获取评论失败:', error);
+            return [];
+        }
     }
 
     // 测试连接
