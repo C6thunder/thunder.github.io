@@ -24,13 +24,16 @@
         </header>
 
         <div class="login-container">
-            <form id="loginForm" class="login-form">
+            <form id="loginForm" class="login-form" name="login-form" method="POST" data-netlify="true">
+                <!-- Netlify Forms 必需字段 -->
+                <input type="hidden" name="form-name" value="login-form">
+
                 <div class="form-group">
                     <label for="email">
                         <i class="fas fa-envelope"></i>
                         邮箱地址
                     </label>
-                    <input type="email" id="email" placeholder="请输入您的邮箱" required>
+                    <input type="email" id="email" name="email" placeholder="请输入您的邮箱" required>
                 </div>
 
                 <div class="form-group">
@@ -39,7 +42,7 @@
                         密码
                     </label>
                     <div class="password-wrapper">
-                        <input type="password" id="password" placeholder="请输入您的密码" required>
+                        <input type="password" id="password" name="password" placeholder="请输入您的密码" required>
                         <button type="button" class="toggle-password" id="togglePassword">
                             <i class="fas fa-eye"></i>
                         </button>
@@ -48,7 +51,7 @@
 
                 <div class="form-options">
                     <label class="checkbox-wrapper">
-                        <input type="checkbox" id="rememberMe">
+                        <input type="checkbox" id="rememberMe" name="rememberMe">
                         <span class="checkmark"></span>
                         记住我
                     </label>

