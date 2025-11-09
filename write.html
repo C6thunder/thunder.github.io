@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>写笔记 - 个人笔记网站</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .write-container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        .write-title { font-size: 3rem; font-weight: 700; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-align: center; margin-bottom: 30px; }
+        .write-form { background: rgba(255,255,255,0.1); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 40px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; color: #fff; font-weight: 600; }
+        .form-group input, .form-group textarea { width: 100%; padding: 15px; border: 2px solid rgba(255,255,255,0.2); border-radius: 10px; background: rgba(255,255,255,0.1); color: #fff; font-family: inherit; }
+        .form-group textarea { min-height: 300px; resize: vertical; }
+        .btn { padding: 15px 30px; border: none; border-radius: 10px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: 600; cursor: pointer; margin-top: 20px; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .warning { background: rgba(248, 113, 113, 0.2); border: 1px solid #f87171; border-radius: 10px; padding: 15px; margin-bottom: 20px; color: #f87171; }
+        .nav { margin-bottom: 30px; }
+        .nav a { color: #667eea; text-decoration: none; }
+    </style>
+</head>
+<body data-theme="violet">
+    <div class="container">
+        <div class="write-container">
+            <div class="nav">
+                <a href="index.html"><i class="fas fa-home"></i> 首页</a> | 
+                <a href="notes.html"><i class="fas fa-book"></i> 所有笔记</a>
+            </div>
+
+            <h1 class="write-title"><i class="fas fa-pen"></i> 写笔记</h1>
+
+            <form class="write-form" id="noteForm">
+                <div class="warning" id="githubStatus">
+                    <i class="fas fa-exclamation-circle"></i> 请先在 <a href="setup.html" style="color: #fff; text-decoration: underline;">配置页面</a> 设置GitHub信息
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-heading"></i> 笔记标题</label>
+                    <input type="text" id="noteTitle" placeholder="请输入笔记标题" required>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-tags"></i> 标签（用逗号分隔）</label>
+                    <input type="text" id="noteTags" placeholder="例如: 技术,学习">
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-align-left"></i> 笔记内容</label>
+                    <textarea id="noteContent" placeholder="在这里写下您的笔记..." required></textarea>
+                </div>
+
+                <button type="submit" class="btn" id="submitBtn" disabled>
+                    <i class="fas fa-paper-plane"></i> 发表笔记
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="github-api.js"></script>
+    <script>
+        let tags = [];
+
+        function checkGitHubConfig() {
+            githubNoteManager.loadConfig();
+            const statusDiv = document.getElementById('githubStatus');
+            const submitBtn = document.getElementById('submitBtn');
+
+            if (githubNoteManager.config.owner && githubNoteManager.config.repo && githubNoteManager.config.token) {
+                statusDiv.style.background = 'rgba(74, 222, 128, 0.2)';
+                statusDiv.style.borderColor = '#4ade80';
+                statusDiv.style.color = '#4ade80';
+                statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> GitHub已配置，笔记将保存到您的仓库';
+                submitBtn.disabled = false;
+            }
+        }
+
+        document.getElementById('noteForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const title = document.getElementById('noteTitle').value.trim();
+            const tagsStr = document.getElementById('noteTags').value.trim();
+            const content = document.getElementById('noteContent').value.trim();
+
+            if (!title || !content) {
+                alert('请填写标题和内容');
+                return;
+            }
+
+            tags = tagsStr ? tagsStr.split(',').map(t => t.trim()).filter(t => t) : [];
+
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 保存中...';
+            submitBtn.disabled = true;
+
+            try {
+                const timestamp = Date.now();
+                const note = {
+                    id: `note-${timestamp}`,
+                    title,
+                    date: new Date().toISOString().split('T')[0],
+                    excerpt: content.substring(0, 100) + (content.length > 100 ? '...' : ''),
+                    tags: tags,
+                    content: content
+                };
+
+                await githubNoteManager.saveNote(note);
+                await githubNoteManager.updateNotesList(note);
+
+                alert('笔记保存成功！\n\n已保存到您的GitHub仓库。');
+                window.location.href = 'notes.html';
+
+            } catch (error) {
+                console.error('保存失败:', error);
+                alert('保存失败: ' + error.message + '\n\n请检查GitHub配置。');
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+
+        window.addEventListener('load', checkGitHubConfig);
+    </script>
+</body>
+</html>
