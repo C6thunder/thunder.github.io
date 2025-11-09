@@ -239,7 +239,9 @@ class BlogLogin {
         // 邮箱登录按钮提交（使用click事件而不是submit事件）
         const loginForm = document.getElementById('loginForm');
         const loginBtn = document.querySelector('.login-btn');
-        loginBtn.addEventListener('click', (e) => this.handleEmailLogin(e, loginForm));
+        if (loginBtn && loginForm) {
+            loginBtn.addEventListener('click', (e) => this.handleEmailLogin(e, loginForm));
+        }
 
         // Toggle password visibility
         const togglePassword = document.getElementById('togglePassword');

@@ -78,6 +78,11 @@ class GitHubNoteManager {
 
             const encryptedData = this.encryptedConfig;
 
+            // 检查是否包含iv（新的AES-GCM格式）
+            if (!encryptedData.iv) {
+                throw new Error('缺少IV参数，请使用新版本的加密脚本');
+            }
+
             // 使用Web Crypto API解密
             const encoder = new TextEncoder();
             const passwordKey = await crypto.subtle.importKey(
@@ -103,8 +108,11 @@ class GitHubNoteManager {
             );
 
             const tokenBytes = this.base64ToBytes(encryptedData.token);
+            const ivBytes = this.base64ToBytes(encryptedData.iv);
+
+            // 使用AES-GCM解密
             const decrypted = await crypto.subtle.decrypt(
-                { name: 'AES-GCM' },
+                { name: 'AES-GCM', iv: ivBytes },
                 key,
                 tokenBytes
             );
