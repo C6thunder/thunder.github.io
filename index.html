@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
-<body>
+<body data-theme="violet">
     <div class="background">
         <div class="gradient-orb orb-1"></div>
         <div class="gradient-orb orb-2"></div>
@@ -19,6 +19,33 @@
         <div class="gradient-orb orb-5"></div>
     </div>
     <div class="particles" id="particles"></div>
+
+    <!-- 主题切换器 -->
+    <div class="theme-switcher">
+        <button class="theme-toggle-btn" id="themeToggle" title="切换主题">
+            <i class="fas fa-palette"></i>
+        </button>
+        <div class="theme-panel" id="themePanel">
+            <h3><i class="fas fa-magic"></i> 选择主题</h3>
+            <div class="theme-options">
+                <div class="theme-option" data-theme="violet" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" title="紫罗兰梦境">
+                    <div class="theme-label">紫罗兰</div>
+                </div>
+                <div class="theme-option" data-theme="cyber" style="background: linear-gradient(135deg, #00f0ff 0%, #ff00ff 100%);" title="霓虹赛博">
+                    <div class="theme-label">赛博</div>
+                </div>
+                <div class="theme-option" data-theme="minimal" style="background: linear-gradient(135deg, #ffffff 0%, #888888 100%);" title="极简黑白">
+                    <div class="theme-label">极简</div>
+                </div>
+                <div class="theme-option" data-theme="sunset" style="background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);" title="日落暖阳">
+                    <div class="theme-label">暖阳</div>
+                </div>
+                <div class="theme-option" data-theme="ocean" style="background: linear-gradient(135deg, #00bfff 0%, #1e90ff 100%);" title="深海幽蓝">
+                    <div class="theme-label">深海</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="container">
         <header class="header">
@@ -372,6 +399,9 @@
                         decoration.style.transition = 'transform 0.3s ease';
                     }
 
+                    // 添加波纹效果
+                    createRippleEffect(this);
+
                     setTimeout(() => {
                         isAnimating = false;
                     }, 300);
@@ -383,7 +413,49 @@
                         decoration.style.transform = 'translateX(0)';
                     }
                 });
+
+                // 添加键盘交互
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        // 按下回车时添加特效
+                        this.style.transform = 'scale(0.98)';
+                        setTimeout(() => {
+                            this.style.transform = '';
+                        }, 100);
+                    }
+                });
             });
+        }
+
+        // 创建波纹效果
+        function createRippleEffect(element) {
+            const ripple = document.createElement('div');
+            ripple.style.cssText = `
+                position: absolute;
+                border-radius: 50%;
+                background: var(--primary);
+                opacity: 0.6;
+                transform: translate(-50%, -50%);
+                pointer-events: none;
+                width: 0;
+                height: 0;
+                z-index: 0;
+            `;
+            const rect = element.getBoundingClientRect();
+            ripple.style.left = rect.width / 2 + 'px';
+            ripple.style.top = rect.height / 2 + 'px';
+
+            element.parentElement.style.position = 'relative';
+            element.parentElement.appendChild(ripple);
+
+            // 动画
+            ripple.animate([
+                { width: 0, height: 0, opacity: 0.6 },
+                { width: 300, height: 300, opacity: 0 }
+            ], {
+                duration: 600,
+                easing: 'ease-out'
+            }).onfinish = () => ripple.remove();
         }
 
         // 页面加载完成后初始化所有效果
@@ -391,7 +463,138 @@
             createBackgroundParticles();
             initMouseFollowParticles();
             initInputAnimation();
+            initThemeSwitcher();
         });
+
+        // ==================== 主题切换器 ====================
+        function initThemeSwitcher() {
+            const themeToggle = document.getElementById('themeToggle');
+            const themePanel = document.getElementById('themePanel');
+            const themeOptions = document.querySelectorAll('.theme-option');
+            const body = document.body;
+            let clickCount = 0;
+            let isPanelOpen = false;
+
+            // 主题配置
+            const themes = {
+                violet: 'violet',
+                cyber: 'cyber',
+                minimal: 'minimal',
+                sunset: 'sunset',
+                ocean: 'ocean'
+            };
+
+            // 初始化主题
+            const savedTheme = localStorage.getItem('theme') || 'violet';
+            setTheme(savedTheme);
+
+            // 切换主题面板
+            themeToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                isPanelOpen = !isPanelOpen;
+                themePanel.classList.toggle('open', isPanelOpen);
+
+                // 彩蛋功能：点击5次激活特殊效果
+                clickCount++;
+                if (clickCount === 5) {
+                    activateEasterEgg();
+                    clickCount = 0;
+                }
+            });
+
+            // 选择主题
+            themeOptions.forEach(option => {
+                option.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const theme = option.dataset.theme;
+                    setTheme(theme);
+                    isPanelOpen = false;
+                    themePanel.classList.remove('open');
+                });
+            });
+
+            // 点击外部关闭面板
+            document.addEventListener('click', () => {
+                isPanelOpen = false;
+                themePanel.classList.remove('open');
+            });
+
+            // 设置主题
+            function setTheme(theme) {
+                body.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+
+                // 更新活动主题高亮
+                themeOptions.forEach(opt => {
+                    opt.classList.toggle('active', opt.dataset.theme === theme);
+                });
+
+                // 主题切换动画
+                body.style.transition = 'background 0.5s ease';
+                setTimeout(() => {
+                    body.style.transition = '';
+                }, 500);
+            }
+
+            // 激活彩蛋效果
+            function activateEasterEgg() {
+                body.classList.add('easter-egg-active');
+
+                // 显示彩蛋消息
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: var(--glass-bg);
+                    backdrop-filter: blur(20px);
+                    border: 2px solid var(--primary);
+                    border-radius: 20px;
+                    padding: 30px 50px;
+                    color: white;
+                    font-size: 24px;
+                    font-weight: bold;
+                    z-index: 10000;
+                    animation: egg-pop 0.5s ease-out;
+                    box-shadow: 0 20px 60px var(--shadow);
+                `;
+                notification.innerHTML = `
+                    <div style="text-align: center;">
+                        <i class="fas fa-gift" style="font-size: 48px; color: var(--accent); margin-bottom: 15px;"></i>
+                        <div>🎉 彩蛋激活！</div>
+                        <div style="font-size: 14px; margin-top: 10px; opacity: 0.8;">特殊效果已开启！</div>
+                    </div>
+                `;
+
+                // 添加动画样式
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes egg-pop {
+                        0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+                        50% { transform: translate(-50%, -50%) scale(1.2); }
+                        100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+                    }
+                `;
+                document.head.appendChild(style);
+
+                document.body.appendChild(notification);
+
+                // 3秒后隐藏彩蛋
+                setTimeout(() => {
+                    notification.style.animation = 'egg-pop 0.5s ease-out reverse';
+                    setTimeout(() => {
+                        notification.remove();
+                        style.remove();
+                    }, 500);
+                }, 3000);
+
+                // 10秒后移除特殊效果
+                setTimeout(() => {
+                    body.classList.remove('easter-egg-active');
+                }, 10000);
+            }
+        }
     </script>
 </body>
 
