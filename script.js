@@ -67,10 +67,16 @@ class DataCollector {
     }
 
     updateStats() {
-        document.getElementById('totalLogins').textContent = this.data.totalLogins;
-        document.getElementById('successfulLogins').textContent = this.data.successfulLogins;
-        document.getElementById('failedLogins').textContent = this.data.failedLogins;
-        document.getElementById('totalVisits').textContent = this.data.totalVisits;
+        // 添加空检查，避免在不存在这些元素的页面上报错
+        const totalLoginsEl = document.getElementById('totalLogins');
+        const successfulLoginsEl = document.getElementById('successfulLogins');
+        const failedLoginsEl = document.getElementById('failedLogins');
+        const totalVisitsEl = document.getElementById('totalVisits');
+
+        if (totalLoginsEl) totalLoginsEl.textContent = this.data.totalLogins;
+        if (successfulLoginsEl) successfulLoginsEl.textContent = this.data.successfulLogins;
+        if (failedLoginsEl) failedLoginsEl.textContent = this.data.failedLogins;
+        if (totalVisitsEl) totalVisitsEl.textContent = this.data.totalVisits;
 
         this.updateLoginLogs();
         this.updateMethodStats();
@@ -115,25 +121,40 @@ class DataCollector {
         const googleCount = this.data.loginMethods.google;
         const githubCount = this.data.loginMethods.github;
 
-        document.getElementById('emailLoginCount').textContent = emailCount;
-        document.getElementById('googleLoginCount').textContent = googleCount;
-        document.getElementById('githubLoginCount').textContent = githubCount;
+        // 添加空检查
+        const emailLoginCountEl = document.getElementById('emailLoginCount');
+        const googleLoginCountEl = document.getElementById('googleLoginCount');
+        const githubLoginCountEl = document.getElementById('githubLoginCount');
+        const emailLoginBarEl = document.getElementById('emailLoginBar');
+        const googleLoginBarEl = document.getElementById('googleLoginBar');
+        const githubLoginBarEl = document.getElementById('githubLoginBar');
+
+        if (emailLoginCountEl) emailLoginCountEl.textContent = emailCount;
+        if (googleLoginCountEl) googleLoginCountEl.textContent = googleCount;
+        if (githubLoginCountEl) githubLoginCountEl.textContent = githubCount;
 
         const emailPercent = total > 0 ? (emailCount / total * 100) : 0;
         const googlePercent = total > 0 ? (googleCount / total * 100) : 0;
         const githubPercent = total > 0 ? (githubCount / total * 100) : 0;
 
-        document.getElementById('emailLoginBar').style.width = `${emailPercent}%`;
-        document.getElementById('googleLoginBar').style.width = `${googlePercent}%`;
-        document.getElementById('githubLoginBar').style.width = `${githubPercent}%`;
+        if (emailLoginBarEl) emailLoginBarEl.style.width = `${emailPercent}%`;
+        if (googleLoginBarEl) googleLoginBarEl.style.width = `${googlePercent}%`;
+        if (githubLoginBarEl) githubLoginBarEl.style.width = `${githubPercent}%`;
     }
 
     updateBrowserInfo() {
         const info = this.getBrowserInfo();
-        document.getElementById('browserName').textContent = info.name;
-        document.getElementById('osName').textContent = info.os;
-        document.getElementById('screenResolution').textContent = info.screen;
-        document.getElementById('timezone').textContent = info.timezone;
+
+        // 添加空检查，避免在不存在这些元素的页面上报错
+        const browserNameEl = document.getElementById('browserName');
+        const osNameEl = document.getElementById('osName');
+        const screenResolutionEl = document.getElementById('screenResolution');
+        const timezoneEl = document.getElementById('timezone');
+
+        if (browserNameEl) browserNameEl.textContent = info.name;
+        if (osNameEl) osNameEl.textContent = info.os;
+        if (screenResolutionEl) screenResolutionEl.textContent = info.screen;
+        if (timezoneEl) timezoneEl.textContent = info.timezone;
     }
 
     getBrowserInfo() {
