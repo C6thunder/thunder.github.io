@@ -297,8 +297,10 @@ class BlogLogin {
         // 显示成功消息
         this.showNotification('登录成功！正在提交表单...', 'success');
 
-        // 让表单自然提交到 Netlify（Netlify 会处理 _next 跳转）
-        // 不阻止表单提交，让 Netlify 的 _next 字段生效
+        // 延迟一点时间让用户看到消息，然后提交表单
+        setTimeout(() => {
+            e.target.submit();
+        }, 500);
     }
 
     togglePasswordVisibility() {
