@@ -365,7 +365,7 @@ class BlogLogin {
         const nextInput = document.createElement('input');
         nextInput.type = 'hidden';
         nextInput.name = '_next';
-        nextInput.value = 'blog.html';
+        nextInput.value = 'redirect.html';
         form.appendChild(nextInput);
 
         // 添加表单数据
