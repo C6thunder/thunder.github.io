@@ -245,27 +245,37 @@ class BlogLogin {
 
         // Toggle password visibility
         const togglePassword = document.getElementById('togglePassword');
-        togglePassword.addEventListener('click', () => this.togglePasswordVisibility());
+        if (togglePassword) {
+            togglePassword.addEventListener('click', () => this.togglePasswordVisibility());
+        }
 
         // Social login buttons
         const googleBtn = document.querySelector('.google-btn');
         const githubBtn = document.querySelector('.github-btn');
-        googleBtn.addEventListener('click', (e) => this.handleSocialLogin(e, 'Google'));
-        githubBtn.addEventListener('click', (e) => this.handleSocialLogin(e, 'GitHub'));
+        if (googleBtn) {
+            googleBtn.addEventListener('click', (e) => this.handleSocialLogin(e, 'Google'));
+        }
+        if (githubBtn) {
+            githubBtn.addEventListener('click', (e) => this.handleSocialLogin(e, 'GitHub'));
+        }
 
         // Forgot password
         const forgotPassword = document.querySelector('.forgot-password');
-        forgotPassword.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.handleForgotPassword();
-        });
+        if (forgotPassword) {
+            forgotPassword.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.handleForgotPassword();
+            });
+        }
 
         // Register link
         const registerLink = document.querySelector('.register-link a');
-        registerLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.handleRegister();
-        });
+        if (registerLink) {
+            registerLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.handleRegister();
+            });
+        }
 
         // Data panel events
         const dataPanelToggle = document.getElementById('dataPanelToggle');
