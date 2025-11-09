@@ -324,13 +324,49 @@ class GitHubNoteManager {
         return await this.saveFile(filename, note, message);
     }
 
-    // 保存评论
+    // 保存评论到笔记文件
     async saveComment(comment) {
-        const timestamp = Date.now();
-        const filename = `comments/comment-${timestamp}.json`;
-        const message = `Add comment to ${comment.noteId}`;
+        try {
+            // 获取笔记文件
+            const noteFile = comment.noteType === 'html'
+                ? `htmlnotes/${comment.noteId}.json`
+                : `notes/${comment.noteId}.json`;
 
-        return await this.saveFile(filename, comment, message);
+            const fileUrl = `${this.apiBase}/repos/${this.config.owner}/${this.config.repo}/contents/${noteFile}?ref=${this.config.branch}`;
+
+            const response = await fetch(fileUrl, {
+                headers: this.getHeaders()
+            });
+
+            if (!response.ok) {
+                throw new Error(`获取笔记文件失败: ${response.statusText}`);
+            }
+
+            const fileData = await response.json();
+            const note = JSON.parse(atob(fileData.content));
+
+            // 添加评论到笔记的comments数组
+            if (!note.comments) {
+                note.comments = [];
+            }
+
+            note.comments.push(comment);
+
+            // 保存更新后的笔记
+            const message = `Add comment to ${comment.noteId}`;
+            await this.saveFile(noteFile, note, message);
+
+            // 也更新本地localStorage
+            const storedComments = localStorage.getItem(`comments_${comment.noteId}`);
+            const localComments = storedComments ? JSON.parse(storedComments) : [];
+            localComments.push(comment);
+            localStorage.setItem(`comments_${comment.noteId}`, JSON.stringify(localComments));
+
+            return { success: true };
+        } catch (error) {
+            console.error('保存评论失败:', error);
+            throw error;
+        }
     }
 
     // 获取所有笔记（从notes.json）
@@ -453,32 +489,35 @@ class GitHubNoteManager {
         return { success: true };
     }
 
-    // 获取单个笔记（包括HTML笔记）
+    // 获取单个笔记（包括HTML笔记和评论）
     async getNoteById(noteId) {
-        // 先从notes.json中查找
-        const notesList = await this.getFile('notes/notes.json');
-        if (notesList && notesList.notes) {
-            const note = notesList.notes.find(n => n.id === noteId);
-            if (note) return { note, type: 'markdown' };
-        }
-
-        // 如果在notes.json中没找到，尝试从notes文件夹扫描
+        // 从notes文件夹扫描获取笔记
         const allNotes = await this.scanAllNotes();
         const note = allNotes.find(n => n.id === noteId);
+
         if (note) {
+            // 确保comments数组存在
+            if (!note.comments) {
+                note.comments = [];
+            }
             return { note, type: note.type || 'markdown' };
         }
 
         return null;
     }
 
-    // 批量获取评论
+    // 获取笔记的评论
     async getComments(noteId) {
         try {
-            // 扫描comments文件夹
-            const comments = await this.scanFolder('comments');
-            return comments.filter(comment => comment.noteId === noteId)
-                          .sort((a, b) => new Date(b.date) - new Date(a.date));
+            // 从notes扫描获取笔记
+            const allNotes = await this.scanAllNotes();
+            const note = allNotes.find(n => n.id === noteId);
+
+            if (note && note.comments) {
+                return note.comments.sort((a, b) => new Date(b.date) - new Date(a.date));
+            }
+
+            return [];
         } catch (error) {
             console.warn('获取评论失败:', error);
             return [];

@@ -833,25 +833,28 @@
             return html.join('');
         }
 
-        // 加载评论
+        // 加载评论（从笔记的comments字段）
         async function loadComments() {
             const noteId = currentNote.id;
-            const storedComments = localStorage.getItem(`comments_${noteId}`);
-            comments = storedComments ? JSON.parse(storedComments) : [];
 
-            try {
-                // 从GitHub获取最新评论
-                const githubComments = await githubNoteManager.getComments(noteId);
-                // 合并评论（GitHub评论优先，避免重复）
-                const localCommentIds = new Set(comments.map(c => c.id));
-                const newComments = githubComments.filter(c => !localCommentIds.has(c.id));
-                comments = [...newComments, ...comments];
-
-                // 保存合并后的评论
-                localStorage.setItem(`comments_${noteId}`, JSON.stringify(comments));
-            } catch (error) {
-                console.warn('获取GitHub评论失败:', error);
+            // 从笔记对象直接读取评论
+            if (currentNote.comments) {
+                comments = currentNote.comments;
+            } else {
+                comments = [];
             }
+
+            // 合并本地存储的临时评论（未同步到GitHub的）
+            const storedComments = localStorage.getItem(`comments_${noteId}`);
+            const localComments = storedComments ? JSON.parse(storedComments) : [];
+
+            // 合并评论（避免重复）
+            const localCommentIds = new Set(comments.map(c => c.id));
+            const newComments = localComments.filter(c => !localCommentIds.has(c.id));
+            comments = [...comments, ...newComments];
+
+            // 按日期排序
+            comments.sort((a, b) => new Date(b.date) - new Date(a.date));
 
             renderComments();
         }
@@ -920,6 +923,7 @@
                     id: `comment-${Date.now()}`,
                     noteId: currentNote.id,
                     noteTitle: currentNote.title,
+                    noteType: currentNote._type,
                     author,
                     content,
                     date: new Date().toISOString()
