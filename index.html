@@ -267,64 +267,94 @@
 
     <!-- 粒子效果 -->
     <script>
-        // 创建粒子效果
+        // 创建粒子效果（优化版）
         function createParticles() {
             const particlesContainer = document.getElementById('particles');
-            const particleCount = 50;
+            const particleCount = 20; // 减少粒子数量
 
             for (let i = 0; i < particleCount; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'particle';
                 particle.style.left = Math.random() * 100 + '%';
                 particle.style.animationDelay = Math.random() * 15 + 's';
-                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                particle.style.animationDuration = (20 + Math.random() * 10) + 's'; // 减慢动画
+                particle.style.opacity = '0.3'; // 降低透明度
                 particlesContainer.appendChild(particle);
             }
         }
 
-        // 3D 鼠标跟踪效果
+        // 3D 鼠标跟踪效果（优化版本）
         function initMouseTrack() {
             const container = document.querySelector('.login-container');
             let isHovered = false;
-
-            document.addEventListener('mousemove', (e) => {
-                if (!isHovered) return;
-
-                const rect = container.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-
-                const rotateX = (y - centerY) / 20;
-                const rotateY = (centerX - x) / 20;
-
-                container.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-10px)`;
-            });
+            let rafId = null;
+            let lastX = 0, lastY = 0;
 
             container.addEventListener('mouseenter', () => {
                 isHovered = true;
-                container.style.transition = 'transform 0.1s ease-out';
+                container.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
             });
 
             container.addEventListener('mouseleave', () => {
                 isHovered = false;
-                container.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                if (rafId) cancelAnimationFrame(rafId);
                 container.style.transform = 'rotateX(5deg) rotateY(-5deg)';
+            });
+
+            // 使用 requestAnimationFrame 优化性能
+            document.addEventListener('mousemove', (e) => {
+                if (!isHovered || (Math.abs(e.clientX - lastX) < 5 && Math.abs(e.clientY - lastY) < 5)) return;
+
+                lastX = e.clientX;
+                lastY = e.clientY;
+
+                if (rafId) return;
+
+                rafId = requestAnimationFrame(() => {
+                    const rect = container.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+
+                    // 减小旋转角度，减少震动
+                    const rotateX = (y - centerY) / 50;
+                    const rotateY = (centerX - x) / 50;
+
+                    container.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-5px)`;
+                    rafId = null;
+                });
             });
         }
 
-        // 输入框动画效果
+        // 输入框动画效果（简化版）
         function initInputAnimation() {
             const inputs = document.querySelectorAll('input[type="email"], input[type="password"]');
             inputs.forEach(input => {
+                let isAnimating = false;
+
                 input.addEventListener('focus', function() {
-                    this.parentElement.parentElement.style.transform = 'translateX(10px)';
+                    if (isAnimating) return;
+                    isAnimating = true;
+
+                    // 只在 .input-decoration 上添加动画，避免影响卡片
+                    const decoration = this.closest('.input-decoration');
+                    if (decoration) {
+                        decoration.style.transform = 'translateX(5px)';
+                        decoration.style.transition = 'transform 0.3s ease';
+                    }
+
+                    setTimeout(() => {
+                        isAnimating = false;
+                    }, 300);
                 });
 
                 input.addEventListener('blur', function() {
-                    this.parentElement.parentElement.style.transform = 'translateX(0)';
+                    const decoration = this.closest('.input-decoration');
+                    if (decoration) {
+                        decoration.style.transform = 'translateX(0)';
+                    }
                 });
             });
         }
