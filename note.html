@@ -658,6 +658,9 @@
                 currentNote = result.note;
                 currentNote._type = result.type || 'markdown';
 
+                // 清理笔记数据确保UTF-8编码正确
+                currentNote = sanitizeNoteData(currentNote);
+
                 renderNote();
                 loadComments();
 
@@ -665,6 +668,30 @@
                 console.error('加载笔记失败:', error);
                 document.getElementById('noteContainer').innerHTML = '<div class="error-state"><i class="fas fa-exclamation-circle"></i><p>加载失败，请刷新页面重试</p></div>';
             }
+        }
+
+        // 清理和验证笔记数据，确保UTF-8编码正确
+        function sanitizeNoteData(note) {
+            if (!note || typeof note !== 'object') return note;
+
+            const cleaned = {};
+            for (const [key, value] of Object.entries(note)) {
+                if (typeof value === 'string') {
+                    // 使用TextEncoder/TextDecoder验证UTF-8
+                    try {
+                        const encoder = new TextEncoder();
+                        const decoder = new TextDecoder('utf-8', { fatal: false });
+                        const bytes = encoder.encode(value);
+                        cleaned[key] = decoder.decode(bytes);
+                    } catch (e) {
+                        // 如果失败，保持原值
+                        cleaned[key] = value;
+                    }
+                } else {
+                    cleaned[key] = value;
+                }
+            }
+            return cleaned;
         }
 
         // 渲染笔记

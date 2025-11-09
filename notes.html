@@ -271,11 +271,43 @@
             animate();
         }
 
+        // 清理和验证笔记数据，确保UTF-8编码正确
+        function sanitizeNotesData(notes) {
+            if (!Array.isArray(notes)) return [];
+
+            return notes.map(note => {
+                if (!note || typeof note !== 'object') return null;
+
+                // 清理字符串字段
+                const cleaned = {};
+                for (const [key, value] of Object.entries(note)) {
+                    if (typeof value === 'string') {
+                        // 使用TextEncoder/TextDecoder验证UTF-8
+                        try {
+                            const encoder = new TextEncoder();
+                            const decoder = new TextDecoder('utf-8', { fatal: false });
+                            const bytes = encoder.encode(value);
+                            cleaned[key] = decoder.decode(bytes);
+                        } catch (e) {
+                            // 如果失败，保持原值
+                            cleaned[key] = value;
+                        }
+                    } else {
+                        cleaned[key] = value;
+                    }
+                }
+                return cleaned;
+            }).filter(note => note !== null);
+        }
+
         // 加载笔记数据
         async function loadNotes() {
             try {
                 // 使用GitHub API扫描所有笔记
                 allNotes = await githubNoteManager.scanAllNotes();
+
+                // 清理数据确保UTF-8编码正确
+                allNotes = sanitizeNotesData(allNotes);
 
                 // 获取URL参数
                 const urlParams = new URLSearchParams(window.location.search);
