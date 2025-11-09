@@ -673,6 +673,16 @@
             const hasKey = currentNote.authorKey;
             const isHtml = currentNote._type === 'html';
 
+            // HTML转义函数
+            const escapeHtml = (str) => {
+                return String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
+            };
+
             // 获取笔记内容
             const contentHtml = isHtml
                 ? currentNote.content  // HTML笔记直接使用内容
@@ -681,7 +691,7 @@
             noteContainer.innerHTML = `
                 <div class="note-content">
                     <div class="note-title-section">
-                        <h1 class="note-title">${currentNote.title}</h1>
+                        <h1 class="note-title">${escapeHtml(currentNote.title)}</h1>
                         <div class="note-actions">
                             <span class="note-type-badge ${isHtml ? 'html' : 'markdown'}">
                                 <i class="fas fa-${isHtml ? 'code' : 'file-alt'}"></i> ${isHtml ? 'HTML' : 'Markdown'}
@@ -695,11 +705,11 @@
                     <div class="note-meta">
                         <div class="note-date">
                             <i class="fas fa-calendar"></i>
-                            ${currentNote.date}
+                            ${escapeHtml(currentNote.date)}
                         </div>
                     </div>
                     <div class="note-tags">
-                        ${currentNote.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                        ${currentNote.tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('')}
                     </div>
                     <div class="note-body ${isHtml ? 'html-note' : ''}">
                         ${contentHtml}
@@ -711,11 +721,11 @@
                     <h3><i class="fas fa-edit"></i> 修改笔记</h3>
                     <div class="form-group">
                         <label>标题</label>
-                        <input type="text" id="editTitle" value="${currentNote.title}">
+                        <input type="text" id="editTitle" value="${escapeHtml(currentNote.title)}">
                     </div>
                     <div class="form-group">
                         <label>标签（用逗号分隔）</label>
-                        <input type="text" id="editTags" value="${currentNote.tags.join(', ')}">
+                        <input type="text" id="editTags" value="${escapeHtml(currentNote.tags.join(', '))}">
                     </div>
                     <div class="form-group">
                         <label>笔记类型</label>
@@ -726,11 +736,11 @@
                     </div>
                     <div class="form-group" id="markdownEditGroup" ${isHtml ? 'style="display: none;"' : ''}>
                         <label>内容（Markdown）</label>
-                        <textarea id="editContent">${isHtml ? '' : currentNote.content}</textarea>
+                        <textarea id="editContent">${isHtml ? '' : escapeHtml(currentNote.content)}</textarea>
                     </div>
                     <div class="form-group" id="htmlEditGroup" ${!isHtml ? 'style="display: none;"' : ''}>
                         <label>内容（HTML）</label>
-                        <div class="html-editor" id="editHtmlContent" contenteditable="true">${isHtml ? currentNote.content : ''}</div>
+                        <div class="html-editor" id="editHtmlContent" contenteditable="true">${isHtml ? escapeHtml(currentNote.content) : ''}</div>
                     </div>
                     <div class="form-actions">
                         <button class="btn" onclick="submitEdit()"><i class="fas fa-save"></i> 保存修改</button>
