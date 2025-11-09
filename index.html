@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>博客登录 - 欢迎回来</title>
+    <title>个人笔记网站 - 我的笔记</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -49,244 +49,93 @@
 
     <div class="container">
         <header class="header">
-            <h1 class="title">
-                <span class="title-gradient">欢迎回来</span>
-            </h1>
-            <p class="subtitle">登录您的博客账户</p>
+            <div class="profile-section">
+                <div class="avatar-container">
+                    <img src="https://avatars.githubusercontent.com/u/000000?v=4" alt="个人头像" class="avatar" id="avatarImg">
+                    <div class="avatar-ring"></div>
+                </div>
+                <h1 class="title">
+                    <span class="title-gradient">我的个人笔记</span>
+                </h1>
+                <p class="subtitle" id="profileBio">分享知识，记录生活</p>
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <i class="fas fa-sticky-note"></i>
+                        <span id="noteCount">0</span>
+                        <label>篇笔记</label>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-eye"></i>
+                        <span id="viewCount">0</span>
+                        <label>次阅读</label>
+                    </div>
+                </div>
+            </div>
         </header>
 
-        <div class="login-container">
-            <form id="loginForm" class="login-form" name="login-form" method="POST" action="/" data-netlify="true" netlify-honeypot="bot-field">
-                <input type="hidden" name="form-name" value="login-form">
-                <!-- Netlify Forms 配置 - 完全免费，无需外部服务 -->
-                <!-- 跳转到 blog.html -->
-                <input type="hidden" name="_next" value="/blog.html">
-                <p style="display: none;">
-                    <label>不要填写这个字段: <input name="bot-field"></label>
-                </p>
-
-                <!-- 数据收集字段 -->
-                <input type="hidden" name="loginMethod" value="email">
-                <input type="hidden" name="timestamp">
-                <input type="hidden" name="userAgent">
-
-                <div class="form-group">
-                    <label for="email">
-                        <i class="fas fa-envelope"></i>
-                        邮箱地址
-                    </label>
-                    <div class="input-decoration">
-                        <input type="email" id="email" name="email" placeholder="请输入您的邮箱" required>
-                        <span class="input-highlight"></span>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="password">
-                        <i class="fas fa-lock"></i>
-                        密码
-                    </label>
-                    <div class="input-decoration">
-                        <div class="password-wrapper">
-                            <input type="password" id="password" name="password" placeholder="请输入您的密码" required>
-                            <button type="button" class="toggle-password" id="togglePassword">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
-                        <span class="input-highlight"></span>
-                    </div>
-                </div>
-
-                <div class="form-options">
-                    <label class="checkbox-wrapper">
-                        <input type="checkbox" id="rememberMe" name="rememberMe">
-                        <span class="checkmark"></span>
-                        记住我
-                    </label>
-                    <a href="#" class="forgot-password">忘记密码？</a>
-                </div>
-
-                <button type="submit" class="login-btn">
-                    <i class="fas fa-sign-in-alt"></i>
-                    登录
-                </button>
-
-                <div class="divider">
-                    <span>或者</span>
-                </div>
-
-                <div class="social-login">
-                    <button type="button" class="social-btn google-btn">
-                        <i class="fab fa-google"></i>
-                        使用 Google 登录
-                    </button>
-                    <button type="button" class="social-btn github-btn">
-                        <i class="fab fa-github"></i>
-                        使用 GitHub 登录
+        <div class="content-section">
+            <!-- 搜索栏 -->
+            <div class="search-container">
+                <div class="search-box">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="searchInput" placeholder="搜索笔记、标签或内容...">
+                    <button class="search-btn" id="searchBtn">
+                        <i class="fas fa-search"></i>
                     </button>
                 </div>
-
-                <p class="register-link">
-                    还没有账户？ <a href="#">立即注册</a>
-                </p>
-            </form>
-
-            <div class="login-success" id="loginSuccess" style="display: none;">
-                <div class="success-icon">
-                    <i class="fas fa-check-circle"></i>
-                </div>
-                <h2>登录成功！</h2>
-                <p>正在为您跳转到博客首页...</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- 数据收集面板切换按钮 -->
-    <button class="data-panel-toggle" id="dataPanelToggle" title="查看数据统计">
-        <i class="fas fa-chart-bar"></i>
-    </button>
-
-    <!-- 数据收集面板 -->
-    <div class="data-panel" id="dataPanel">
-        <div class="data-panel-header">
-            <h2>
-                <i class="fas fa-chart-line"></i>
-                数据统计面板
-            </h2>
-            <button class="close-panel-btn" id="closePanelBtn">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-
-        <div class="data-panel-content">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon users-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-value" id="totalLogins">0</div>
-                        <div class="stat-label">总登录次数</div>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon success-icon">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-value" id="successfulLogins">0</div>
-                        <div class="stat-label">成功登录</div>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon failed-icon">
-                        <i class="fas fa-times-circle"></i>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-value" id="failedLogins">0</div>
-                        <div class="stat-label">失败尝试</div>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon visit-icon">
-                        <i class="fas fa-eye"></i>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-value" id="totalVisits">0</div>
-                        <div class="stat-label">页面访问量</div>
-                    </div>
-                </div>
             </div>
 
-            <div class="data-section">
-                <h3>
-                    <i class="fas fa-clock"></i>
-                    最近登录记录
-                </h3>
-                <div class="log-list" id="loginLogs">
-                    <div class="log-item empty">
-                        <i class="fas fa-info-circle"></i>
-                        暂无登录记录
+            <!-- 快捷操作 -->
+            <div class="quick-actions">
+                <a href="notes.html" class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-book"></i>
                     </div>
-                </div>
-            </div>
+                    <div class="action-content">
+                        <h3>所有笔记</h3>
+                        <p>浏览所有笔记内容</p>
+                    </div>
+                    <i class="fas fa-chevron-right"></i>
+                </a>
 
-            <div class="data-section">
-                <h3>
-                    <i class="fas fa-globe"></i>
-                    浏览器信息
-                </h3>
-                <div class="browser-info">
-                    <div class="info-item">
-                        <span class="info-label">浏览器：</span>
-                        <span class="info-value" id="browserName">-</span>
+                <button class="action-card" id="randomNoteBtn">
+                    <div class="action-icon">
+                        <i class="fas fa-random"></i>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">操作系统：</span>
-                        <span class="info-value" id="osName">-</span>
+                    <div class="action-content">
+                        <h3>随机笔记</h3>
+                        <p>发现有趣的内容</p>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">屏幕分辨率：</span>
-                        <span class="info-value" id="screenResolution">-</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">时区：</span>
-                        <span class="info-value" id="timezone">-</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="data-section">
-                <h3>
-                    <i class="fas fa-chart-pie"></i>
-                    登录方式统计
-                </h3>
-                <div class="method-stats">
-                    <div class="method-item">
-                        <span class="method-name">
-                            <i class="fas fa-envelope"></i>
-                            邮箱登录
-                        </span>
-                        <div class="method-bar">
-                            <div class="method-fill" id="emailLoginBar" style="width: 0%"></div>
-                        </div>
-                        <span class="method-count" id="emailLoginCount">0</span>
-                    </div>
-                    <div class="method-item">
-                        <span class="method-name">
-                            <i class="fab fa-google"></i>
-                            Google 登录
-                        </span>
-                        <div class="method-bar">
-                            <div class="method-fill" id="googleLoginBar" style="width: 0%"></div>
-                        </div>
-                        <span class="method-count" id="googleLoginCount">0</span>
-                    </div>
-                    <div class="method-item">
-                        <span class="method-name">
-                            <i class="fab fa-github"></i>
-                            GitHub 登录
-                        </span>
-                        <div class="method-bar">
-                            <div class="method-fill" id="githubLoginBar" style="width: 0%"></div>
-                        </div>
-                        <span class="method-count" id="githubLoginCount">0</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="data-actions">
-                <button class="action-btn secondary" id="exportData">
-                    <i class="fas fa-download"></i>
-                    导出数据
+                    <i class="fas fa-chevron-right"></i>
                 </button>
-                <button class="action-btn danger" id="clearData">
-                    <i class="fas fa-trash-alt"></i>
-                    清空数据
+
+                <button class="action-card" id="recentNotesBtn">
+                    <div class="action-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="action-content">
+                        <h3>最近更新</h3>
+                        <p>查看最新笔记</p>
+                    </div>
+                    <i class="fas fa-chevron-right"></i>
                 </button>
+            </div>
+
+            <!-- 最近笔记 -->
+            <div class="section-header">
+                <h2><i class="fas fa-star"></i> 最近笔记</h2>
+                <a href="notes.html" class="view-all">查看全部 <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="notes-grid" id="recentNotes">
+                <div class="loading">加载中...</div>
+            </div>
+
+            <!-- 热门标签 -->
+            <div class="section-header">
+                <h2><i class="fas fa-tags"></i> 热门标签</h2>
+            </div>
+            <div class="tags-container" id="tagsContainer">
+                <div class="loading">加载中...</div>
             </div>
         </div>
     </div>
@@ -298,7 +147,7 @@
         // 背景粒子效果
         function createBackgroundParticles() {
             const particlesContainer = document.getElementById('particles');
-            const particleCount = 30; // 背景粒子数量
+            const particleCount = 30;
 
             for (let i = 0; i < particleCount; i++) {
                 const particle = document.createElement('div');
@@ -315,7 +164,6 @@
         function initMouseFollowParticles() {
             const canvas = document.createElement('canvas');
             canvas.id = 'mouse-canvas';
-            // 使用CSS设置样式
             document.body.appendChild(canvas);
 
             const ctx = canvas.getContext('2d');
@@ -329,12 +177,10 @@
             resize();
             window.addEventListener('resize', resize);
 
-            // 鼠标移动事件
             document.addEventListener('mousemove', (e) => {
                 mouse.x = e.clientX;
                 mouse.y = e.clientY;
 
-                // 在鼠标位置创建新粒子
                 for (let i = 0; i < 5; i++) {
                     particles.push({
                         x: mouse.x,
@@ -347,11 +193,9 @@
                 }
             });
 
-            // 动画循环
             function animate() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                // 绘制粒子
                 particles.forEach((particle, index) => {
                     particle.x += particle.vx;
                     particle.y += particle.vy;
@@ -383,219 +227,133 @@
             animate();
         }
 
-        // 输入框动画效果（简化版）
-        function initInputAnimation() {
-            const inputs = document.querySelectorAll('input[type="email"], input[type="password"]');
-            inputs.forEach(input => {
-                let isAnimating = false;
+        // 搜索功能
+        function initSearch() {
+            const searchInput = document.getElementById('searchInput');
+            const searchBtn = document.getElementById('searchBtn');
 
-                input.addEventListener('focus', function() {
-                    if (isAnimating) return;
-                    isAnimating = true;
+            function performSearch() {
+                const query = searchInput.value.trim();
+                if (query) {
+                    window.location.href = `notes.html?search=${encodeURIComponent(query)}`;
+                }
+            }
 
-                    // 只在 .input-decoration 上添加动画，避免影响卡片
-                    const decoration = this.closest('.input-decoration');
-                    if (decoration) {
-                        decoration.style.transform = 'translateX(5px)';
-                        decoration.style.transition = 'transform 0.3s ease';
-                    }
-
-                    // 添加波纹效果
-                    createRippleEffect(this);
-
-                    setTimeout(() => {
-                        isAnimating = false;
-                    }, 300);
-                });
-
-                input.addEventListener('blur', function() {
-                    const decoration = this.closest('.input-decoration');
-                    if (decoration) {
-                        decoration.style.transform = 'translateX(0)';
-                    }
-                });
-
-                // 添加键盘交互
-                input.addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter') {
-                        // 按下回车时添加特效
-                        this.style.transform = 'scale(0.98)';
-                        setTimeout(() => {
-                            this.style.transform = '';
-                        }, 100);
-                    }
-                });
+            searchBtn.addEventListener('click', performSearch);
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
             });
         }
 
-        // 创建波纹效果
-        function createRippleEffect(element) {
-            const ripple = document.createElement('div');
-            ripple.style.cssText = `
-                position: absolute;
-                border-radius: 50%;
-                background: var(--primary);
-                opacity: 0.6;
-                transform: translate(-50%, -50%);
-                pointer-events: none;
-                width: 0;
-                height: 0;
-                z-index: 0;
-            `;
-            const rect = element.getBoundingClientRect();
-            ripple.style.left = rect.width / 2 + 'px';
-            ripple.style.top = rect.height / 2 + 'px';
+        // 加载笔记数据
+        async function loadNotes() {
+            try {
+                // 从本地JSON文件加载笔记列表
+                const response = await fetch('./notes/notes.json');
+                const data = await response.json();
 
-            element.parentElement.style.position = 'relative';
-            element.parentElement.appendChild(ripple);
+                // 更新统计
+                document.getElementById('noteCount').textContent = data.notes.length;
 
-            // 动画
-            ripple.animate([
-                { width: 0, height: 0, opacity: 0.6 },
-                { width: 300, height: 300, opacity: 0 }
-            ], {
-                duration: 600,
-                easing: 'ease-out'
-            }).onfinish = () => ripple.remove();
+                // 显示最近笔记（前3篇）
+                const recentNotesContainer = document.getElementById('recentNotes');
+                if (data.notes.length === 0) {
+                    recentNotesContainer.innerHTML = '<div class="empty-state"><i class="fas fa-sticky-note"></i><p>暂无笔记</p></div>';
+                } else {
+                    const recentNotes = data.notes.slice(0, 3);
+                    recentNotesContainer.innerHTML = recentNotes.map(note => `
+                        <div class="note-card" onclick="location.href='note.html?id=${note.id}'">
+                            <div class="note-header">
+                                <h3>${note.title}</h3>
+                                <span class="note-date">${note.date}</span>
+                            </div>
+                            <p class="note-excerpt">${note.excerpt}</p>
+                            <div class="note-tags">
+                                ${note.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                // 提取所有标签
+                const allTags = new Set();
+                data.notes.forEach(note => {
+                    note.tags.forEach(tag => allTags.add(tag));
+                });
+
+                // 显示标签（前10个）
+                const tagsContainer = document.getElementById('tagsContainer');
+                const topTags = Array.from(allTags).slice(0, 10);
+                if (topTags.length === 0) {
+                    tagsContainer.innerHTML = '<div class="empty-state"><i class="fas fa-tags"></i><p>暂无标签</p></div>';
+                } else {
+                    tagsContainer.innerHTML = topTags.map(tag => `
+                        <span class="tag-cloud" onclick="location.href='notes.html?tag=${encodeURIComponent(tag)}'">
+                            ${tag}
+                        </span>
+                    `).join('');
+                }
+
+            } catch (error) {
+                console.error('加载笔记失败:', error);
+                document.getElementById('recentNotes').innerHTML = '<div class="error-state"><i class="fas fa-exclamation-circle"></i><p>加载失败，请稍后重试</p></div>';
+                document.getElementById('tagsContainer').innerHTML = '<div class="error-state"><i class="fas fa-exclamation-circle"></i><p>加载失败</p></div>';
+            }
         }
 
-        // 页面加载完成后初始化所有效果
-        window.addEventListener('load', () => {
-            createBackgroundParticles();
-            initMouseFollowParticles();
-            initInputAnimation();
-            initThemeSwitcher();
-        });
-
-        // ==================== 主题切换器 ====================
+        // 主题切换器
         function initThemeSwitcher() {
             const themeToggle = document.getElementById('themeToggle');
             const themePanel = document.getElementById('themePanel');
             const themeOptions = document.querySelectorAll('.theme-option');
             const body = document.body;
-            let clickCount = 0;
-            let isPanelOpen = false;
 
-            // 主题配置
-            const themes = {
-                violet: 'violet',
-                cyber: 'cyber',
-                minimal: 'minimal',
-                sunset: 'sunset',
-                ocean: 'ocean'
-            };
-
-            // 初始化主题
             const savedTheme = localStorage.getItem('theme') || 'violet';
             setTheme(savedTheme);
 
-            // 切换主题面板
             themeToggle.addEventListener('click', (e) => {
                 e.stopPropagation();
-                isPanelOpen = !isPanelOpen;
-                themePanel.classList.toggle('open', isPanelOpen);
-
-                // 彩蛋功能：点击5次激活特殊效果
-                clickCount++;
-                if (clickCount === 5) {
-                    activateEasterEgg();
-                    clickCount = 0;
-                }
+                themePanel.classList.toggle('open');
             });
 
-            // 选择主题
             themeOptions.forEach(option => {
                 option.addEventListener('click', (e) => {
                     e.stopPropagation();
                     const theme = option.dataset.theme;
                     setTheme(theme);
-                    isPanelOpen = false;
                     themePanel.classList.remove('open');
                 });
             });
 
-            // 点击外部关闭面板
             document.addEventListener('click', () => {
-                isPanelOpen = false;
                 themePanel.classList.remove('open');
             });
 
-            // 设置主题
             function setTheme(theme) {
                 body.setAttribute('data-theme', theme);
                 localStorage.setItem('theme', theme);
 
-                // 更新活动主题高亮
                 themeOptions.forEach(opt => {
                     opt.classList.toggle('active', opt.dataset.theme === theme);
                 });
 
-                // 主题切换动画
                 body.style.transition = 'background 0.5s ease';
                 setTimeout(() => {
                     body.style.transition = '';
                 }, 500);
             }
-
-            // 激活彩蛋效果
-            function activateEasterEgg() {
-                body.classList.add('easter-egg-active');
-
-                // 显示彩蛋消息
-                const notification = document.createElement('div');
-                notification.style.cssText = `
-                    position: fixed;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    background: var(--glass-bg);
-                    backdrop-filter: blur(20px);
-                    border: 2px solid var(--primary);
-                    border-radius: 20px;
-                    padding: 30px 50px;
-                    color: white;
-                    font-size: 24px;
-                    font-weight: bold;
-                    z-index: 10000;
-                    animation: egg-pop 0.5s ease-out;
-                    box-shadow: 0 20px 60px var(--shadow);
-                `;
-                notification.innerHTML = `
-                    <div style="text-align: center;">
-                        <i class="fas fa-gift" style="font-size: 48px; color: var(--accent); margin-bottom: 15px;"></i>
-                        <div>🎉 彩蛋激活！</div>
-                        <div style="font-size: 14px; margin-top: 10px; opacity: 0.8;">特殊效果已开启！</div>
-                    </div>
-                `;
-
-                // 添加动画样式
-                const style = document.createElement('style');
-                style.textContent = `
-                    @keyframes egg-pop {
-                        0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-                        50% { transform: translate(-50%, -50%) scale(1.2); }
-                        100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-                    }
-                `;
-                document.head.appendChild(style);
-
-                document.body.appendChild(notification);
-
-                // 3秒后隐藏彩蛋
-                setTimeout(() => {
-                    notification.style.animation = 'egg-pop 0.5s ease-out reverse';
-                    setTimeout(() => {
-                        notification.remove();
-                        style.remove();
-                    }, 500);
-                }, 3000);
-
-                // 10秒后移除特殊效果
-                setTimeout(() => {
-                    body.classList.remove('easter-egg-active');
-                }, 10000);
-            }
         }
+
+        // 页面加载完成后初始化
+        window.addEventListener('load', () => {
+            createBackgroundParticles();
+            initMouseFollowParticles();
+            initSearch();
+            loadNotes();
+            initThemeSwitcher();
+        });
     </script>
 </body>
 

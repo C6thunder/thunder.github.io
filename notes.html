@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>所有笔记 - 个人笔记网站</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body data-theme="violet">
+    <div class="background">
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+        <div class="gradient-orb orb-3"></div>
+        <div class="gradient-orb orb-4"></div>
+        <div class="gradient-orb orb-5"></div>
+    </div>
+    <div class="particles" id="particles"></div>
+
+    <!-- 主题切换器 -->
+    <div class="theme-switcher">
+        <button class="theme-toggle-btn" id="themeToggle" title="切换主题">
+            <i class="fas fa-palette"></i>
+        </button>
+        <div class="theme-panel" id="themePanel">
+            <h3><i class="fas fa-magic"></i> 选择主题</h3>
+            <div class="theme-options">
+                <div class="theme-option" data-theme="violet" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" title="紫罗兰梦境">
+                    <div class="theme-label">紫罗兰</div>
+                </div>
+                <div class="theme-option" data-theme="cyber" style="background: linear-gradient(135deg, #00f0ff 0%, #ff00ff 100%);" title="霓虹赛博">
+                    <div class="theme-label">赛博</div>
+                </div>
+                <div class="theme-option" data-theme="minimal" style="background: linear-gradient(135deg, #ffffff 0%, #888888 100%);" title="极简黑白">
+                    <div class="theme-label">极简</div>
+                </div>
+                <div class="theme-option" data-theme="sunset" style="background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);" title="日落暖阳">
+                    <div class="theme-label">暖阳</div>
+                </div>
+                <div class="theme-option" data-theme="ocean" style="background: linear-gradient(135deg, #00bfff 0%, #1e90ff 100%);" title="深海幽蓝">
+                    <div class="theme-label">深海</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <header class="header">
+            <div class="header-nav">
+                <a href="index.html" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> 返回首页
+                </a>
+                <h1 class="title">
+                    <span class="title-gradient">所有笔记</span>
+                </h1>
+                <div class="header-actions">
+                    <button class="action-btn" id="sortBtn">
+                        <i class="fas fa-sort"></i> 排序
+                    </button>
+                </div>
+            </div>
+
+            <!-- 搜索栏 -->
+            <div class="search-container">
+                <div class="search-box">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="searchInput" placeholder="搜索笔记、标签或内容...">
+                    <button class="search-btn" id="searchBtn">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 筛选标签 -->
+            <div class="filter-tags" id="filterTags">
+                <div class="loading">加载中...</div>
+            </div>
+        </header>
+
+        <div class="content-section">
+            <!-- 笔记网格 -->
+            <div class="notes-grid" id="notesGrid">
+                <div class="loading">加载中...</div>
+            </div>
+
+            <!-- 分页 -->
+            <div class="pagination" id="pagination" style="display: none;">
+                <button class="page-btn" id="prevPage" disabled>
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <div class="page-numbers" id="pageNumbers"></div>
+                <button class="page-btn" id="nextPage" disabled>
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <!-- 空状态 -->
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <i class="fas fa-search"></i>
+                <h3>未找到相关笔记</h3>
+                <p>尝试更换关键词或清除筛选条件</p>
+                <button class="btn-primary" onclick="clearFilters()">清除筛选</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+
+    <script>
+        // 全局变量
+        let allNotes = [];
+        let filteredNotes = [];
+        let currentPage = 1;
+        const notesPerPage = 9;
+        let currentSort = 'date-desc';
+        let currentFilter = null;
+        let currentSearch = '';
+
+        // 背景粒子效果
+        function createBackgroundParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 30;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle bg-particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (20 + Math.random() * 10) + 's';
+                particle.style.opacity = '0.2';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // 鼠标跟随粒子效果
+        function initMouseFollowParticles() {
+            const canvas = document.createElement('canvas');
+            canvas.id = 'mouse-canvas';
+            document.body.appendChild(canvas);
+
+            const ctx = canvas.getContext('2d');
+            const particles = [];
+            const mouse = { x: 0, y: 0 };
+
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            document.addEventListener('mousemove', (e) => {
+                mouse.x = e.clientX;
+                mouse.y = e.clientY;
+
+                for (let i = 0; i < 5; i++) {
+                    particles.push({
+                        x: mouse.x,
+                        y: mouse.y,
+                        vx: (Math.random() - 0.5) * 2,
+                        vy: (Math.random() - 0.5) * 2,
+                        life: 1,
+                        size: Math.random() * 3 + 2
+                    });
+                }
+            });
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                particles.forEach((particle, index) => {
+                    particle.x += particle.vx;
+                    particle.y += particle.vy;
+                    particle.life -= 0.02;
+
+                    if (particle.life <= 0) {
+                        particles.splice(index, 1);
+                        return;
+                    }
+
+                    const alpha = particle.life;
+                    const gradient = ctx.createRadialGradient(
+                        particle.x, particle.y, 0,
+                        particle.x, particle.y, particle.size * 2
+                    );
+                    gradient.addColorStop(0, `rgba(102, 126, 234, ${alpha})`);
+                    gradient.addColorStop(0.5, `rgba(240, 147, 251, ${alpha * 0.5})`);
+                    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                requestAnimationFrame(animate);
+            }
+
+            animate();
+        }
+
+        // 加载笔记数据
+        async function loadNotes() {
+            try {
+                const response = await fetch('./notes/notes.json');
+                const data = await response.json();
+                allNotes = data.notes;
+
+                // 获取URL参数
+                const urlParams = new URLSearchParams(window.location.search);
+                currentSearch = urlParams.get('search') || '';
+                const tag = urlParams.get('tag');
+
+                if (currentSearch) {
+                    document.getElementById('searchInput').value = currentSearch;
+                }
+
+                if (tag) {
+                    currentFilter = tag;
+                }
+
+                filterAndSortNotes();
+                loadFilterTags();
+
+            } catch (error) {
+                console.error('加载笔记失败:', error);
+                document.getElementById('notesGrid').innerHTML = '<div class="error-state"><i class="fas fa-exclamation-circle"></i><p>加载失败，请刷新页面重试</p></div>';
+            }
+        }
+
+        // 加载筛选标签
+        async function loadFilterTags() {
+            try {
+                const response = await fetch('./notes/notes.json');
+                const data = await response.json();
+
+                const allTags = new Set();
+                data.notes.forEach(note => {
+                    note.tags.forEach(tag => allTags.add(tag));
+                });
+
+                const filterTagsContainer = document.getElementById('filterTags');
+                const tags = Array.from(allTags);
+
+                if (tags.length === 0) {
+                    filterTagsContainer.innerHTML = '<span class="empty-text">暂无标签</span>';
+                    return;
+                }
+
+                let html = '<span class="filter-label">筛选：</span>';
+                html += `<span class="tag ${!currentFilter ? 'active' : ''}" data-tag="">全部</span>`;
+
+                tags.forEach(tag => {
+                    const activeClass = currentFilter === tag ? 'active' : '';
+                    html += `<span class="tag ${activeClass}" data-tag="${tag}">${tag}</span>`;
+                });
+
+                filterTagsContainer.innerHTML = html;
+
+                // 绑定标签点击事件
+                filterTagsContainer.querySelectorAll('.tag').forEach(tagEl => {
+                    tagEl.addEventListener('click', () => {
+                        const tag = tagEl.dataset.tag;
+                        currentFilter = tag || null;
+                        currentPage = 1;
+                        filterAndSortNotes();
+                        loadFilterTags(); // 重新加载以更新active状态
+                    });
+                });
+
+            } catch (error) {
+                console.error('加载标签失败:', error);
+            }
+        }
+
+        // 筛选和排序笔记
+        function filterAndSortNotes() {
+            filteredNotes = [...allNotes];
+
+            // 按标签筛选
+            if (currentFilter) {
+                filteredNotes = filteredNotes.filter(note =>
+                    note.tags.includes(currentFilter)
+                );
+            }
+
+            // 搜索过滤
+            if (currentSearch) {
+                const query = currentSearch.toLowerCase();
+                filteredNotes = filteredNotes.filter(note =>
+                    note.title.toLowerCase().includes(query) ||
+                    note.excerpt.toLowerCase().includes(query) ||
+                    note.content.toLowerCase().includes(query) ||
+                    note.tags.some(tag => tag.toLowerCase().includes(query))
+                );
+            }
+
+            // 排序
+            switch (currentSort) {
+                case 'date-desc':
+                    filteredNotes.sort((a, b) => new Date(b.date) - new Date(a.date));
+                    break;
+                case 'date-asc':
+                    filteredNotes.sort((a, b) => new Date(a.date) - new Date(b.date));
+                    break;
+                case 'title-asc':
+                    filteredNotes.sort((a, b) => a.title.localeCompare(b.title));
+                    break;
+                case 'title-desc':
+                    filteredNotes.sort((a, b) => b.title.localeCompare(a.title));
+                    break;
+            }
+
+            renderNotes();
+            renderPagination();
+        }
+
+        // 渲染笔记列表
+        function renderNotes() {
+            const notesGrid = document.getElementById('notesGrid');
+            const emptyState = document.getElementById('emptyState');
+
+            if (filteredNotes.length === 0) {
+                notesGrid.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            notesGrid.style.display = 'grid';
+            emptyState.style.display = 'none';
+
+            const start = (currentPage - 1) * notesPerPage;
+            const end = start + notesPerPage;
+            const pageNotes = filteredNotes.slice(start, end);
+
+            notesGrid.innerHTML = pageNotes.map(note => `
+                <div class="note-card" onclick="location.href='note.html?id=${note.id}'">
+                    <div class="note-header">
+                        <h3>${note.title}</h3>
+                        <span class="note-date">${note.date}</span>
+                    </div>
+                    <p class="note-excerpt">${note.excerpt}</p>
+                    <div class="note-tags">
+                        ${note.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                    </div>
+                    <div class="note-footer">
+                        <span class="read-more">
+                            阅读更多 <i class="fas fa-arrow-right"></i>
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 渲染分页
+        function renderPagination() {
+            const totalPages = Math.ceil(filteredNotes.length / notesPerPage);
+
+            if (totalPages <= 1) {
+                document.getElementById('pagination').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('pagination').style.display = 'flex';
+
+            const prevBtn = document.getElementById('prevPage');
+            const nextBtn = document.getElementById('nextPage');
+            const pageNumbers = document.getElementById('pageNumbers');
+
+            prevBtn.disabled = currentPage === 1;
+            nextBtn.disabled = currentPage === totalPages;
+
+            let html = '';
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === currentPage) {
+                    html += `<span class="page-number active">${i}</span>`;
+                } else {
+                    html += `<span class="page-number" onclick="changePage(${i})">${i}</span>`;
+                }
+            }
+
+            pageNumbers.innerHTML = html;
+
+            prevBtn.onclick = () => changePage(currentPage - 1);
+            nextBtn.onclick = () => changePage(currentPage + 1);
+        }
+
+        // 切换页面
+        function changePage(page) {
+            currentPage = page;
+            renderNotes();
+            renderPagination();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 清除筛选
+        function clearFilters() {
+            currentFilter = null;
+            currentSearch = '';
+            currentPage = 1;
+            document.getElementById('searchInput').value = '';
+            filterAndSortNotes();
+            loadFilterTags();
+        }
+
+        // 绑定事件
+        function bindEvents() {
+            // 搜索
+            const searchInput = document.getElementById('searchInput');
+            const searchBtn = document.getElementById('searchBtn');
+
+            function performSearch() {
+                currentSearch = searchInput.value.trim();
+                currentPage = 1;
+                filterAndSortNotes();
+            }
+
+            searchBtn.addEventListener('click', performSearch);
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+
+            // 排序
+            document.getElementById('sortBtn').addEventListener('click', () => {
+                const sortOptions = ['date-desc', 'date-asc', 'title-asc', 'title-desc'];
+                const currentIndex = sortOptions.indexOf(currentSort);
+                const nextIndex = (currentIndex + 1) % sortOptions.length;
+                currentSort = sortOptions[nextIndex];
+
+                const sortText = {
+                    'date-desc': '日期降序',
+                    'date-asc': '日期升序',
+                    'title-asc': '标题 A-Z',
+                    'title-desc': '标题 Z-A'
+                };
+
+                document.getElementById('sortBtn').innerHTML = `<i class="fas fa-sort"></i> ${sortText[currentSort]}`;
+                filterAndSortNotes();
+            });
+
+            // 主题切换
+            initThemeSwitcher();
+        }
+
+        // 主题切换器
+        function initThemeSwitcher() {
+            const themeToggle = document.getElementById('themeToggle');
+            const themePanel = document.getElementById('themePanel');
+            const themeOptions = document.querySelectorAll('.theme-option');
+            const body = document.body;
+
+            const savedTheme = localStorage.getItem('theme') || 'violet';
+            setTheme(savedTheme);
+
+            themeToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                themePanel.classList.toggle('open');
+            });
+
+            themeOptions.forEach(option => {
+                option.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const theme = option.dataset.theme;
+                    setTheme(theme);
+                    themePanel.classList.remove('open');
+                });
+            });
+
+            document.addEventListener('click', () => {
+                themePanel.classList.remove('open');
+            });
+
+            function setTheme(theme) {
+                body.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+
+                themeOptions.forEach(opt => {
+                    opt.classList.toggle('active', opt.dataset.theme === theme);
+                });
+
+                body.style.transition = 'background 0.5s ease';
+                setTimeout(() => {
+                    body.style.transition = '';
+                }, 500);
+            }
+        }
+
+        // 页面加载完成后初始化
+        window.addEventListener('load', () => {
+            createBackgroundParticles();
+            initMouseFollowParticles();
+            loadNotes();
+            bindEvents();
+        });
+    </script>
+</body>
+
+</html>

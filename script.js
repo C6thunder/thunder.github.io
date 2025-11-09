@@ -213,9 +213,10 @@ class BlogLogin {
     }
 
     bindEvents() {
-        // 邮箱登录表单提交
+        // 邮箱登录按钮提交（使用click事件而不是submit事件）
         const loginForm = document.getElementById('loginForm');
-        loginForm.addEventListener('submit', (e) => this.handleEmailLogin(e));
+        const loginBtn = document.querySelector('.login-btn');
+        loginBtn.addEventListener('click', (e) => this.handleEmailLogin(e, loginForm));
 
         // Toggle password visibility
         const togglePassword = document.getElementById('togglePassword');
@@ -263,7 +264,7 @@ class BlogLogin {
         });
     }
 
-    handleEmailLogin(e) {
+    handleEmailLogin(e, loginForm) {
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         const rememberMe = document.getElementById('rememberMe').checked;
@@ -299,7 +300,7 @@ class BlogLogin {
 
         // 延迟一点时间让用户看到消息，然后提交表单
         setTimeout(() => {
-            e.target.submit();
+            loginForm.submit();
         }, 500);
     }
 
