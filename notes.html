@@ -327,12 +327,10 @@
         // 加载筛选标签
         async function loadFilterTags() {
             try {
-                const response = await fetch('./notes/notes.json');
-                const data = await response.json();
-
+                // 从allNotes中获取所有标签
                 const allTags = new Set();
-                data.notes.forEach(note => {
-                    note.tags.forEach(tag => allTags.add(tag));
+                allNotes.filter(note => note && note.id).forEach(note => {
+                    (note.tags || []).forEach(tag => allTags.add(tag));
                 });
 
                 const filterTagsContainer = document.getElementById('filterTags');
@@ -416,7 +414,10 @@
             const notesGrid = document.getElementById('notesGrid');
             const emptyState = document.getElementById('emptyState');
 
-            if (filteredNotes.length === 0) {
+            // 过滤掉null和undefined的笔记
+            const validNotes = filteredNotes.filter(note => note && note.id);
+
+            if (validNotes.length === 0) {
                 notesGrid.style.display = 'none';
                 emptyState.style.display = 'block';
                 return;
@@ -427,7 +428,7 @@
 
             const start = (currentPage - 1) * notesPerPage;
             const end = start + notesPerPage;
-            const pageNotes = filteredNotes.slice(start, end);
+            const pageNotes = validNotes.slice(start, end);
 
             notesGrid.innerHTML = pageNotes.map(note => `
                 <div class="note-card" onclick="location.href='note.html?id=${note.id}'">
@@ -450,7 +451,9 @@
 
         // 渲染分页
         function renderPagination() {
-            const totalPages = Math.ceil(filteredNotes.length / notesPerPage);
+            // 过滤掉null和undefined的笔记，计算有效笔记数量
+            const validNotes = filteredNotes.filter(note => note && note.id);
+            const totalPages = Math.ceil(validNotes.length / notesPerPage);
 
             if (totalPages <= 1) {
                 document.getElementById('pagination').style.display = 'none';
