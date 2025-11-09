@@ -1,0 +1,14 @@
+{
+  "id": "note-004",
+  "title": "Git使用指南",
+  "date": "2025-11-07",
+  "excerpt": "Git版本控制系统的常用命令和最佳实践，适合初学者学习。",
+  "tags": [
+    "Git",
+    "工具",
+    "版本控制"
+  ],
+  "content": "# Git 使用指南\n\n## 基本概念\n\nGit是一个分布式版本控制系统。\n\n### 三个区域\n\n1. **工作区（Working Directory）**\n   - 实际的文件目录\n\n2. **暂存区（Staging Area）**\n   - 临时存储将要提交的文件\n\n3. **版本库（Repository）**\n   - 存储所有版本信息\n\n## 常用命令\n\n### 初始化仓库\n\n```bash\ngit init\n```\n\n### 克隆仓库\n\n```bash\ngit clone [url]\n```\n\n### 添加文件\n\n```bash\ngit add [file]\ngit add .\n```\n\n### 提交更改\n\n```bash\ngit commit -m \"提交信息\"\n```\n\n### 查看状态\n\n```bash\ngit status\n```\n\n### 查看历史\n\n```bash\ngit log\n```\n\n### 分支操作\n\n```bash\n# 创建分支\ngit branch [branch-name]\n\n# 切换分支\ngit checkout [branch-name]\n\n# 创建并切换\ngit checkout -b [branch-name]\n```\n\n### 合并分支\n\n```bash\ngit merge [branch]\n```\n\n### 推送远程\n\n```bash\ngit push origin [branch]\n```\n\n### 拉取更新\n\n```bash\ngit pull\n```\n\n## 最佳实践\n\n1. **频繁提交**\n   - 小步提交，便于回滚\n\n2. **清晰的提交信息**\n   - 使用规范化的格式\n   - 说明变更原因\n\n3. **使用分支**\n   - 功能开发使用独立分支\n   - 保护主分支\n\n4. **代码审查**\n   - Pull Request机制\n   - 团队协作\n\n## 总结\n\n掌握Git是程序员的必备技能，多练习才能熟练运用。\n\n> Keep coding!",
+  "authorKey": "git2024",
+  "type": "markdown"
+}
