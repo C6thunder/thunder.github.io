@@ -284,14 +284,23 @@ class BlogLogin {
         const exportDataBtn = document.getElementById('exportData');
         const clearDataBtn = document.getElementById('clearData');
 
-        dataPanelToggle.addEventListener('click', () => this.toggleDataPanel());
-        closePanelBtn.addEventListener('click', () => this.closeDataPanel());
-        exportDataBtn.addEventListener('click', () => this.dataCollector.exportData());
-        clearDataBtn.addEventListener('click', () => this.dataCollector.clearData());
+        if (dataPanelToggle) {
+            dataPanelToggle.addEventListener('click', () => this.toggleDataPanel());
+        }
+        if (closePanelBtn) {
+            closePanelBtn.addEventListener('click', () => this.closeDataPanel());
+        }
+        if (exportDataBtn) {
+            exportDataBtn.addEventListener('click', () => this.dataCollector.exportData());
+        }
+        if (clearDataBtn) {
+            clearDataBtn.addEventListener('click', () => this.dataCollector.clearData());
+        }
 
         // Close panel when clicking outside
-        document.addEventListener('click', (e) => {
-            if (dataPanel.classList.contains('open') &&
+        if (dataPanel) {
+            document.addEventListener('click', (e) => {
+                if (dataPanel.classList.contains('open') &&
                 !dataPanel.contains(e.target) &&
                 e.target !== dataPanelToggle) {
                 this.closeDataPanel();

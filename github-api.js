@@ -369,19 +369,10 @@ class GitHubNoteManager {
         }
     }
 
-    // 获取所有笔记（从notes.json）
+    // 获取所有笔记（通过扫描文件夹）
     async getAllNotes() {
-        try {
-            // 从notes.json获取笔记列表
-            const notesList = await this.getFile('notes/notes.json');
-            if (notesList && notesList.notes) {
-                return notesList.notes;
-            }
-        } catch (error) {
-            console.log('Notes file not found, starting fresh');
-        }
-
-        return [];
+        // 使用scanAllNotes获取所有笔记
+        return await this.scanAllNotes();
     }
 
     // 扫描指定文件夹获取所有JSON文件
