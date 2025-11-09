@@ -84,6 +84,8 @@ class DataCollector {
 
     updateLoginLogs() {
         const logList = document.getElementById('loginLogs');
+        if (!logList) return; // 如果元素不存在，直接返回
+
         if (this.data.loginLogs.length === 0) {
             logList.innerHTML = '<div class="log-item empty"><i class="fas fa-info-circle"></i> 暂无登录记录</div>';
             return;

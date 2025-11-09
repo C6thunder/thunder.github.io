@@ -128,20 +128,29 @@ class GitHubNoteManager {
 
     // 初始化（只使用加密token）
     async init() {
+        console.log('🔄 GitHubNoteManager.init() 开始...');
+        console.log('📋 encryptedConfig 状态:', this.encryptedConfig);
+
         // 检查是否配置了加密token
         if (!this.encryptedConfig) {
-            console.warn('⚠️ 未配置加密token，请通过 window.setupEncryptedToken() 配置');
+            console.error('❌ 未配置加密token！');
+            console.log('ℹ️ 请确保在HTML中调用 window.setupEncryptedToken()');
             return;
         }
 
+        console.log('🔑 正在解密token...');
         // 尝试解密token
         const decryptedToken = await this.getDecryptedToken();
+        console.log('🔑 解密结果:', decryptedToken ? '成功' : '失败');
+
         if (decryptedToken) {
             this.config.token = decryptedToken;
             console.log('✅ 已从加密配置加载token，用户可直接评论');
+            console.log('🔑 Token前缀:', decryptedToken.substring(0, 10) + '...');
             return;
         } else {
             console.error('❌ Token解密失败，请检查加密配置');
+            console.error('🔑 加密配置:', this.encryptedConfig);
         }
     }
 
@@ -160,7 +169,9 @@ class GitHubNoteManager {
         if (!this.config.token) {
             throw new Error('未加载加密token，请通过 window.setupEncryptedToken() 配置');
         }
-        // owner和repo使用默认配置，无需用户设置
+        if (!this.config.owner || !this.config.repo) {
+            throw new Error('GitHub仓库信息未配置');
+        }
     }
 
     // 获取文件内容
@@ -344,12 +355,20 @@ githubNoteManager.init().then(() => {
  * @type {(config: EncryptedTokenConfig) => void}
  */
 window.setupEncryptedToken = function (encryptedConfig) {
+    console.log('🔧 window.setupEncryptedToken() 被调用');
+    console.log('📋 收到的配置:', encryptedConfig);
+
     githubNoteManager.setEncryptedConfig(encryptedConfig);
+    console.log('📋 已设置 encryptedConfig');
+
     // 重新初始化以加载加密token
+    console.log('🔄 开始初始化...');
     githubNoteManager.init().then(() => {
-        console.log('✅ 已加载加密token，用户可直接评论');
+        console.log('✅ 初始化完成');
         // 通知其他组件token已加载
         window.dispatchEvent(new CustomEvent('tokenLoaded'));
+    }).catch(err => {
+        console.error('❌ 初始化失败:', err);
     });
 };
 
