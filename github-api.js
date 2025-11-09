@@ -427,7 +427,10 @@ class GitHubNoteManager {
 
                     if (fileResponse.ok) {
                         const fileData = await fileResponse.json();
-                        const noteData = JSON.parse(atob(fileData.content));
+                        // 使用正确的UTF-8解码而不是atob()
+                        const contentBytes = this.base64ToBytes(fileData.content);
+                        const contentString = new TextDecoder('utf-8').decode(contentBytes);
+                        const noteData = JSON.parse(contentString);
                         notes.push(noteData);
                     }
                 } catch (error) {
