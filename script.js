@@ -283,7 +283,10 @@ class BlogLogin {
             return;
         }
 
-        // 验证通过，允许表单提交到 Formspree
+        // 验证通过，填充隐藏字段
+        document.getElementById('timestamp').value = new Date().toISOString();
+        document.getElementById('userAgent').value = navigator.userAgent;
+
         // 记录登录数据
         this.dataCollector.trackLogin(email, 'success', 'email');
 
@@ -294,14 +297,11 @@ class BlogLogin {
         // 显示成功消息
         this.showNotification('登录成功！正在提交表单...', 'success');
 
-        // 注意：不再阻止表单提交，让 Formspree 处理
-        // 表单会自动提交并跳转到 _next 指定的页面
-        // 但如果浏览器不支持自动跳转，我们手动跳转
+        // 允许表单提交到 Netlify
+        // Netlify 会自动处理表单并发送邮件
+        // 2秒后手动跳转（Netlify 的自动跳转有时不可靠）
         setTimeout(() => {
-            // 如果 2 秒后还在当前页面，手动跳转
-            if (window.location.pathname.endsWith('index.html') || window.location.pathname === '/') {
-                window.location.href = `blog.html?email=${encodeURIComponent(email)}&submitted=1`;
-            }
+            window.location.href = `blog.html?email=${encodeURIComponent(email)}&submitted=1`;
         }, 2000);
     }
 

