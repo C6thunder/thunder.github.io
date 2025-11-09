@@ -145,43 +145,6 @@ class GitHubNoteManager {
         }
     }
 
-    /**
-     * @deprecated 此方法已废弃，不再支持用户自定义token
-     * 所有用户统一使用加密token
-     */
-    setConfig(owner, repo, branch, token) {
-        console.warn('⚠️ setConfig() 已废弃，请使用加密token');
-        this.config.owner = owner;
-        this.config.repo = repo;
-        this.config.branch = branch;
-        // 注意：token参数不再使用，但保留以避免破坏现有代码
-        console.log('ℹ️ Token参数已忽略，请使用加密token');
-    }
-
-    /**
-     * @deprecated 此方法已废弃
-     * 不再支持localStorage配置
-     */
-    saveConfig() {
-        console.warn('⚠️ saveConfig() 已废弃，不再支持本地配置');
-    }
-
-    /**
-     * @deprecated 此方法已废弃
-     * 加载配置仅用于向后兼容，不再加载token
-     */
-    loadConfig() {
-        const saved = localStorage.getItem('githubConfig');
-        if (saved) {
-            const config = JSON.parse(saved);
-            // 只加载仓库信息，不加载token
-            if (config.owner) this.config.owner = config.owner;
-            if (config.repo) this.config.repo = config.repo;
-            if (config.branch) this.config.branch = config.branch;
-            console.log('ℹ️ 已加载本地仓库配置（不使用本地token）');
-        }
-    }
-
     // 获取请求头
     getHeaders() {
         return {
@@ -194,9 +157,10 @@ class GitHubNoteManager {
 
     // 验证配置
     validateConfig() {
-        if (!this.config.owner || !this.config.repo || !this.config.token) {
-            throw new Error('请先配置GitHub信息');
+        if (!this.config.token) {
+            throw new Error('未加载加密token，请通过 window.setupEncryptedToken() 配置');
         }
+        // owner和repo使用默认配置，无需用户设置
     }
 
     // 获取文件内容

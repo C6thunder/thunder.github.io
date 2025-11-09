@@ -64,25 +64,15 @@
         let tags = [];
 
         function checkGitHubConfig() {
-            githubNoteManager.loadConfig();
             const statusDiv = document.getElementById('githubStatus');
             const submitBtn = document.getElementById('submitBtn');
 
-            // 现在使用加密token，只需检查仓库配置
-            if (githubNoteManager.config.owner && githubNoteManager.config.repo) {
-                statusDiv.style.background = 'rgba(74, 222, 128, 0.2)';
-                statusDiv.style.borderColor = '#4ade80';
-                statusDiv.style.color = '#4ade80';
-                statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> 系统已配置，笔记将保存到云端';
-                submitBtn.disabled = false;
-            } else {
-                // 如果没有仓库信息，提示用户
-                statusDiv.style.background = 'rgba(251, 191, 36, 0.2)';
-                statusDiv.style.borderColor = '#fbbf24';
-                statusDiv.style.color = '#fbbf24';
-                statusDiv.innerHTML = '<i class="fas fa-info-circle"></i> 系统使用加密token，无需配置';
-                submitBtn.disabled = false; // 仍然允许提交
-            }
+            // 现在使用加密token，无需用户配置
+            statusDiv.style.background = 'rgba(74, 222, 128, 0.2)';
+            statusDiv.style.borderColor = '#4ade80';
+            statusDiv.style.color = '#4ade80';
+            statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> 系统已配置加密token，笔记将保存到云端';
+            submitBtn.disabled = false;
         }
 
         document.getElementById('noteForm').addEventListener('submit', async (e) => {
