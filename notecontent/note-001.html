@@ -3,86 +3,347 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的第一篇笔记</title>
+    <title>欢迎来到我的个人笔记世界</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.8;
             color: #2c3e50;
-            max-width: 800px;
-            margin: 0 auto;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             padding: 40px 20px;
         }
-        h1, h2, h3 {
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 20px;
+            padding: 60px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .header::before {
+            content: '👋';
+            font-size: 80px;
+            display: block;
+            margin-bottom: 20px;
+            animation: wave 1.5s ease-in-out infinite;
+        }
+
+        @keyframes wave {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(20deg); }
+            75% { transform: rotate(-20deg); }
+        }
+
+        h1 {
+            font-size: 2.8em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 1.3em;
+            color: #7f8c8d;
+            font-weight: 300;
+        }
+
+        .section {
+            margin: 40px 0;
+            padding: 30px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .section:hover {
+            transform: translateX(10px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        h2 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #667eea;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        h3 {
             color: #34495e;
-            margin-top: 30px;
+            font-size: 1.3em;
+            margin: 20px 0 10px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .feature-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .feature-desc {
+            color: #7f8c8d;
+            font-size: 0.95em;
+        }
+
+        .step-list {
+            counter-reset: step-counter;
+            list-style: none;
+        }
+
+        .step-list li {
+            counter-increment: step-counter;
+            margin: 20px 0;
+            padding-left: 60px;
+            position: relative;
+            min-height: 50px;
+        }
+
+        .step-list li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            padding: 25px;
+            border-radius: 12px;
+            margin: 25px 0;
+            border-left: 5px solid #f39c12;
+            box-shadow: 0 4px 15px rgba(243, 156, 18, 0.2);
+        }
+
+        .tip-icon {
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 2px solid #ecf0f1;
+            color: #95a5a6;
+        }
+
+        .footer::before {
+            content: '💝';
+            font-size: 2em;
+            display: block;
             margin-bottom: 15px;
         }
-        h1 { font-size: 2em; }
-        h2 { font-size: 1.5em; }
-        h3 { font-size: 1.3em; }
-        p {
-            margin: 15px 0;
-        }
-        code {
-            background: #f4f4f4;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-family: Monaco, 'Courier New', monospace;
-            font-size: 0.9em;
-        }
-        pre {
-            background: #f8f8f8;
-            border: 1px solid #e1e4e8;
-            border-radius: 6px;
-            padding: 16px;
-            overflow-x: auto;
-        }
-        pre code {
-            background: none;
-            padding: 0;
-        }
-        blockquote {
-            border-left: 4px solid #dfe2e5;
-            padding-left: 16px;
-            color: #6a737d;
-            margin: 16px 0;
-        }
-        ul, ol {
-            margin: 16px 0;
-            padding-left: 30px;
-        }
-        li {
-            margin: 8px 0;
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-<p><h1>欢迎使用个人笔记网站</h1></p>
+    <div class="container">
+        <div class="header">
+            <h1>欢迎来到我的个人笔记世界</h1>
+            <p class="subtitle">记录思考，分享知识，共同成长</p>
+        </div>
 
-<p>这是我的第一篇笔记！</p>
+        <div class="section">
+            <h2>🌟 欢迎致辞</h2>
+            <p style="font-size: 1.1em; color: #555;">你好！非常高兴您访问我的个人笔记网站。这里是我学习和思考的空间，承载着各种技术知识、读书感悟和生活点滴。</p>
+            <p style="font-size: 1.1em; color: #555;">希望这些笔记能够对您有所帮助，也欢迎您留下宝贵的意见和建议！</p>
+        </div>
 
-<p><h2>主要功能</h2></p>
+        <div class="section">
+            <h2>🚀 核心功能</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📚</div>
+                    <div class="feature-title">笔记浏览</div>
+                    <div class="feature-desc">轻松浏览所有笔记，支持分批加载和无限滚动</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <div class="feature-title">智能搜索</div>
+                    <div class="feature-desc">快速搜索标题、内容和标签，瞬间找到目标笔记</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💬</div>
+                    <div class="feature-title">评论互动</div>
+                    <div class="feature-desc">在笔记下方留下您的想法和见解</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <div class="feature-title">主题切换</div>
+                    <div class="feature-desc">四种精美主题，适配不同使用场景</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">✍️</div>
+                    <div class="feature-title">笔记编写</div>
+                    <div class="feature-desc">创建和编辑您的专属笔记</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🏷️</div>
+                    <div class="feature-title">标签分类</div>
+                    <div class="feature-desc">使用标签快速筛选相关内容</div>
+                </div>
+            </div>
+        </div>
 
-<ul>
-<li>查看所有笔记</li>
-<li>搜索笔记内容</li>
-<li>发表评论</li>
-<li>主题切换</li>
-</ul>
+        <div class="section">
+            <h2>📖 快速上手</h2>
+            <ol class="step-list">
+                <li>
+                    <strong>浏览笔记</strong><br>
+                    从"所有笔记"页面开始，探索各类技术文章和读书笔记
+                </li>
+                <li>
+                    <strong>使用搜索</strong><br>
+                    在搜索框输入关键词，快速定位感兴趣的内容
+                </li>
+                <li>
+                    <strong>筛选标签</strong><br>
+                    点击标签按钮，只查看特定主题的笔记
+                </li>
+                <li>
+                    <strong>发表评论</strong><br>
+                    在笔记详情页的评论区留下您的想法
+                </li>
+                <li>
+                    <strong>切换主题</strong><br>
+                    点击左下角的调色板图标，选择您喜欢的主题
+                </li>
+                <li>
+                    <strong>编写笔记</strong><br>
+                    使用"写笔记"功能，记录您自己的学习心得
+                </li>
+            </ol>
+        </div>
 
-<p><h2>使用方法</h2></p>
+        <div class="highlight-box">
+            <h3 style="color: #e67e22; margin-top: 0;">
+                <span class="tip-icon">💡</span>小贴士
+            </h3>
+            <ul style="margin-left: 20px; color: #555;">
+                <li>所有笔记支持分批加载，浏览更流畅</li>
+                <li>部分笔记设置了修改密钥，保护内容不被随意修改</li>
+                <li>推荐使用现代浏览器（Chrome、Firefox、Safari、Edge）以获得最佳体验</li>
+                <li>定期更新缓存以确保内容为最新版本</li>
+            </ul>
+        </div>
 
-<p>您可以：</p>
+        <div class="section">
+            <h2>📝 笔记分类</h2>
+            <p style="margin-bottom: 15px; color: #555;">目前网站包含以下类型的笔记：</p>
+            <ul style="margin-left: 20px; color: #555;">
+                <li><strong>技术学习</strong> - JavaScript、Git、前端开发等技术笔记</li>
+                <li><strong>读书感悟</strong> - 优秀书籍的阅读笔记和思考</li>
+                <li><strong>工具使用</strong> - 开发工具和实用软件的使用指南</li>
+                <li><strong>生活随笔</strong> - 兴趣爱好和日常生活分享</li>
+            </ul>
+        </div>
 
-<ol>
-<li>浏览所有笔记</li>
-<li>点击标签筛选内容</li>
-<li>在笔记页面发表评论</li>
-</ol>
+        <div class="section">
+            <h2>🎯 持续更新</h2>
+            <p style="color: #555;">这个网站我会持续维护和更新，包括：</p>
+            <ul style="margin-left: 20px; color: #555;">
+                <li>添加新的学习笔记和知识总结</li>
+                <li>优化用户界面和交互体验</li>
+                <li>修复发现的问题和bug</li>
+                <li>增加新的功能特性</li>
+            </ul>
+        </div>
 
-<p>希望您喜欢这个网站！</p>
-
-<p><blockquote>持续更新中...</blockquote></p>
+        <div class="footer">
+            <p style="font-size: 1.1em; color: #667eea; font-weight: 600;">感谢您的访问！</p>
+            <p style="margin-top: 10px;">希望这些笔记能为您带来价值</p>
+            <p style="margin-top: 5px; font-size: 0.9em;">—— Thunder 于 2025年冬</p>
+        </div>
+    </div>
 </body>
 </html>

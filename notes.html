@@ -128,7 +128,7 @@
         </main>
     </div>
 
-    <script src="github-api.js?v=1762755300"></script>
+    <script src="github-api.js?v=1762755400"></script>
 
     <script>
         // 配置加密token
@@ -278,12 +278,28 @@
             const notesGrid = document.getElementById('notesGrid');
             const batch = filteredNotes.slice(start, end);
 
-            for (const note of batch) {
-                const commentCount = await window.githubNoteManager.getCommentCount(note.id);
+            // 等待所有评论数加载完成
+            const notesWithCounts = await Promise.all(
+                batch.map(async (note) => {
+                    const commentCount = await window.githubNoteManager.getCommentCount(note.id);
+                    return { ...note, commentCount };
+                })
+            );
+
+            for (const note of notesWithCounts) {
                 const noteCard = document.createElement('div');
                 noteCard.className = 'note-card';
-                noteCard.onclick = () => location.href = `note.html?id=${note.id}`;
-                noteCard.innerHTML = `
+                noteCard.style.position = 'relative';  // 为编辑按钮提供定位上下文
+                noteCard.onclick = (e) => {
+                    // 如果点击的是编辑按钮，不触发跳转
+                    if (e.target.closest('.edit-btn')) {
+                        return;
+                    }
+                    location.href = `note.html?id=${note.id}`;
+                };
+
+                // 构建HTML
+                let html = `
                     <div class="note-card-header">
                         <div class="note-card-icon">📝</div>
                         <div>
@@ -292,18 +308,47 @@
                         </div>
                     </div>
                     <div class="note-card-excerpt">${escapeHtml(note.excerpt || '')}</div>
-                    ${note.tags && note.tags.length > 0 ? `
+                `;
+
+                if (note.tags && note.tags.length > 0) {
+                    html += `
                         <div class="note-card-tags">
                             ${note.tags.map(tag => `<span class="note-card-tag">${escapeHtml(tag)}</span>`).join('')}
                         </div>
-                    ` : ''}
+                    `;
+                }
+
+                html += `
                     <div class="note-card-footer">
                         <div class="note-card-meta">
                             <i class="fas fa-comments"></i>
-                            <span>${commentCount} 评论</span>
+                            <span>${note.commentCount} 评论</span>
                         </div>
-                    </div>
                 `;
+
+                // 如果有修改密钥，显示编辑按钮
+                if (note.editKey) {
+                    html += `
+                        <button class="edit-btn" onclick="editNote('${note.id}', '${note.editKey}', event)" style="
+                            position: absolute;
+                            top: 12px;
+                            right: 12px;
+                            padding: 6px 10px;
+                            background: var(--primary);
+                            color: white;
+                            border: none;
+                            border-radius: 6px;
+                            font-size: 12px;
+                            cursor: pointer;
+                            transition: all 0.2s;
+                        ">
+                            <i class="fas fa-edit"></i> 编辑
+                        </button>
+                    `;
+                }
+
+                html += `</div>`;
+                noteCard.innerHTML = html;
                 notesGrid.appendChild(noteCard);
             }
         }
@@ -337,7 +382,7 @@
         function filterByTag(tag) {
             currentFilter = tag;
             filteredNotes = allNotes.filter(note => note.tags && note.tags.includes(tag));
-            displayNotes();
+            displayNotesBatch();
             loadTags();
         }
 
@@ -347,7 +392,7 @@
             currentSearch = '';
             document.getElementById('searchInput').value = '';
             filteredNotes = [...allNotes];
-            displayNotes();
+            displayNotesBatch();
             loadTags();
         }
 
@@ -368,7 +413,7 @@
                            (note.tags && note.tags.some(tag => tag.toLowerCase().includes(currentSearch)));
                 });
             }
-            displayNotes();
+            displayNotesBatch();
         });
 
         // 排序
@@ -382,7 +427,7 @@
             const currentIndex = sorts.findIndex(s => s.value === currentSort);
             const nextIndex = (currentIndex + 1) % sorts.length;
             currentSort = sorts[nextIndex].value;
-            displayNotes();
+            displayNotesBatch();
         });
 
         // 刷新
@@ -397,6 +442,21 @@
             const date = new Date(dateStr);
             return date.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
         }
+
+        // 编辑笔记
+        window.editNote = function(noteId, editKey, event) {
+            event.stopPropagation(); // 阻止事件冒泡
+            const inputKey = prompt('请输入修改密钥:');
+            if (inputKey === null) return;  // 用户取消
+
+            if (inputKey !== editKey) {
+                alert('修改密钥错误！');
+                return;
+            }
+
+            // 跳转到编辑页面
+            window.location.href = `write.html?edit=${noteId}`;
+        };
 
         function escapeHtml(text) {
             const div = document.createElement('div');
