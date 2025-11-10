@@ -86,13 +86,13 @@
                     <!-- 背景图 -->
                     <div style="height: 420px; position: relative; overflow: visible; border-radius: 12px;">
                         <!-- 背景图片 -->
-                        <div style="position: absolute; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('img/girl-ocean-view.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; border-radius: 12px;"></div>
+                        <div style="position: absolute; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.25)), url('img/girl-ocean-view.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; border-radius: 12px;"></div>
 
-                        <!-- 渐变遮罩 - 上半部分 -->
-                        <div style="position: absolute; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.3) 50%); border-radius: 12px;"></div>
+                        <!-- 渐变遮罩 - 顶部 -->
+                        <div style="position: absolute; width: 100%; height: 30%; background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 100%); border-radius: 12px 12px 0 0;"></div>
 
                         <!-- 下半部分渐变透明遮挡 -->
-                        <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 70%; background: linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.95) 100%); border-radius: 12px;"></div>
+                        <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 65%; background: linear-gradient(to bottom, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.95) 50%, rgba(255,255,255,1) 100%); border-radius: 0 0 12px 12px;"></div>
 
                         <!-- 装饰性元素 -->
                         <div style="position: absolute; top: 20px; right: 20px; color: white; font-size: 40px; opacity: 0.3; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); z-index: 1;">
@@ -103,26 +103,26 @@
                         </div>
 
                         <!-- 头像 -->
-                        <div style="position: absolute; bottom: 220px; left: 50%; transform: translateX(-50%); width: 140px; height: 140px; border-radius: 50%; border: 5px solid white; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3); overflow: hidden; background: white; display: flex; align-items: center; justify-content: center; z-index: 2;" id="profileAvatar">
+                        <div style="position: absolute; bottom: 140px; left: 50%; transform: translateX(-50%); width: 120px; height: 120px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.9); box-shadow: 0 0 0 4px rgba(255,255,255,0.2), 0 12px 35px rgba(0, 0, 0, 0.35); overflow: hidden; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; z-index: 3; transition: all 0.3s ease;" id="profileAvatar">
                             <img src="img/avatar.jpg" style="width: 100%; height: 100%; object-fit: cover;" data-config="avatar">
                         </div>
 
                         <!-- 用户信息 -->
-                        <div style="padding: 20px 32px 32px 32px; text-align: center; background: transparent; position: relative; z-index: 1;">
-                            <h2 style="font-size: 32px; font-weight: 700; color: var(--text-primary); margin: 140px 0 12px 0; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);" id="profileName">Thunder</h2>
+                        <div style="padding: 160px 32px 32px 32px; text-align: center; background: transparent; position: relative; z-index: 2;">
+                            <h2 style="font-size: 32px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);" id="profileName">Thunder</h2>
                             <p style="color: var(--text-secondary); font-size: 15px; margin-bottom: 24px; text-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);" id="profileGender">
                                 <i class="fas fa-code" style="color: #667eea; margin-right: 6px;"></i> 软件工程师
                             </p>
 
                             <!-- 社交链接 -->
                             <div style="display: flex; justify-content: center; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
-                                <a href="https://github.com/C6thunder" target="_blank" class="btn btn-secondary" style="text-decoration: none; backdrop-filter: blur(10px); background: rgba(255,255,255,0.85); border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);">
+                                <a href="https://github.com/C6thunder" target="_blank" class="btn btn-secondary" style="text-decoration: none; backdrop-filter: blur(10px); background: rgba(255,255,255,0.9); border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); transition: all 0.3s ease;">
                                     <i class="fab fa-github"></i> GitHub
                                 </a>
-                                <button class="btn btn-secondary" onclick="showEmails()" style="backdrop-filter: blur(10px); background: rgba(255,255,255,0.85); border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);">
+                                <button class="btn btn-secondary" onclick="showEmails()" style="backdrop-filter: blur(10px); background: rgba(255,255,255,0.9); border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); transition: all 0.3s ease;">
                                     <i class="fas fa-envelope"></i> 邮箱
                                 </button>
-                                <button class="btn btn-secondary" onclick="showMessage()" style="backdrop-filter: blur(10px); background: rgba(255,255,255,0.85); border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);">
+                                <button class="btn btn-secondary" onclick="showMessage()" style="backdrop-filter: blur(10px); background: rgba(255,255,255,0.9); border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); transition: all 0.3s ease;">
                                     <i class="fas fa-quote-left"></i> 寄语
                                 </button>
                             </div>
@@ -303,6 +303,7 @@
         // 更换头像颜色
         function changeAvatar() {
             const avatar = document.getElementById('userAvatar');
+            const profileAvatar = document.getElementById('profileAvatar');
             const colors = [
                 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
@@ -317,7 +318,25 @@
                 newColor = colors[(colors.indexOf(newColor) + 1) % colors.length];
             }
             avatar.style.background = newColor;
+            if (profileAvatar) {
+                profileAvatar.style.background = newColor;
+            }
         }
+
+        // 头像悬停效果
+        document.addEventListener('DOMContentLoaded', function() {
+            const profileAvatar = document.getElementById('profileAvatar');
+            if (profileAvatar) {
+                profileAvatar.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateX(-50%) scale(1.05)';
+                    this.style.boxShadow = '0 0 0 6px rgba(255,255,255,0.3), 0 15px 40px rgba(0, 0, 0, 0.45)';
+                });
+                profileAvatar.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateX(-50%) scale(1)';
+                    this.style.boxShadow = '0 0 0 4px rgba(255,255,255,0.2), 0 12px 35px rgba(0, 0, 0, 0.35)';
+                });
+            }
+        });
 
         // 显示邮箱
         function showEmails() {
