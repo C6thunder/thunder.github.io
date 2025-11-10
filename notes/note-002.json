@@ -8,8 +8,8 @@
     "编程",
     "学习"
   ],
-  "content": "# JavaScript 基础学习笔记\n\n## 变量声明\n\nJavaScript中有三种声明变量的方式：\n\n### 1. var\n- 函数作用域\n- 可以重复声明\n- 有变量提升\n\n### 2. let\n- 块级作用域\n- 不能重复声明\n- 暂存死区\n\n### 3. const\n- 块级作用域\n- 必须初始化\n- 不能重新赋值\n\n## 函数\n\n函数是JavaScript的基础构件。\n\n### 函数声明\n\n```javascript\nfunction greet(name) {\n    return `Hello, ${name}!`;\n}\n```\n\n### 箭头函数\n\n```javascript\nconst greet = (name) => `Hello, ${name}!`;\n```\n\n## 对象\n\n对象是JavaScript中重要的数据结构。\n\n```javascript\nconst person = {\n    name: '张三',\n    age: 25,\n    greet() {\n        return `Hello, I'm ${this.name}`;\n    }\n};\n```\n\n## 总结\n\n掌握这些基础知识对学习JavaScript非常重要。\n\n> 持续学习中...",
+  "content": "notecontent/note-002.html",
   "authorKey": "js2024",
-  "type": "markdown",
+  "type": "html",
   "comments": []
 }

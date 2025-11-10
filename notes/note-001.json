@@ -7,9 +7,9 @@
     "入门",
     "介绍"
   ],
-  "content": "# 欢迎使用个人笔记网站\n\n这是我的第一篇笔记！\n\n## 主要功能\n\n- 查看所有笔记\n- 搜索笔记内容\n- 发表评论\n- 主题切换\n\n## 使用方法\n\n您可以：\n\n1. 浏览所有笔记\n2. 点击标签筛选内容\n3. 在笔记页面发表评论\n\n希望您喜欢这个网站！\n\n> 持续更新中...",
+  "content": "notecontent/note-001.html",
   "authorKey": null,
-  "type": "markdown",
+  "type": "html",
   "comments": [
     {
       "id": "comment-1733366400000",

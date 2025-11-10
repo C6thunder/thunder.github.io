@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git使用指南</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.8;
+            color: #2c3e50;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        h1, h2, h3 {
+            color: #34495e;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        h1 { font-size: 2em; }
+        h2 { font-size: 1.5em; }
+        h3 { font-size: 1.3em; }
+        p {
+            margin: 15px 0;
+        }
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: Monaco, 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        pre {
+            background: #f8f8f8;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
+            padding: 16px;
+            overflow-x: auto;
+        }
+        pre code {
+            background: none;
+            padding: 0;
+        }
+        blockquote {
+            border-left: 4px solid #dfe2e5;
+            padding-left: 16px;
+            color: #6a737d;
+            margin: 16px 0;
+        }
+        ul, ol {
+            margin: 16px 0;
+            padding-left: 30px;
+        }
+        li {
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+<p><h1>Git 使用指南</h1></p>
+
+<p><h2>基本概念</h2></p>
+
+<p>Git是一个分布式版本控制系统。</p>
+
+<p><h3>三个区域</h3></p>
+
+<ol>
+<li><strong>工作区（Working Directory）</strong></li>
+<ul>
+<li>实际的文件目录</li>
+</ul>
+</ol>
+
+<ol>
+<li><strong>暂存区（Staging Area）</strong></li>
+<ul>
+<li>临时存储将要提交的文件</li>
+</ul>
+</ol>
+
+<ol>
+<li><strong>版本库（Repository）</strong></li>
+<ul>
+<li>存储所有版本信息</li>
+</ul>
+</ol>
+
+<p><h2>常用命令</h2></p>
+
+<p><h3>初始化仓库</h3></p>
+
+<p><pre><code class="language-bash">git init</p>
+<p></code></pre></p>
+
+<p><h3>克隆仓库</h3></p>
+
+<p><pre><code class="language-bash">git clone [url]</p>
+<p></code></pre></p>
+
+<p><h3>添加文件</h3></p>
+
+<p><pre><code class="language-bash">git add [file]</p>
+<p>git add .</p>
+<p></code></pre></p>
+
+<p><h3>提交更改</h3></p>
+
+<p><pre><code class="language-bash">git commit -m "提交信息"</p>
+<p></code></pre></p>
+
+<p><h3>查看状态</h3></p>
+
+<p><pre><code class="language-bash">git status</p>
+<p></code></pre></p>
+
+<p><h3>查看历史</h3></p>
+
+<p><pre><code class="language-bash">git log</p>
+<p></code></pre></p>
+
+<p><h3>分支操作</h3></p>
+
+<p><pre><code class="language-bash"># 创建分支</p>
+<p>git branch [branch-name]</p>
+
+<p><h1>切换分支</h1></p>
+<p>git checkout [branch-name]</p>
+
+<p><h1>创建并切换</h1></p>
+<p>git checkout -b [branch-name]</p>
+<p></code></pre></p>
+
+<p><h3>合并分支</h3></p>
+
+<p><pre><code class="language-bash">git merge [branch]</p>
+<p></code></pre></p>
+
+<p><h3>推送远程</h3></p>
+
+<p><pre><code class="language-bash">git push origin [branch]</p>
+<p></code></pre></p>
+
+<p><h3>拉取更新</h3></p>
+
+<p><pre><code class="language-bash">git pull</p>
+<p></code></pre></p>
+
+<p><h2>最佳实践</h2></p>
+
+<ol>
+<li><strong>频繁提交</strong></li>
+<ul>
+<li>小步提交，便于回滚</li>
+</ul>
+</ol>
+
+<ol>
+<li><strong>清晰的提交信息</strong></li>
+<ul>
+<li>使用规范化的格式</li>
+<li>说明变更原因</li>
+</ul>
+</ol>
+
+<ol>
+<li><strong>使用分支</strong></li>
+<ul>
+<li>功能开发使用独立分支</li>
+<li>保护主分支</li>
+</ul>
+</ol>
+
+<ol>
+<li><strong>代码审查</strong></li>
+<ul>
+<li>Pull Request机制</li>
+<li>团队协作</li>
+</ul>
+</ol>
+
+<p><h2>总结</h2></p>
+
+<p>掌握Git是程序员的必备技能，多练习才能熟练运用。</p>
+
+<p><blockquote>Keep coding!</blockquote></p>
+</body>
+</html>

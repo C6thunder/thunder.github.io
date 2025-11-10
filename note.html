@@ -244,10 +244,32 @@
                     tagsContainer.style.display = 'none';
                 }
 
-                // 渲染正文（Markdown）
-                if (note.type === 'markdown') {
+                // 渲染正文（HTML 或 Markdown）
+                if (note.type === 'html') {
+                    if (note.content.startsWith('notecontent/')) {
+                        // 加载 HTML 文件
+                        const htmlFile = note.content;
+                        fetch(htmlFile)
+                            .then(response => response.text())
+                            .then(html => {
+                                const parser = new DOMParser();
+                                const doc = parser.parseFromString(html, 'text/html');
+                                const bodyContent = doc.body.innerHTML;
+                                document.getElementById('noteContent').innerHTML = bodyContent;
+                            })
+                            .catch(error => {
+                                console.error('加载 HTML 文件失败:', error);
+                                document.getElementById('noteContent').innerHTML = '<p>加载内容失败</p>';
+                            });
+                    } else {
+                        // 直接显示 HTML 内容
+                        document.getElementById('noteContent').innerHTML = note.content;
+                    }
+                } else if (note.type === 'markdown') {
+                    // 兼容旧版 Markdown 格式
                     document.getElementById('noteContent').innerHTML = marked.parse(note.content);
                 } else {
+                    // 其他类型直接显示
                     document.getElementById('noteContent').innerHTML = note.content;
                 }
 

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学习笔记：JavaScript基础</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.8;
+            color: #2c3e50;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        h1, h2, h3 {
+            color: #34495e;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        h1 { font-size: 2em; }
+        h2 { font-size: 1.5em; }
+        h3 { font-size: 1.3em; }
+        p {
+            margin: 15px 0;
+        }
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: Monaco, 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        pre {
+            background: #f8f8f8;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
+            padding: 16px;
+            overflow-x: auto;
+        }
+        pre code {
+            background: none;
+            padding: 0;
+        }
+        blockquote {
+            border-left: 4px solid #dfe2e5;
+            padding-left: 16px;
+            color: #6a737d;
+            margin: 16px 0;
+        }
+        ul, ol {
+            margin: 16px 0;
+            padding-left: 30px;
+        }
+        li {
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+<p><h1>JavaScript 基础学习笔记</h1></p>
+
+<p><h2>变量声明</h2></p>
+
+<p>JavaScript中有三种声明变量的方式：</p>
+
+<p><h3>1. var</h3></p>
+<ul>
+<li>函数作用域</li>
+<li>可以重复声明</li>
+<li>有变量提升</li>
+</ul>
+
+<p><h3>2. let</h3></p>
+<ul>
+<li>块级作用域</li>
+<li>不能重复声明</li>
+<li>暂存死区</li>
+</ul>
+
+<p><h3>3. const</h3></p>
+<ul>
+<li>块级作用域</li>
+<li>必须初始化</li>
+<li>不能重新赋值</li>
+</ul>
+
+<p><h2>函数</h2></p>
+
+<p>函数是JavaScript的基础构件。</p>
+
+<p><h3>函数声明</h3></p>
+
+<p><pre><code class="language-javascript">function greet(name) {</p>
+<p>return <code>Hello, ${name}!</code>;</p>
+<p>}</p>
+<p></code></pre></p>
+
+<p><h3>箭头函数</h3></p>
+
+<p><pre><code class="language-javascript">const greet = (name) => <code>Hello, ${name}!</code>;</p>
+<p></code></pre></p>
+
+<p><h2>对象</h2></p>
+
+<p>对象是JavaScript中重要的数据结构。</p>
+
+<p><pre><code class="language-javascript">const person = {</p>
+<p>name: '张三',</p>
+<p>age: 25,</p>
+<p>greet() {</p>
+<p>return <code>Hello, I'm ${this.name}</code>;</p>
+<p>}</p>
+<p>};</p>
+<p></code></pre></p>
+
+<p><h2>总结</h2></p>
+
+<p>掌握这些基础知识对学习JavaScript非常重要。</p>
+
+<p><blockquote>持续学习中...</blockquote></p>
+</body>
+</html>

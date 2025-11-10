@@ -85,8 +85,8 @@
                 <!-- 内容 -->
                 <div style="margin-bottom: 24px;">
                     <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: var(--text-primary);">内容 <span style="color: var(--danger);">*</span></label>
-                    <textarea id="content" required rows="16" style="width: 100%; padding: 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 15px; line-height: 1.8; resize: vertical; font-family: 'Monaco', 'Menlo', 'Courier New', monospace;" placeholder="使用 Markdown 格式编写您的笔记..."></textarea>
-                    <p style="font-size: 12px; color: var(--text-tertiary); margin-top: 6px;">支持 Markdown 语法</p>
+                    <textarea id="content" required rows="16" style="width: 100%; padding: 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 15px; line-height: 1.8; resize: vertical; font-family: 'Monaco', 'Menlo', 'Courier New', monospace;" placeholder="使用 HTML 格式编写您的笔记..."></textarea>
+                    <p style="font-size: 12px; color: var(--text-tertiary); margin-top: 6px;">支持 HTML 标签，例如：&lt;h1&gt;, &lt;h2&gt;, &lt;p&gt;, &lt;code&gt;, &lt;pre&gt;, &lt;ul&gt;, &lt;ol&gt;, &lt;li&gt;, &lt;strong&gt;, &lt;em&gt;, &lt;blockquote&gt;</p>
                 </div>
 
                 <!-- 作者标识 -->
@@ -233,15 +233,16 @@
             try {
                 await waitForGitHubConfig();
 
+                // 创建 HTML 笔记
                 const note = {
                     id: 'note-' + Date.now(),
                     title: title,
-                    content: content,
+                    content: content,  // HTML 内容直接保存
                     excerpt: excerpt || content.substring(0, 100) + '...',
                     tags: tags,
                     date: new Date().toISOString().split('T')[0],
                     authorKey: authorKey || null,
-                    type: 'markdown',
+                    type: 'html',  // 改为 HTML 类型
                     comments: []
                 };
 
