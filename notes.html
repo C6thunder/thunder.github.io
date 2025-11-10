@@ -6,7 +6,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>所有笔记 - 个人笔记网站</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=20231113">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
@@ -127,8 +127,8 @@
         </main>
     </div>
 
-    <script src="script.js"></script>
-    <script src="github-api.js"></script>
+    <script src="github-api.js?v=20231113"></script>
+    <script src="script.js?v=20231113"></script>
 
     <script>
         // 配置加密token
@@ -165,12 +165,34 @@
 
         // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', async function() {
-            try {
-                await loadNotes();
-            } catch (error) {
-                console.error('加载笔记失败:', error);
-                document.getElementById('notesGrid').innerHTML =
-                    '<div style="text-align: center; padding: 40px; color: var(--text-secondary);">加载失败，请检查网络连接</div>';
+            // 等待 GitHub 初始化完成
+            if (window.githubNoteManager && window.githubNoteManager.config.token) {
+                try {
+                    await loadNotes();
+                } catch (error) {
+                    console.error('加载笔记失败:', error);
+                    document.getElementById('notesGrid').innerHTML =
+                        '<div style="text-align: center; padding: 40px; color: var(--text-secondary);">加载失败: ' + error.message + '</div>';
+                }
+            } else {
+                // 等待 token 加载
+                const checkInterval = setInterval(() => {
+                    if (window.githubNoteManager && window.githubNoteManager.config.token) {
+                        clearInterval(checkInterval);
+                        loadNotes().catch(error => {
+                            console.error('加载笔记失败:', error);
+                            document.getElementById('notesGrid').innerHTML =
+                                '<div style="text-align: center; padding: 40px; color: var(--text-secondary);">加载失败: ' + error.message + '</div>';
+                        });
+                    }
+                }, 100);
+
+                // 5秒后超时
+                setTimeout(() => {
+                    clearInterval(checkInterval);
+                    document.getElementById('notesGrid').innerHTML =
+                        '<div style="text-align: center; padding: 40px; color: var(--danger);">GitHub 配置加载超时，请刷新页面重试</div>';
+                }, 5000);
             }
         });
 
