@@ -2,13 +2,15 @@
   "id": "note-005",
   "title": "我的兴趣爱好",
   "date": "2025-11-06",
-  "excerpt": "记录平时喜欢做的事情，包括阅读、音乐、运动等。",
+  "excerpt": "分享我的六大兴趣爱好：阅读、音乐、运动、技术、旅行和美食，探讨如何让生活更丰富多彩。",
   "tags": [
-    "生活",
-    "兴趣",
-    "个人"
+    "生活分享",
+    "兴趣爱好",
+    "个人成长",
+    "生活方式"
   ],
   "content": "notecontent/note-005.html",
-  "authorKey": null,
-  "type": "html"
+  "authorKey": "life2024",
+  "type": "html",
+  "editKey": "mynote123"
 }

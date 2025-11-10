@@ -2,13 +2,15 @@
   "id": "note-003",
   "title": "读书笔记：《代码整洁之道》",
   "date": "2025-11-08",
-  "excerpt": "读后感和关键要点总结，学习如何编写高质量的代码。",
+  "excerpt": "深度解读经典编程书籍，总结代码整洁的核心原则和实践方法。",
   "tags": [
-    "读书",
-    "编程",
+    "读书笔记",
+    "代码质量",
+    "编程思想",
     "最佳实践"
   ],
   "content": "notecontent/note-003.html",
-  "authorKey": "clean-code",
-  "type": "html"
+  "authorKey": "book2024",
+  "type": "html",
+  "editKey": "mynote123"
 }
