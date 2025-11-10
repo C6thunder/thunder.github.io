@@ -6,8 +6,9 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>写笔记 - 个人笔记网站</title>
-    <link rel="stylesheet" href="style.css?v=20231113">
+    <link rel="stylesheet" href="style.css?v=2023111400">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="config.js?v=1762755000"></script>
 </head>
 
 <body style="background: var(--bg-primary);">
@@ -48,7 +49,7 @@
                 </div>
             </div>
             <a href="profile.html" style="width: 36px; height: 36px; border-radius: 50%; display: block; overflow: hidden; cursor: pointer;">
-                <img src="img/avatar.jpg?v=1762753846" style="width: 100%; height: 100%; object-fit: cover;" id="userAvatar">
+                <img src="img/avatar.jpg" style="width: 100%; height: 100%; object-fit: cover;" id="userAvatar" data-config="avatar">
             </a>
         </div>
     </header>
@@ -108,7 +109,8 @@
         </div>
     </main>
 
-    <script src="github-api.js?v=1762754002"></script>
+    <script src="github-api.js?v=1762755000"></script>
+
     <script>
         // 主题切换
         document.querySelectorAll('.theme-option').forEach(option => {
