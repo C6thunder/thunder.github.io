@@ -317,13 +317,8 @@
                     if (e.target.closest('.edit-btn')) {
                         return;
                     }
-                    // HTML类型笔记直接跳转到HTML文件，保持完整设计
-                    if (note.type === 'html' && note.content.startsWith('notecontent/')) {
-                        location.href = note.content;
-                    } else {
-                        // 其他类型跳转到note.html
-                        location.href = `note.html?id=${note.id}`;
-                    }
+                    // 所有笔记都跳转到note.html，在note.html中加载内容
+                    location.href = `note.html?id=${note.id}`;
                 };
 
                 // 构建HTML

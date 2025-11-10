@@ -245,14 +245,15 @@
         // 加载笔记
         async function loadNote(noteId) {
             try {
-                const result = await window.githubNoteManager.getNoteById(noteId);
-                if (!result) {
+                // 从 notes.json 获取所有笔记，找到匹配的笔记
+                const allNotes = await window.githubNoteManager.scanAllNotes();
+                const note = allNotes.find(n => n.id === noteId);
+
+                if (!note) {
                     document.getElementById('noteContent').innerHTML =
                         '<div style="text-align: center; padding: 60px; color: var(--danger);">笔记不存在</div>';
                     return;
                 }
-
-                const note = result.note;
 
                 // 渲染笔记内容
                 document.getElementById('noteTitle').textContent = note.title;
