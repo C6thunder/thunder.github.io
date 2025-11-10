@@ -118,7 +118,7 @@
         </div>
     </main>
 
-    <script src="github-api.js?v=1762760200"></script>
+    <script src="github-api.js?v=1762760700"></script>
 
     <script>
         // 配置加密token
@@ -278,6 +278,9 @@
                     status.textContent = '保存成功！';
                     status.style.color = 'var(--success)';
 
+                    // 清除notes页面的缓存
+                    localStorage.setItem('notesCacheInvalidate', Date.now().toString());
+
                     setTimeout(() => {
                         alert('保存成功！');
                         window.location.href = `note.html?id=${noteId}`;
@@ -300,6 +303,9 @@
                     await window.githubNoteManager.saveNote(note);
                     status.textContent = '发布成功！';
                     status.style.color = 'var(--success)';
+
+                    // 清除notes页面的缓存
+                    localStorage.setItem('notesCacheInvalidate', Date.now().toString());
 
                     setTimeout(() => {
                         alert('发布成功！');

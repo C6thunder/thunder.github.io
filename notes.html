@@ -33,10 +33,6 @@
                     <i class="fas fa-pen"></i>
                     <span>写笔记</span>
                 </a>
-                <a href="restore-notes.html" class="nav-item">
-                    <i class="fas fa-history"></i>
-                    <span>恢复笔记</span>
-                </a>
             </nav>
 
             <div class="sidebar-footer">
@@ -128,7 +124,7 @@
         </main>
     </div>
 
-    <script src="github-api.js?v=1762760300"></script>
+    <script src="github-api.js?v=1762760700"></script>
 
     <script>
         // 配置加密token
@@ -185,10 +181,26 @@
         let currentFilter = null;
         let currentSearch = '';
 
+        // 本地缓存
+        const cache = {
+            notes: null,
+            lastFetch: 0,
+            ttl: 5 * 60 * 1000 // 5分钟缓存
+        };
+
         // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', async function() {
             try {
                 await waitForGitHubConfig();
+
+                // 检查是否有其他页面触发的缓存失效
+                const invalidateFlag = localStorage.getItem('notesCacheInvalidate');
+                if (invalidateFlag) {
+                    cache.notes = null;
+                    cache.lastFetch = 0;
+                    localStorage.removeItem('notesCacheInvalidate');
+                }
+
                 await loadNotes();
             } catch (error) {
                 console.error('加载笔记失败:', error);
@@ -217,7 +229,7 @@
             });
         }
 
-        // 加载笔记（分批加载）
+        // 加载笔记（使用缓存）
         async function loadNotes() {
             const notesGrid = document.getElementById('notesGrid');
             notesGrid.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--text-secondary);">加载中...</div>';
@@ -227,7 +239,15 @@
                     throw new Error('GitHub配置未就绪');
                 }
 
-                allNotes = await window.githubNoteManager.scanAllNotes();
+                // 检查缓存
+                const now = Date.now();
+                if (cache.notes && (now - cache.lastFetch < cache.ttl)) {
+                    allNotes = cache.notes;
+                } else {
+                    allNotes = await window.githubNoteManager.scanAllNotes();
+                    cache.notes = allNotes;
+                    cache.lastFetch = now;
+                }
 
                 if (allNotes.length === 0) {
                     notesGrid.innerHTML =
@@ -299,13 +319,13 @@
             const notesGrid = document.getElementById('notesGrid');
             const batch = filteredNotes.slice(start, end);
 
-            // 等待所有评论数加载完成
-            const notesWithCounts = await Promise.all(
-                batch.map(async (note) => {
-                    const commentCount = await window.githubNoteManager.getCommentCount(note.id);
-                    return { ...note, commentCount };
-                })
-            );
+            // 批量获取所有评论数（从N次API调用减少到1次）
+            const noteIds = batch.map(note => note.id);
+            const commentCountMap = await window.githubNoteManager.getAllCommentsCount(noteIds);
+            const notesWithCounts = batch.map(note => ({
+                ...note,
+                commentCount: commentCountMap[note.id] || 0
+            }));
 
             for (const note of notesWithCounts) {
                 const noteCard = document.createElement('div');
@@ -461,8 +481,12 @@
             displayNotesBatch();
         });
 
-        // 刷新
+        // 刷新（清除缓存）
         document.getElementById('refreshBtn').addEventListener('click', async function() {
+            // 清除缓存
+            cache.notes = null;
+            cache.lastFetch = 0;
+
             this.classList.add('spinning');
             await loadNotes();
             setTimeout(() => this.classList.remove('spinning'), 1000);

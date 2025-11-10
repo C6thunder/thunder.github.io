@@ -327,7 +327,8 @@ class GitHubNoteManager {
 
     // 保存笔记
     async saveNote(note) {
-        const timestamp = Date.now();
+        // 从note.id中提取时间戳，确保文件名一致
+        const timestamp = note.id.replace('note-', '');
 
         if (note.type === 'html') {
             // HTML笔记：保存到notecontent/文件夹
@@ -494,20 +495,20 @@ class GitHubNoteManager {
         let notesList = await this.getFile('notes.json');
 
         if (!notesList) {
-            notesList = { notes: [] };
+            notesList = { notes: [], version: '3.0' };
         }
 
-        // 检查笔记是否已存在
+        if (!Array.isArray(notesList.notes)) {
+            notesList.notes = [];
+        }
+
         const existsIndex = notesList.notes.findIndex(n => n.id === note.id);
         if (existsIndex !== -1) {
-            // 更新已存在的笔记
             notesList.notes[existsIndex] = note;
         } else {
-            // 添加新笔记
             notesList.notes.unshift(note);
         }
 
-        // 更新最后修改时间
         notesList.lastUpdated = new Date().toISOString();
 
         return await this.saveFile('notes.json', notesList, `Update notes list: ${existsIndex !== -1 ? 'update' : 'add'} ${note.title}`);
@@ -515,10 +516,13 @@ class GitHubNoteManager {
 
     // 更新笔记
     async updateNote(noteId, updatedNote) {
-        // 直接从 notes.json 获取原始笔记以优化性能
+        // 只调用一次getFile获取notes.json
         const notesList = await this.getFile('notes.json');
-        const originalNote = notesList?.notes?.find(n => n.id === noteId);
+        if (!notesList || !Array.isArray(notesList.notes)) {
+            throw new Error('笔记列表不存在');
+        }
 
+        const originalNote = notesList.notes.find(n => n.id === noteId);
         if (!originalNote) {
             throw new Error('笔记不存在');
         }
@@ -533,14 +537,12 @@ class GitHubNoteManager {
             await this.saveFile(filename, updatedNote, message);
         }
 
-        // 更新 notes.json 中的笔记列表
-        if (notesList?.notes) {
-            const noteIndex = notesList.notes.findIndex(note => note.id === noteId);
-            if (noteIndex !== -1) {
-                notesList.notes[noteIndex] = { ...updatedNote, excerpt: updatedNote.excerpt };
-                notesList.lastUpdated = new Date().toISOString();
-                await this.saveFile('notes.json', notesList, `Update notes list: modify ${updatedNote.title}`);
-            }
+        // 更新 notes.json 中的笔记列表（使用已获取的notesList）
+        const noteIndex = notesList.notes.findIndex(note => note.id === noteId);
+        if (noteIndex !== -1) {
+            notesList.notes[noteIndex] = { ...updatedNote, excerpt: updatedNote.excerpt };
+            notesList.lastUpdated = new Date().toISOString();
+            await this.saveFile('notes.json', notesList, `Update notes list: modify ${updatedNote.title}`);
         }
 
         return { success: true };
@@ -578,11 +580,47 @@ class GitHubNoteManager {
         }
     }
 
-    // 获取评论数量
+    // 批量获取所有笔记的评论数量
+    async getAllCommentsCount(noteIds) {
+        try {
+            const commentFilePaths = noteIds.map(id => `comments/${id}.json`);
+            const comments = await this.batchGetFiles(commentFilePaths);
+
+            const countMap = {};
+            noteIds.forEach(id => { countMap[id] = 0; });
+
+            comments.forEach((data, index) => {
+                const noteId = noteIds[index];
+                if (data && Array.isArray(data.comments)) {
+                    countMap[noteId] = data.comments.length;
+                }
+            });
+
+            return countMap;
+        } catch (error) {
+            console.warn('批量获取评论数失败:', error);
+            // 返回默认值
+            const defaultCount = {};
+            noteIds.forEach(id => { defaultCount[id] = 0; });
+            return defaultCount;
+        }
+    }
+
+    // 批量获取多个文件
+    async batchGetFiles(paths) {
+        const results = await Promise.allSettled(
+            paths.map(path => this.getFile(path))
+        );
+        return results.map(result =>
+            result.status === 'fulfilled' ? result.value : null
+        );
+    }
+
+    // 获取评论数量（保持向后兼容）
     async getCommentCount(noteId) {
         try {
-            const comments = await this.getComments(noteId);
-            return comments.length;
+            const countMap = await this.getAllCommentsCount([noteId]);
+            return countMap[noteId] || 0;
         } catch (error) {
             return 0;
         }
