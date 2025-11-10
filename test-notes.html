@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>测试 notes.json 加载</title>
+</head>
+<body>
+    <h1>测试 notes.json</h1>
+    <pre id="output"></pre>
+    <script>
+        // 模拟 GitHub API 调用
+        const testLoad = async () => {
+            const output = document.getElementById('output');
+            try {
+                // 通过 HTTP 访问 notes.json
+                const response = await fetch('notes.json');
+                const data = await response.json();
+                output.textContent = '成功加载 ' + data.notes.length + ' 个笔记\n\n';
+                data.notes.forEach(note => {
+                    output.textContent += '- ' + note.id + ': ' + note.title + '\n';
+                });
+            } catch (error) {
+                output.textContent = '错误: ' + error.message;
+            }
+        };
+        testLoad();
+    </script>
+</body>
+</html>
