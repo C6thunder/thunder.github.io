@@ -1,502 +1,237 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="diary">
 
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>个人笔记网站 - 开始</title>
+    <title>个人笔记网站 - 首页</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .start-container {
-            text-align: center;
-            padding: 60px 20px;
-        }
-
-        .main-title {
-            font-size: 5rem;
-            font-weight: 900;
-            margin-bottom: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: gradientShift 3s ease-in-out infinite;
-            background-size: 200% 200%;
-        }
-
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .subtitle {
-            font-size: 1.8rem;
-            color: var(--text-secondary);
-            margin-bottom: 60px;
-            font-weight: 300;
-        }
-
-        .start-button-container {
-            margin: 80px 0;
-        }
-
-        .start-button {
-            position: relative;
-            padding: 25px 80px;
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: white;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 60px;
-            cursor: pointer;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
-            transform: perspective(1000px);
-        }
-
-        .start-button::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb, #667eea);
-            background-size: 300% 300%;
-            border-radius: 60px;
-            z-index: -1;
-            animation: borderGradient 3s linear infinite;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        @keyframes borderGradient {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .start-button::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-
-        .start-button:hover::before {
-            opacity: 1;
-        }
-
-        .start-button:hover {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.6);
-        }
-
-        .start-button:hover::after {
-            width: 300px;
-            height: 300px;
-        }
-
-        .start-button:active {
-            transform: translateY(-2px) scale(1.02);
-        }
-
-        .start-button i {
-            margin-left: 15px;
-            animation: arrowMove 1.5s ease-in-out infinite;
-        }
-
-        @keyframes arrowMove {
-            0%, 100% { transform: translateX(0); }
-            50% { transform: translateX(10px); }
-        }
-
-        .features-preview {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin-top: 80px;
-            flex-wrap: wrap;
-        }
-
-        .feature-item {
-            text-align: center;
-        }
-
-        .feature-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            opacity: 0.7;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        .feature-item:nth-child(2) .feature-icon {
-            animation-delay: 0.5s;
-        }
-
-        .feature-item:nth-child(3) .feature-icon {
-            animation-delay: 1s;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-        }
-
-        .feature-text {
-            color: var(--text-secondary);
-            font-size: 1.1rem;
-        }
-
-        .floating-particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .floating-particle {
-            position: absolute;
-            background: linear-gradient(135deg, #667eea, #f093fb);
-            border-radius: 50%;
-            opacity: 0.1;
-            animation: floatAround 20s linear infinite;
-        }
-
-        @keyframes floatAround {
-            0% {
-                transform: translateY(100vh) translateX(0) rotate(0deg);
-                opacity: 0;
-            }
-            10% {
-                opacity: 0.1;
-            }
-            90% {
-                opacity: 0.1;
-            }
-            100% {
-                transform: translateY(-100vh) translateX(100px) rotate(360deg);
-                opacity: 0;
-            }
-        }
-
-        .version-badge {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            padding: 10px 20px;
-            border-radius: 20px;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-
-        .footer-text {
-            margin-top: 100px;
-            color: var(--text-secondary);
-            font-size: 1rem;
-        }
-
-        .footer-text i {
-            color: var(--danger);
-            animation: heartbeat 1.5s ease-in-out infinite;
-        }
-
-        @keyframes heartbeat {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-        }
-
-        @media (max-width: 768px) {
-            .main-title {
-                font-size: 3rem;
-            }
-
-            .subtitle {
-                font-size: 1.2rem;
-                margin-bottom: 40px;
-            }
-
-            .start-button {
-                padding: 20px 50px;
-                font-size: 1.3rem;
-            }
-
-            .features-preview {
-                gap: 20px;
-            }
-
-            .feature-icon {
-                font-size: 2rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .main-title {
-                font-size: 2rem;
-            }
-
-            .start-button {
-                padding: 18px 40px;
-                font-size: 1.1rem;
-            }
-        }
-    </style>
 </head>
 
-<body data-theme="violet">
-    <div class="background">
-        <div class="gradient-orb orb-1"></div>
-        <div class="gradient-orb orb-2"></div>
-        <div class="gradient-orb orb-3"></div>
-        <div class="gradient-orb orb-4"></div>
-        <div class="gradient-orb orb-5"></div>
-    </div>
-    <div class="particles" id="particles"></div>
-
-    <!-- 浮动粒子背景 -->
-    <div class="floating-particles" id="floatingParticles"></div>
-
-    <!-- 版本标识 -->
-    <div class="version-badge">
-        v1.0.0
-    </div>
-
-    <div class="container">
-        <div class="start-container">
-            <h1 class="main-title">个人笔记</h1>
-            <p class="subtitle">记录思考，分享知识</p>
-
-            <div class="start-button-container">
-                <button class="start-button" id="startButton">
-                    开始探索
-                    <i class="fas fa-arrow-right"></i>
-                </button>
+<body>
+    <div class="app-container">
+        <!-- 左侧导航栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">我的笔记</div>
+                <div class="sidebar-subtitle">记录生活点滴</div>
             </div>
 
-            <div class="features-preview">
-                <div class="feature-item">
-                    <div class="feature-icon">
-                        <i class="fas fa-search"></i>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-item active">
+                    <i class="fas fa-home"></i>
+                    <span>首页</span>
+                </a>
+                <a href="notes.html" class="nav-item">
+                    <i class="fas fa-sticky-note"></i>
+                    <span>所有笔记</span>
+                </a>
+                <a href="write.html" class="nav-item">
+                    <i class="fas fa-pen"></i>
+                    <span>写笔记</span>
+                </a>
+                <a href="restore-notes.html" class="nav-item">
+                    <i class="fas fa-history"></i>
+                    <span>恢复笔记</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="theme-switcher">
+                    <div class="theme-toggle-btn" title="切换主题">
+                        <i class="fas fa-palette"></i>
                     </div>
-                    <div class="feature-text">智能搜索</div>
+                    <div class="theme-panel">
+                        <h4>选择主题</h4>
+                        <div class="theme-options">
+                            <div class="theme-option active" data-theme="diary">
+                                <i class="fas fa-sun"></i>
+                                <span>米白日记</span>
+                            </div>
+                            <div class="theme-option" data-theme="dark">
+                                <i class="fas fa-moon"></i>
+                                <span>夜间模式</span>
+                            </div>
+                            <div class="theme-option" data-theme="paper">
+                                <i class="fas fa-scroll"></i>
+                                <span>暖黄护眼</span>
+                            </div>
+                            <div class="theme-option" data-theme="minimal">
+                                <i class="fas fa-gem"></i>
+                                <span>极简灰</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="feature-item">
-                    <div class="feature-icon">
-                        <i class="fas fa-tags"></i>
+                <div class="user-info" onclick="changeAvatar()">
+                    <div class="user-avatar" id="userAvatar">T</div>
+                    <div class="user-details">
+                        <div class="user-name" id="userName">Thunder</div>
+                        <div class="user-email" id="userEmail">thunder@example.com</div>
                     </div>
-                    <div class="feature-text">标签分类</div>
-                </div>
-                <div class="feature-item">
-                    <div class="feature-icon">
-                        <i class="fas fa-comments"></i>
-                    </div>
-                    <div class="feature-text">互动评论</div>
                 </div>
             </div>
+        </aside>
 
-            <p class="footer-text">
-                Made with <i class="fas fa-heart"></i> for everyone
-            </p>
-        </div>
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <div class="content-container">
+                <!-- 欢迎区域 -->
+                <div class="page-header">
+                    <h1 class="page-title">欢迎回来 👋</h1>
+                    <p class="page-subtitle">今天是 <span id="todayDate"></span>，继续你的创作之旅吧</p>
+                </div>
+
+                <!-- 统计卡片 -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 32px;">
+                    <div class="stats-card">
+                        <div class="stats-value" id="totalNotes">0</div>
+                        <div class="stats-label">总笔记数</div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-value" id="totalComments">0</div>
+                        <div class="stats-label">总评论数</div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-value" id="totalTags">0</div>
+                        <div class="stats-label">标签数量</div>
+                    </div>
+                </div>
+
+                <!-- 快速操作 -->
+                <div class="card" style="padding: 24px; margin-bottom: 32px;">
+                    <h3 style="margin: 0 0 16px 0; font-size: 18px; color: var(--text-primary);">快速操作</h3>
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <button class="btn btn-primary" onclick="location.href='write.html'">
+                            <i class="fas fa-plus"></i> 写新笔记
+                        </button>
+                        <button class="btn btn-secondary" onclick="location.href='notes.html'">
+                            <i class="fas fa-list"></i> 浏览所有笔记
+                        </button>
+                        <button class="btn btn-secondary" onclick="location.href='restore-notes.html'">
+                            <i class="fas fa-history"></i> 恢复笔记
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 最近的活动 -->
+                <h2 style="font-size: 20px; color: var(--text-primary); margin-bottom: 16px;">最近的活动</h2>
+                <div id="recentActivity">
+                    <div class="activity-card">
+                        <div class="activity-header">
+                            <div class="activity-icon">
+                                <i class="fas fa-pen"></i>
+                            </div>
+                            <div class="activity-title">欢迎使用个人笔记网站</div>
+                            <div class="activity-time">刚刚</div>
+                        </div>
+                        <div class="activity-content">
+                            开始记录您的第一篇笔记吧！点击上方"写新笔记"按钮开始创作。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
 
-    <script src="script.js"></script>
-    <script src="github-api.js"></script>
-
     <script>
-        // 配置加密token
-        window.setupEncryptedToken({
-            token: "lNR9YHMTLt0NT4G74I8p3qDY+Qxf7XJAf1ZupELPZpORCw+VQyk7wQ4JIN467U1t3bpXCwa/PKW+H89k7sUFL2mtyU+74rof+MkdLfBTWLFRl4ABnitXNeG4fNo0PToItXVIGvotqhIEJbdWnw==",
-            iv: "qNWMHi6UqGFcdWee",
-            salt: "P3RiVIlxU1RLiUV8YbefVQ==",
-            iterations: 100000,
-            password: "lei20060113"
+        // 设置今天日期
+        const today = new Date();
+        const dateStr = today.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
+        document.getElementById('todayDate').textContent = dateStr;
+
+        // 主题切换
+        document.querySelectorAll('.theme-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const theme = this.dataset.theme;
+                document.documentElement.setAttribute('data-theme', theme);
+
+                // 更新活动状态
+                document.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+            });
         });
+
+        // 更换头像
+        function changeAvatar() {
+            const avatar = document.getElementById('userAvatar');
+            const name = document.getElementById('userName');
+
+            const colors = [
+                'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+                'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+                'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
+            ];
+
+            const currentColor = avatar.style.background;
+            let newColor = colors[Math.floor(Math.random() * colors.length)];
+            if (currentColor === newColor) {
+                newColor = colors[(colors.indexOf(newColor) + 1) % colors.length];
+            }
+            avatar.style.background = newColor;
+        }
+
+        // 加载统计数据
+        async function loadStats() {
+            try {
+                // 这里可以从 GitHub API 或本地存储获取数据
+                // 暂时使用示例数据
+                const totalNotes = localStorage.getItem('totalNotes') || 0;
+                const totalComments = localStorage.getItem('totalComments') || 0;
+                const totalTags = localStorage.getItem('totalTags') || 0;
+
+                document.getElementById('totalNotes').textContent = totalNotes;
+                document.getElementById('totalComments').textContent = totalComments;
+                document.getElementById('totalTags').textContent = totalTags;
+            } catch (error) {
+                console.error('加载统计数据失败:', error);
+            }
+        }
+
+        loadStats();
     </script>
 
-    <script>
-        // 背景粒子效果
-        function createBackgroundParticles() {
-            const particlesContainer = document.getElementById('particles');
-            const particleCount = 30;
-
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle bg-particle';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.animationDelay = Math.random() * 15 + 's';
-                particle.style.animationDuration = (20 + Math.random() * 10) + 's';
-                particle.style.opacity = '0.2';
-                particlesContainer.appendChild(particle);
-            }
+    <style>
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        // 鼠标跟随粒子效果
-        function initMouseFollowParticles() {
-            const canvas = document.createElement('canvas');
-            canvas.id = 'mouse-canvas';
-            document.body.appendChild(canvas);
-
-            const ctx = canvas.getContext('2d');
-            const particles = [];
-            const mouse = { x: 0, y: 0 };
-
-            function resize() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            }
-            resize();
-            window.addEventListener('resize', resize);
-
-            document.addEventListener('mousemove', (e) => {
-                mouse.x = e.clientX;
-                mouse.y = e.clientY;
-
-                for (let i = 0; i < 5; i++) {
-                    particles.push({
-                        x: mouse.x,
-                        y: mouse.y,
-                        vx: (Math.random() - 0.5) * 2,
-                        vy: (Math.random() - 0.5) * 2,
-                        life: 1,
-                        size: Math.random() * 3 + 2
-                    });
-                }
-            });
-
-            function animate() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-                particles.forEach((particle, index) => {
-                    particle.x += particle.vx;
-                    particle.y += particle.vy;
-                    particle.life -= 0.02;
-
-                    if (particle.life <= 0) {
-                        particles.splice(index, 1);
-                        return;
-                    }
-
-                    const alpha = particle.life;
-                    const gradient = ctx.createRadialGradient(
-                        particle.x, particle.y, 0,
-                        particle.x, particle.y, particle.size * 2
-                    );
-                    gradient.addColorStop(0, `rgba(102, 126, 234, ${alpha})`);
-                    gradient.addColorStop(0.5, `rgba(240, 147, 251, ${alpha * 0.5})`);
-                    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-
-                    ctx.fillStyle = gradient;
-                    ctx.beginPath();
-                    ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-                    ctx.fill();
-                });
-
-                requestAnimationFrame(animate);
-            }
-
-            animate();
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: var(--shadow-sm);
         }
 
-        // 创建浮动粒子
-        function createFloatingParticles() {
-            const container = document.getElementById('floatingParticles');
-            const particleCount = 15;
-
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'floating-particle';
-
-                const size = Math.random() * 20 + 10;
-                particle.style.width = size + 'px';
-                particle.style.height = size + 'px';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.animationDelay = Math.random() * 20 + 's';
-                particle.style.animationDuration = (Math.random() * 10 + 15) + 's';
-
-                container.appendChild(particle);
-            }
+        .btn-primary:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
         }
 
-        // 开始按钮点击事件
-        function initStartButton() {
-            const startButton = document.getElementById('startButton');
-
-            startButton.addEventListener('click', function(e) {
-                // 创建点击波纹效果
-                const ripple = document.createElement('span');
-                ripple.style.position = 'absolute';
-                ripple.style.borderRadius = '50%';
-                ripple.style.background = 'rgba(255, 255, 255, 0.6)';
-                ripple.style.transform = 'scale(0)';
-                ripple.style.animation = 'ripple 0.6s linear';
-                ripple.style.left = (e.offsetX - 10) + 'px';
-                ripple.style.top = (e.offsetY - 10) + 'px';
-                ripple.style.width = '20px';
-                ripple.style.height = '20px';
-
-                this.appendChild(ripple);
-
-                setTimeout(() => ripple.remove(), 600);
-
-                // 添加点击动画
-                this.style.transform = 'translateY(-2px) scale(1.02)';
-                setTimeout(() => {
-                    this.style.transition = 'all 0.3s ease';
-                    this.style.transform = '';
-                }, 100);
-
-                // 延迟跳转以显示动画
-                setTimeout(() => {
-                    window.location.href = 'notes.html';
-                }, 300);
-            });
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
         }
 
-        // 添加波纹动画样式
-        function addRippleAnimation() {
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes ripple {
-                    to {
-                        transform: scale(4);
-                        opacity: 0;
-                    }
-                }
-            `;
-            document.head.appendChild(style);
+        .btn-secondary:hover {
+            background: var(--card-bg);
+            box-shadow: var(--shadow-sm);
         }
-
-        // 页面加载完成后初始化
-        window.addEventListener('load', () => {
-            createBackgroundParticles();
-            initMouseFollowParticles();
-            createFloatingParticles();
-            initStartButton();
-            addRippleAnimation();
-        });
-    </script>
+    </style>
 </body>
 
 </html>

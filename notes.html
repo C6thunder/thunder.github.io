@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="diary">
 
 <head>
     <meta charset="UTF-8">
@@ -7,50 +7,125 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>所有笔记 - 个人笔记网站</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
-<body data-theme="violet">
-    <div class="background">
-        <div class="gradient-orb orb-1"></div>
-        <div class="gradient-orb orb-2"></div>
-        <div class="gradient-orb orb-3"></div>
-        <div class="gradient-orb orb-4"></div>
-        <div class="gradient-orb orb-5"></div>
-    </div>
-    <div class="particles" id="particles"></div>
+<body>
+    <div class="app-container">
+        <!-- 左侧导航栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">我的笔记</div>
+                <div class="sidebar-subtitle">记录生活点滴</div>
+            </div>
 
-    <!-- 主题切换器 -->
-    <div class="theme-switcher">
-        <button class="theme-toggle-btn" id="themeToggle" title="切换主题">
-            <i class="fas fa-palette"></i>
-        </button>
-        <div class="theme-panel" id="themePanel">
-            <h3><i class="fas fa-magic"></i> 选择主题</h3>
-            <div class="theme-options">
-                <div class="theme-option" data-theme="violet" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" title="紫罗兰梦境">
-                    <div class="theme-label">紫罗兰</div>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>首页</span>
+                </a>
+                <a href="notes.html" class="nav-item active">
+                    <i class="fas fa-sticky-note"></i>
+                    <span>所有笔记</span>
+                </a>
+                <a href="write.html" class="nav-item">
+                    <i class="fas fa-pen"></i>
+                    <span>写笔记</span>
+                </a>
+                <a href="restore-notes.html" class="nav-item">
+                    <i class="fas fa-history"></i>
+                    <span>恢复笔记</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="theme-switcher">
+                    <div class="theme-toggle-btn" title="切换主题">
+                        <i class="fas fa-palette"></i>
+                    </div>
+                    <div class="theme-panel">
+                        <h4>选择主题</h4>
+                        <div class="theme-options">
+                            <div class="theme-option active" data-theme="diary">
+                                <i class="fas fa-sun"></i>
+                                <span>米白日记</span>
+                            </div>
+                            <div class="theme-option" data-theme="dark">
+                                <i class="fas fa-moon"></i>
+                                <span>夜间模式</span>
+                            </div>
+                            <div class="theme-option" data-theme="paper">
+                                <i class="fas fa-scroll"></i>
+                                <span>暖黄护眼</span>
+                            </div>
+                            <div class="theme-option" data-theme="minimal">
+                                <i class="fas fa-gem"></i>
+                                <span>极简灰</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="theme-option" data-theme="cyber" style="background: linear-gradient(135deg, #00f0ff 0%, #ff00ff 100%);" title="霓虹赛博">
-                    <div class="theme-label">赛博</div>
-                </div>
-                <div class="theme-option" data-theme="minimal" style="background: linear-gradient(135deg, #ffffff 0%, #888888 100%);" title="极简黑白">
-                    <div class="theme-label">极简</div>
-                </div>
-                <div class="theme-option" data-theme="sunset" style="background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);" title="日落暖阳">
-                    <div class="theme-label">暖阳</div>
-                </div>
-                <div class="theme-option" data-theme="ocean" style="background: linear-gradient(135deg, #00bfff 0%, #1e90ff 100%);" title="深海幽蓝">
-                    <div class="theme-label">深海</div>
+                <div class="user-info" onclick="changeAvatar()">
+                    <div class="user-avatar" id="userAvatar">T</div>
+                    <div class="user-details">
+                        <div class="user-name" id="userName">Thunder</div>
+                        <div class="user-email" id="userEmail">thunder@example.com</div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
+        </aside>
 
-    <div class="container">
-        <header class="header">
-            <div class="header-nav">
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <div class="content-container">
+                <!-- 页面头部 -->
+                <div class="page-header">
+                    <h1 class="page-title">所有笔记</h1>
+                    <p class="page-subtitle">浏览和管理您的所有笔记</p>
+                </div>
+
+                <!-- 工具栏 -->
+                <div class="card" style="padding: 16px; margin-bottom: 24px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                    <a href="write.html" class="btn btn-primary" style="text-decoration: none;">
+                        <i class="fas fa-plus"></i> 写笔记
+                    </a>
+                    <button class="btn btn-secondary" id="sortBtn">
+                        <i class="fas fa-sort"></i> 排序
+                    </button>
+                    <button class="btn btn-secondary" id="refreshBtn" title="刷新笔记">
+                        <i class="fas fa-sync-alt"></i> 刷新
+                    </button>
+                    <span class="last-update" id="lastUpdate" style="margin-left: auto; font-size: 12px; color: var(--text-tertiary);"></span>
+                </div>
+
+                <!-- 搜索栏 -->
+                <div class="search-container" style="margin-bottom: 24px;">
+                    <div class="search-box" style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 16px; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-search" style="color: var(--text-tertiary);"></i>
+                        <input type="text" id="searchInput" placeholder="搜索笔记、标签或内容..." style="border: none; background: transparent; outline: none; color: var(--text-primary); flex: 1; font-size: 14px;">
+                    </div>
+                </div>
+
+                <!-- 筛选标签 -->
+                <div class="filter-tags" id="filterTags" style="margin-bottom: 24px;">
+                    <div class="loading" style="color: var(--text-secondary);">加载中...</div>
+                </div>
+
+                <!-- 笔记列表 -->
+                <div class="notes-list" id="notesGrid">
+                    <div class="loading" style="color: var(--text-secondary); text-align: center; padding: 40px;">加载中...</div>
+                </div>
+
+                <!-- 空状态 -->
+                <div class="empty-state" id="emptyState" style="display: none; text-align: center; padding: 60px 20px;">
+                    <i class="fas fa-search" style="font-size: 48px; color: var(--text-tertiary); margin-bottom: 16px;"></i>
+                    <h3 style="color: var(--text-primary); margin-bottom: 8px;">未找到相关笔记</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 20px;">尝试更换关键词或清除筛选条件</p>
+                    <button class="btn btn-primary" onclick="clearFilters()">清除筛选</button>
+                </div>
+            </div>
+        </main>
+    </div>
                 <a href="index.html" class="back-btn">
                     <i class="fas fa-arrow-left"></i> 返回首页
                 </a>
