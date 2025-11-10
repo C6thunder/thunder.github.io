@@ -172,17 +172,134 @@
 
     <script>
         // 主题切换
+        const themeToggleBtn = document.querySelector('.theme-toggle-btn');
+        const themePanel = document.querySelector('.theme-panel');
+
+        // 点击按钮切换面板显示
+        themeToggleBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            themePanel.classList.toggle('show');
+        });
+
+        // 点击其他地方关闭面板
+        document.addEventListener('click', function() {
+            themePanel.classList.remove('show');
+        });
+
+        // 阻止面板内部点击事件冒泡
+        themePanel.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+
+        // 主题选项点击
         document.querySelectorAll('.theme-option').forEach(option => {
             option.addEventListener('click', function() {
                 const theme = this.dataset.theme;
                 document.documentElement.setAttribute('data-theme', theme);
                 document.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('active'));
                 this.classList.add('active');
+                // 选择后关闭面板
+                themePanel.classList.remove('show');
+            });
+        });
+
+        // 主题适配笔记内容
+        function applyThemeToNote() {
+            const noteContent = document.getElementById('noteContent');
+            if (!noteContent) return;
+
+            // 获取当前主题
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'diary';
+
+            // 根据主题应用适配颜色
+            const themeColors = {
+                diary: {
+                    text: '#2c3e50',
+                    textSecondary: '#555',
+                    heading: '#2c3e50',
+                    background: 'transparent'
+                },
+                dark: {
+                    text: '#e2e8f0',
+                    textSecondary: '#a0aec0',
+                    heading: '#e2e8f0',
+                    background: 'transparent'
+                },
+                paper: {
+                    text: '#5d4e37',
+                    textSecondary: '#7d6b50',
+                    heading: '#5d4e37',
+                    background: 'transparent'
+                },
+                minimal: {
+                    text: '#2d2d2d',
+                    textSecondary: '#666666',
+                    heading: '#2d2d2d',
+                    background: 'transparent'
+                }
+            };
+
+            const colors = themeColors[currentTheme];
+
+            // 应用到根元素
+            noteContent.style.color = colors.text;
+            noteContent.style.background = colors.background;
+
+            // 适配内部所有元素
+            const allElements = noteContent.querySelectorAll('*');
+            allElements.forEach(el => {
+                const computedStyle = window.getComputedStyle(el);
+                const tagName = el.tagName;
+
+                // 保存原始style以便恢复
+                if (!el.hasAttribute('data-theme-applied')) {
+                    el.setAttribute('data-theme-applied', 'true');
+                    el.setAttribute('data-original-style', el.getAttribute('style') || '');
+                }
+
+                // 标题颜色
+                if (['H1', 'H2', 'H3', 'H4', 'H5', 'H6'].includes(tagName)) {
+                    el.style.color = colors.heading;
+                }
+                // 段落和span
+                else if (tagName === 'P' || tagName === 'SPAN' || tagName === 'LI' || tagName === 'DIV') {
+                    // 保持原本的背景色，但更改文字颜色
+                    if (computedStyle.color && computedStyle.color !== 'rgba(0, 0, 0, 0)') {
+                        el.style.color = colors.text;
+                    }
+                }
+                // 代码块
+                else if (tagName === 'CODE' || tagName === 'PRE') {
+                    // 代码块背景保持，文字使用次要颜色
+                    el.style.color = colors.textSecondary;
+                }
+                // 链接
+                else if (tagName === 'A') {
+                    // 链接颜色保持主题色
+                }
+            });
+        }
+
+        // 监听主题变化
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.attributeName === 'data-theme') {
+                    applyThemeToNote();
+                }
             });
         });
 
         // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', async function() {
+            // 启动主题变化监听
+            observer.observe(document.documentElement, {
+                attributes: true,
+                attributeFilter: ['data-theme']
+            });
+
+            // 初始应用一次主题适配
+            setTimeout(applyThemeToNote, 200);
+
             const urlParams = new URLSearchParams(window.location.search);
             const noteId = urlParams.get('id');
 
@@ -263,6 +380,8 @@
                                 const doc = parser.parseFromString(html, 'text/html');
                                 const bodyContent = doc.body.innerHTML;
                                 document.getElementById('noteContent').innerHTML = bodyContent;
+                                // 主题适配
+                                applyThemeToNote();
                             })
                             .catch(error => {
                                 console.error('加载 HTML 文件失败:', error);
@@ -282,6 +401,9 @@
 
                 // 渲染评论
                 loadComments(noteId);
+
+                // 主题适配笔记内容
+                setTimeout(applyThemeToNote, 100);
 
             } catch (error) {
                 console.error('加载笔记失败:', error);

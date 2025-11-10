@@ -536,9 +536,11 @@ body {
     transform: translateY(10px);
     transition: all 0.2s ease;
     box-shadow: var(--shadow-md);
+    z-index: 1000;
 }
 
-.theme-switcher:hover .theme-panel {
+.theme-switcher:hover .theme-panel,
+.theme-panel.show {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
