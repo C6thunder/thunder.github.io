@@ -287,9 +287,56 @@
                             .then(html => {
                                 const parser = new DOMParser();
                                 const doc = parser.parseFromString(html, 'text/html');
+
+                                // 提取所有style标签
+                                const styles = doc.querySelectorAll('style');
+                                let styleText = '';
+                                styles.forEach(style => {
+                                    styleText += style.textContent + '\n';
+                                });
+
+                                // 提取body内容
                                 const bodyContent = doc.body.innerHTML;
-                                document.getElementById('noteContent').innerHTML = bodyContent;
-                                // 不进行主题适配，保持笔记原有设计
+
+                                // 将内容包裹在隔离容器中
+                                const wrappedContent = `<div class="note-html-wrapper">${bodyContent}</div>`;
+                                document.getElementById('noteContent').innerHTML = wrappedContent;
+
+                                // 添加隔离样式，防止影响页面其他部分
+                                const styleElement = document.createElement('style');
+                                styleElement.textContent = `
+                                    /* 隔离样式作用域 */
+                                    #noteContent {
+                                        position: relative;
+                                        z-index: 1;
+                                    }
+
+                                    #noteContent .note-html-wrapper {
+                                        /* 移除body的默认样式 */
+                                        margin: 0 !important;
+                                        padding: 0 !important;
+                                        background: transparent !important;
+                                        min-height: auto !important;
+                                    }
+
+                                    /* 重写原始样式中的body和html选择器 */
+                                    ${styleText
+                                        .replace(/body\s*\{/g, '#noteContent .note-html-wrapper {')
+                                        .replace(/html\s*\{/g, '#noteContent .note-html-wrapper {')
+                                        .replace(/:root\s*\{/g, '#noteContent .note-html-wrapper {')
+                                    }
+
+                                    /* 确保评论区域不受影响 */
+                                    #noteContent ~ * {
+                                        position: relative;
+                                        z-index: 10;
+                                    }
+                                `;
+
+                                // 移除旧样式并添加新样式
+                                document.querySelectorAll('style[data-note-content]').forEach(s => s.remove());
+                                styleElement.setAttribute('data-note-content', 'true');
+                                document.head.appendChild(styleElement);
                             })
                             .catch(error => {
                                 console.error('加载 HTML 文件失败:', error);

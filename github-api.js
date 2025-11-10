@@ -364,6 +364,67 @@ class GitHubNoteManager {
         }
     }
 
+    // 保存原始文件（不转换为JSON）
+    async saveRawFile(path, content, message) {
+        this.validateConfig();
+
+        try {
+            // 先检查文件是否存在
+            let sha = null;
+            try {
+                const fileUrl = `${this.apiBase}/repos/${this.config.owner}/${this.config.repo}/contents/${path}?ref=${this.config.branch}`;
+                const fileResponse = await fetch(fileUrl, {
+                    headers: this.getHeaders()
+                });
+                if (fileResponse.ok) {
+                    const fileData = await fileResponse.json();
+                    sha = fileData.sha;
+                }
+            } catch (error) {
+                // 文件不存在，继续创建
+            }
+
+            // 直接将内容转换为base64，不包装为JSON
+            const base64Content = this.utf8ToBase64(content);
+
+            const url = `${this.apiBase}/repos/${this.config.owner}/${this.config.repo}/contents/${path}`;
+
+            const body = {
+                message,
+                content: base64Content,
+                branch: this.config.branch
+            };
+
+            // 如果文件存在，需要包含sha
+            if (sha) {
+                body.sha = sha;
+            }
+
+            const response = await fetch(url, {
+                method: 'PUT',
+                headers: this.getHeaders(),
+                body: JSON.stringify(body)
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('保存文件失败:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    path: path,
+                    message: message,
+                    error: errorText
+                });
+                throw new Error(`保存文件失败: ${response.status} ${response.statusText}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('保存文件异常:', { path, error: error.message });
+            throw error;
+        }
+    }
+
     // 保存笔记（Markdown）
     async saveNote(note) {
         const timestamp = Date.now();
@@ -373,13 +434,23 @@ class GitHubNoteManager {
         return await this.saveFile(filename, note, message);
     }
 
-    // 保存HTML笔记
+    // 保存HTML笔记到notecontent/文件夹
     async saveHtmlNote(note) {
         const timestamp = Date.now();
-        const filename = `htmlnotes/note-${timestamp}.json`;
+        const filename = `notecontent/note-${timestamp}.html`;
         const message = `Add HTML note: ${note.title}`;
 
-        return await this.saveFile(filename, note, message);
+        // 将笔记的content保存为HTML文件
+        await this.saveRawFile(filename, note.content, message);
+
+        // 更新notes.json中的笔记列表
+        const noteWithPath = {
+            ...note,
+            content: filename
+        };
+        await this.updateNotesList(noteWithPath);
+
+        return { success: true, note: noteWithPath };
     }
 
     // 保存评论到独立的 comments 文件
@@ -551,9 +622,18 @@ class GitHubNoteManager {
 
     // 更新笔记
     async updateNote(noteId, updatedNote) {
-        // HTML 笔记不保存单独的 JSON 文件（内容在 notecontent 中）
-        // Markdown 笔记才保存到 notes/ 文件夹
-        if (updatedNote.type !== 'html') {
+        // HTML 笔记需要更新 notecontent/ 文件夹中的 HTML 文件
+        if (updatedNote.type === 'html') {
+            // 获取原始笔记以获取文件路径
+            const allNotes = await this.scanAllNotes();
+            const originalNote = allNotes.find(n => n.id === noteId);
+
+            if (originalNote && originalNote.content && originalNote.content.startsWith('notecontent/')) {
+                // 保存新的HTML内容到原文件路径
+                await this.saveRawFile(originalNote.content, updatedNote.content, `Update HTML note: ${updatedNote.title}`);
+            }
+        } else {
+            // Markdown 笔记才保存到 notes/ 文件夹
             const filename = `notes/${noteId}.json`;
             const message = `Update note: ${updatedNote.title}`;
             await this.saveFile(filename, updatedNote, message);

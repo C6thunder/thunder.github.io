@@ -257,17 +257,18 @@
                 const note = {
                     id: 'note-' + Date.now(),
                     title: title,
-                    content: content,  // HTML 内容直接保存
+                    content: content,  // HTML 内容
                     excerpt: excerpt || content.substring(0, 100) + '...',
                     tags: tags,
                     date: new Date().toISOString().split('T')[0],
                     authorKey: authorKey || null,
                     editKey: editKey || null,  // 保存修改密钥
-                    type: 'html',  // 改为 HTML 类型
+                    type: 'html',  // HTML 类型
                     comments: []
                 };
 
-                await window.githubNoteManager.saveNote(note);
+                // 保存HTML笔记到notecontent/文件夹并更新notes.json
+                await window.githubNoteManager.saveHtmlNote(note);
                 status.textContent = '发布成功！';
                 status.style.color = 'var(--success)';
 
