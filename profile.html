@@ -6,7 +6,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>个人信息 - Thunder的个人笔记</title>
-    <link rel="stylesheet" href="style.css?v=2023111500">
+    <link rel="stylesheet" href="style.css?v=2023111600">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="config.js?v=1762755000"></script>
 </head>
@@ -88,8 +88,11 @@
                         <!-- 背景图片 -->
                         <div style="position: absolute; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('img/girl-ocean-view.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;"></div>
 
-                        <!-- 渐变遮罩 -->
-                        <div style="position: absolute; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.5) 100%);"></div>
+                        <!-- 渐变遮罩 - 上半部分 -->
+                        <div style="position: absolute; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.3) 50%);"></div>
+
+                        <!-- 下半部分渐变透明遮挡 -->
+                        <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 60%; background: linear-gradient(to bottom, transparent 0%, var(--card-bg) 100%);"></div>
 
                         <!-- 装饰性元素 -->
                         <div style="position: absolute; top: 20px; right: 20px; color: white; font-size: 40px; opacity: 0.3;">

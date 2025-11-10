@@ -124,7 +124,7 @@
         </main>
     </div>
 
-    <script src="github-api.js?v=1762760700"></script>
+    <script src="github-api.js?v=1762760800"></script>
 
     <script>
         // 配置加密token
@@ -269,28 +269,29 @@
         // 分批显示笔记
         async function displayNotesBatch() {
             const notesGrid = document.getElementById('notesGrid');
-            document.getElementById('emptyState').style.display = 'none';
+            const emptyState = document.getElementById('emptyState');
+            emptyState.style.display = 'none';
 
             // 排序
             filteredNotes.sort((a, b) => {
                 switch (currentSort) {
-                    case 'date-desc':
-                        return new Date(b.date) - new Date(a.date);
-                    case 'date-asc':
-                        return new Date(a.date) - new Date(b.date);
-                    case 'title-asc':
-                        return a.title.localeCompare(b.title);
-                    case 'title-desc':
-                        return b.title.localeCompare(a.title);
-                    default:
-                        return 0;
+                    case 'date-desc': return new Date(b.date) - new Date(a.date);
+                    case 'date-asc': return new Date(a.date) - new Date(b.date);
+                    case 'title-asc': return a.title.localeCompare(b.title);
+                    case 'title-desc': return b.title.localeCompare(a.title);
+                    default: return 0;
                 }
             });
 
             if (filteredNotes.length === 0) {
-                document.getElementById('emptyState').style.display = 'block';
+                emptyState.style.display = 'block';
                 notesGrid.innerHTML = '';
                 return;
+            }
+
+            // 移除旧的滚动监听器，防止重复
+            if (window._scrollListener) {
+                window.removeEventListener('scroll', window._scrollListener);
             }
 
             // 初始显示前3个
@@ -302,22 +303,27 @@
             currentIndex = batchSize;
 
             // 滚动加载更多
-            const loadMore = () => {
+            window._scrollListener = () => {
                 if (currentIndex >= filteredNotes.length) {
-                    window.removeEventListener('scroll', loadMore);
+                    window.removeEventListener('scroll', window._scrollListener);
                     return;
                 }
                 renderBatch(currentIndex, Math.min(currentIndex + batchSize, filteredNotes.length));
                 currentIndex += batchSize;
             };
 
-            window.addEventListener('scroll', loadMore);
+            window.addEventListener('scroll', window._scrollListener);
         }
 
         // 渲染一批笔记
         async function renderBatch(start, end) {
             const notesGrid = document.getElementById('notesGrid');
             const batch = filteredNotes.slice(start, end);
+
+            // 如果是第一批，清空grid
+            if (start === 0) {
+                notesGrid.innerHTML = '';
+            }
 
             // 批量获取所有评论数（从N次API调用减少到1次）
             const noteIds = batch.map(note => note.id);

@@ -83,14 +83,12 @@ class GitHubNoteManager {
     // 解密并获取token
     async getDecryptedToken() {
         if (!this.encryptedConfig) {
-            console.log('未配置加密token');
             return null;
         }
 
         try {
             // 获取解密密码
             const password = this.getDecryptionPassword();
-            console.log('🔑 使用解密密码:', password.replace(/./g, '*'));
 
             const encryptedData = this.encryptedConfig;
 
@@ -133,11 +131,8 @@ class GitHubNoteManager {
                 tokenBytes
             );
 
-            console.log('✅ Token解密成功');
             return new TextDecoder().decode(decrypted);
         } catch (error) {
-            console.error('❌ Token解密失败:', error.message);
-            console.error('详细信息:', error);
             return null;
         }
     }
@@ -158,7 +153,6 @@ class GitHubNoteManager {
             }
             return btoa(binary);
         } catch (error) {
-            console.error('编码失败:', error);
             return '';
         }
     }
@@ -175,7 +169,6 @@ class GitHubNoteManager {
             // 使用TextDecoder解码为UTF-8字符串
             return new TextDecoder('utf-8').decode(bytes);
         } catch (error) {
-            console.error('解码失败:', error);
             return '';
         }
     }
@@ -192,20 +185,16 @@ class GitHubNoteManager {
     // 辅助函数：base64转字节数组
     base64ToBytes(base64) {
         try {
-            // 验证 base64 是否为空
             if (!base64 || base64.trim() === '') {
                 throw new Error('空字符串');
             }
 
-            // 转换urlsafe base64为标准base64
             base64 = base64.replace(/-/g, '+').replace(/_/g, '/');
 
-            // 添加缺失的padding
             while (base64.length % 4 !== 0) {
                 base64 += '=';
             }
 
-            // 使用 window.atob 解码
             const binaryString = atob(base64);
             const bytes = new Uint8Array(binaryString.length);
             for (let i = 0; i < binaryString.length; i++) {
@@ -213,8 +202,6 @@ class GitHubNoteManager {
             }
             return bytes;
         } catch (error) {
-            console.error('Base64解码失败:', { original: base64, error: error.message, stack: error.stack });
-            // 返回空数组而不是抛出错误
             return new Uint8Array(0);
         }
     }
@@ -389,89 +376,20 @@ class GitHubNoteManager {
         return await this.scanAllNotes();
     }
 
-    // 扫描指定文件夹获取所有JSON文件
-    async scanFolder(folderPath) {
-        const url = `${this.apiBase}/repos/${this.config.owner}/${this.config.repo}/contents/${folderPath}?ref=${this.config.branch}`;
-
-        try {
-            const response = await fetch(url, {
-                headers: this.getHeaders()
-            });
-
-            if (response.status === 404) {
-                // 文件夹不存在，返回空数组（静默处理）
-                return [];
-            }
-
-            if (!response.ok) {
-                throw new Error(`扫描文件夹失败: ${response.statusText}`);
-            }
-
-            const files = await response.json();
-            const jsonFiles = files.filter(file => file.name.endsWith('.json'));
-
-            const notes = [];
-            for (const file of jsonFiles) {
-                try {
-                    console.log(`正在读取文件: ${file.name}`);
-                    const fileUrl = `${this.apiBase}/repos/${this.config.owner}/${this.config.repo}/contents/${file.path}?ref=${this.config.branch}`;
-                    const fileResponse = await fetch(fileUrl, {
-                        headers: this.getHeaders()
-                    });
-
-                    if (fileResponse.ok) {
-                        const fileData = await fileResponse.json();
-                        console.log(`文件 ${file.name} 的原始base64内容:`, fileData.content);
-                        // 使用正确的UTF-8解码而不是atob()
-                        const contentString = this.base64ToUtf8(fileData.content);
-                        if (contentString) {
-                            try {
-                                const noteData = JSON.parse(contentString);
-                                console.log(`成功读取: ${file.name}`, noteData.title);
-                                notes.push(noteData);
-                            } catch (parseError) {
-                                console.error(`JSON解析失败: ${file.name}`, parseError);
-                            }
-                        } else {
-                            console.error(`解码失败: ${file.name}`);
-                        }
-                    } else {
-                        console.error(`文件 ${file.name} 响应错误:`, fileResponse.status, fileResponse.statusText);
-                    }
-                } catch (error) {
-                    console.error(`读取文件 ${file.name} 失败:`, error);
-                }
-            }
-            console.log(`扫描完成，共读取 ${notes.length} 个文件`);
-
-            return notes;
-        } catch (error) {
-            // 静默处理错误，不显示警告
-            return [];
-        }
-    }
-
     // 扫描所有笔记（从 notes.json 读取）
     async scanAllNotes() {
-        console.log('📌 开始扫描笔记...');
         try {
-            // 检查配置
             if (!this.config || !this.config.token) {
-                console.error('❌ GitHub 配置缺失');
                 return [];
             }
 
-            console.log('📌 尝试读取 notes.json...');
-            // 从 notes.json 读取笔记列表
             const notesData = await this.getFile('notes.json');
 
             if (!notesData) {
-                console.error('❌ notes.json 为空或不存在');
                 return [];
             }
 
             if (!notesData.notes || !Array.isArray(notesData.notes)) {
-                console.error('❌ notes.json 格式错误:', notesData);
                 return [];
             }
 
@@ -480,12 +398,8 @@ class GitHubNoteManager {
                 return new Date(b.date) - new Date(a.date);
             });
 
-            console.log(`✅ 成功读取 ${allNotes.length} 个笔记:`, allNotes.map(n => n.id).join(', '));
-
             return allNotes;
         } catch (error) {
-            console.error('❌ 读取 notes.json 失败:', error);
-            console.error('错误详情:', error.message);
             return [];
         }
     }
