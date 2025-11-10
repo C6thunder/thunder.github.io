@@ -157,7 +157,7 @@
         </main>
     </div>
 
-    <script src="github-api.js?v=1762760000"></script>
+    <script src="github-api.js?v=1762760200"></script>
 
     <script>
         // 配置加密token
@@ -203,83 +203,11 @@
             });
         });
 
-        // 主题适配笔记内容（只适配文字颜色，保留独特背景）
-        function applyThemeToNote() {
-            const noteContent = document.getElementById('noteContent');
-            if (!noteContent) return;
-
-            // 获取当前主题
-            const currentTheme = document.documentElement.getAttribute('data-theme') || 'diary';
-
-            // 根据主题只调整文字颜色
-            const themeColors = {
-                diary: {
-                    text: '#2c3e50',
-                    heading: '#2c3e50',
-                    secondary: '#555'
-                },
-                dark: {
-                    text: '#e2e8f0',
-                    heading: '#e2e8f0',
-                    secondary: '#a0aec0'
-                },
-                paper: {
-                    text: '#5d4e37',
-                    heading: '#5d4e37',
-                    secondary: '#7d6b50'
-                },
-                minimal: {
-                    text: '#2d2d2d',
-                    heading: '#2d2d2d',
-                    secondary: '#666666'
-                }
-            };
-
-            const colors = themeColors[currentTheme];
-
-            // 适配文字颜色 - 只调整，不覆盖背景
-            const textElements = noteContent.querySelectorAll('h1, h2, h3, h4, h5, h6, p, span, li, code, blockquote');
-            textElements.forEach(el => {
-                const tagName = el.tagName;
-                const computedStyle = window.getComputedStyle(el);
-
-                // 只在原文字不是白色/透明的情况下才调整
-                if (computedStyle.color && computedStyle.color !== 'rgba(0, 0, 0, 0)' && computedStyle.color !== 'transparent') {
-
-                    if (['H1', 'H2', 'H3', 'H4', 'H5', 'H6'].includes(tagName)) {
-                        // 标题使用主题色
-                        el.style.color = colors.heading;
-                    } else if (tagName === 'CODE' || tagName === 'PRE') {
-                        // 代码使用次要色
-                        el.style.color = colors.secondary;
-                    } else {
-                        // 段落等使用主要文字色
-                        el.style.color = colors.text;
-                    }
-                }
-            });
-        }
-
-        // 监听主题变化
-        const observer = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
-                if (mutation.attributeName === 'data-theme') {
-                    applyThemeToNote();
-                }
-            });
-        });
+        // 移除主题适配 - 让每篇笔记保持自己的独特设计风格
+        // 注：如果需要主题适配，可以在这里实现更智能的方案
 
         // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', async function() {
-            // 启动主题变化监听
-            observer.observe(document.documentElement, {
-                attributes: true,
-                attributeFilter: ['data-theme']
-            });
-
-            // 初始应用一次主题适配
-            setTimeout(applyThemeToNote, 200);
-
             const urlParams = new URLSearchParams(window.location.search);
             const noteId = urlParams.get('id');
 
@@ -360,8 +288,7 @@
                                 const doc = parser.parseFromString(html, 'text/html');
                                 const bodyContent = doc.body.innerHTML;
                                 document.getElementById('noteContent').innerHTML = bodyContent;
-                                // 主题适配
-                                applyThemeToNote();
+                                // 不进行主题适配，保持笔记原有设计
                             })
                             .catch(error => {
                                 console.error('加载 HTML 文件失败:', error);
@@ -381,9 +308,7 @@
 
                 // 渲染评论
                 loadComments(noteId);
-
-                // 主题适配笔记内容
-                setTimeout(applyThemeToNote, 100);
+                // 不进行主题适配，让笔记保持自己的独特设计
 
             } catch (error) {
                 console.error('加载笔记失败:', error);

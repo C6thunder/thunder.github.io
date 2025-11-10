@@ -488,12 +488,25 @@ class GitHubNoteManager {
 
     // 扫描所有笔记（从 notes.json 读取）
     async scanAllNotes() {
+        console.log('📌 开始扫描笔记...');
         try {
+            // 检查配置
+            if (!this.config || !this.config.token) {
+                console.error('❌ GitHub 配置缺失');
+                return [];
+            }
+
+            console.log('📌 尝试读取 notes.json...');
             // 从 notes.json 读取笔记列表
             const notesData = await this.getFile('notes.json');
 
-            if (!notesData || !notesData.notes || !Array.isArray(notesData.notes)) {
-                console.warn('notes.json 格式错误或不存在');
+            if (!notesData) {
+                console.error('❌ notes.json 为空或不存在');
+                return [];
+            }
+
+            if (!notesData.notes || !Array.isArray(notesData.notes)) {
+                console.error('❌ notes.json 格式错误:', notesData);
                 return [];
             }
 
@@ -502,11 +515,12 @@ class GitHubNoteManager {
                 return new Date(b.date) - new Date(a.date);
             });
 
-            console.log(`成功读取 ${allNotes.length} 个笔记`);
+            console.log(`✅ 成功读取 ${allNotes.length} 个笔记:`, allNotes.map(n => n.id).join(', '));
 
             return allNotes;
         } catch (error) {
-            console.error('读取 notes.json 失败:', error);
+            console.error('❌ 读取 notes.json 失败:', error);
+            console.error('错误详情:', error.message);
             return [];
         }
     }
