@@ -132,12 +132,12 @@
                     </h2>
 
                     <!-- 发表评论 -->
-                    <div id="commentForm" style="background: var(--bg-secondary); border-radius: 12px; padding: 24px; margin-bottom: 32px;">
+                    <div style="margin-bottom: 32px; padding: 0;">
                         <div style="margin-bottom: 16px;">
-                            <input type="text" id="commentAuthor" placeholder="您的昵称（可选）" style="width: 100%; padding: 12px 16px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 14px;">
+                            <input type="text" id="commentAuthor" placeholder="您的昵称（可选）" style="width: 100%; padding: 12px 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 14px;">
                         </div>
                         <div style="margin-bottom: 16px;">
-                            <textarea id="commentContent" rows="4" placeholder="写下您的评论..." style="width: 100%; padding: 12px 16px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 14px; line-height: 1.6; resize: vertical; font-family: inherit;"></textarea>
+                            <textarea id="commentContent" rows="4" placeholder="写下您的评论..." style="width: 100%; padding: 12px 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 14px; line-height: 1.6; resize: vertical; font-family: inherit;"></textarea>
                         </div>
                         <button class="btn btn-primary" id="submitComment">
                             <i class="fas fa-paper-plane"></i> 发表评论
@@ -180,18 +180,30 @@
                 return;
             }
 
-            // 等待 GitHub 初始化
-            if (window.githubNoteManager && window.githubNoteManager.config.token) {
-                loadNote(noteId);
-            } else {
+            // 等待 GitHub 初始化 - 优化等待机制
+            await waitForGitHubConfig();
+            loadNote(noteId);
+        });
+
+        // 优化GitHub配置等待机制
+        async function waitForGitHubConfig() {
+            return new Promise((resolve, reject) => {
+                let attempts = 0;
+                const maxAttempts = 50; // 5秒 * 10次/秒
+
                 const checkInterval = setInterval(() => {
-                    if (window.githubNoteManager && window.githubNoteManager.config.token) {
+                    attempts++;
+
+                    if (window.githubNoteManager && window.githubNoteManager.config && window.githubNoteManager.config.token) {
                         clearInterval(checkInterval);
-                        loadNote(noteId);
+                        resolve();
+                    } else if (attempts >= maxAttempts) {
+                        clearInterval(checkInterval);
+                        reject(new Error('GitHub 配置加载超时，请刷新页面重试'));
                     }
                 }, 100);
-            }
-        });
+            });
+        }
 
         // 加载笔记
         async function loadNote(noteId) {
@@ -250,7 +262,7 @@
             }
 
             commentsList.innerHTML = comments.map(comment => `
-                <div style="background: var(--bg-secondary); border-radius: 12px; padding: 20px;">
+                <div style="padding: 20px 0; border-bottom: 1px solid var(--border-color);">
                     <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
                         <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--accent)); display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; font-weight: 600;">
                             ${comment.author ? comment.author.charAt(0).toUpperCase() : '匿'}
