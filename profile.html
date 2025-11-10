@@ -103,8 +103,8 @@
                         </div>
 
                         <!-- 头像 -->
-                        <div style="position: absolute; bottom: 140px; left: 50%; transform: translateX(-50%); width: 120px; height: 120px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.9); box-shadow: 0 0 0 4px rgba(255,255,255,0.2), 0 12px 35px rgba(0, 0, 0, 0.35); overflow: hidden; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; z-index: 3; transition: all 0.3s ease;" id="profileAvatar">
-                            <img src="img/avatar.jpg" style="width: 100%; height: 100%; object-fit: cover;" data-config="avatar">
+                        <div style="position: absolute; bottom: 140px; left: 50%; transform: translateX(-50%); width: 110px; height: 110px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.6); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25), 0 0 0 8px rgba(255,255,255,0.08); overflow: hidden; background: rgba(255,255,255,0.05); backdrop-filter: blur(2px); display: flex; align-items: center; justify-content: center; z-index: 3; transition: all 0.3s ease;" id="profileAvatar">
+                            <img src="img/avatar.jpg" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; filter: brightness(1.05) contrast(1.05);" data-config="avatar">
                         </div>
 
                         <!-- 用户信息 -->
@@ -328,12 +328,14 @@
             const profileAvatar = document.getElementById('profileAvatar');
             if (profileAvatar) {
                 profileAvatar.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateX(-50%) scale(1.05)';
-                    this.style.boxShadow = '0 0 0 6px rgba(255,255,255,0.3), 0 15px 40px rgba(0, 0, 0, 0.45)';
+                    this.style.transform = 'translateX(-50%) scale(1.03)';
+                    this.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.3), 0 0 0 10px rgba(255,255,255,0.12)';
+                    this.style.borderColor = 'rgba(255,255,255,0.8)';
                 });
                 profileAvatar.addEventListener('mouseleave', function() {
                     this.style.transform = 'translateX(-50%) scale(1)';
-                    this.style.boxShadow = '0 0 0 4px rgba(255,255,255,0.2), 0 12px 35px rgba(0, 0, 0, 0.35)';
+                    this.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.25), 0 0 0 8px rgba(255,255,255,0.08)';
+                    this.style.borderColor = 'rgba(255,255,255,0.6)';
                 });
             }
         });
