@@ -65,13 +65,13 @@
                         </div>
                     </div>
                 </div>
-                <div class="user-info" onclick="changeAvatar()">
+                <a href="profile.html" class="user-info" style="text-decoration: none; color: inherit;">
                     <div class="user-avatar" id="userAvatar">T</div>
                     <div class="user-details">
                         <div class="user-name" id="userName">Thunder</div>
                         <div class="user-email" id="userEmail">thunder@example.com</div>
                     </div>
-                </div>
+                </a>
             </div>
         </aside>
 
@@ -154,27 +154,7 @@
             });
         });
 
-        // 更换头像
-        function changeAvatar() {
-            const avatar = document.getElementById('userAvatar');
-            const name = document.getElementById('userName');
-
-            const colors = [
-                'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-                'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-                'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-                'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-                'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
-            ];
-
-            const currentColor = avatar.style.background;
-            let newColor = colors[Math.floor(Math.random() * colors.length)];
-            if (currentColor === newColor) {
-                newColor = colors[(colors.indexOf(newColor) + 1) % colors.length];
-            }
-            avatar.style.background = newColor;
-        }
+        // 头像点击跳转到个人信息页
 
         // 加载统计数据
         async function loadStats() {

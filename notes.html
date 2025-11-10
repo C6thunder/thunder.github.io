@@ -65,13 +65,13 @@
                         </div>
                     </div>
                 </div>
-                <div class="user-info" onclick="changeAvatar()">
+                <a href="profile.html" class="user-info" style="text-decoration: none; color: inherit;">
                     <div class="user-avatar" id="userAvatar">T</div>
                     <div class="user-details">
                         <div class="user-name" id="userName">Thunder</div>
                         <div class="user-email" id="userEmail">thunder@example.com</div>
                     </div>
-                </div>
+                </a>
             </div>
         </aside>
 
@@ -126,72 +126,6 @@
             </div>
         </main>
     </div>
-                <a href="index.html" class="back-btn">
-                    <i class="fas fa-arrow-left"></i> 返回首页
-                </a>
-                <h1 class="title">
-                    <span class="title-gradient">所有笔记</span>
-                </h1>
-                <div class="header-actions">
-                    <a href="write.html" class="action-btn" style="background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); color: white; text-decoration: none; margin-right: 10px;">
-                        <i class="fas fa-pen"></i> 写笔记
-                    </a>
-                    <a href="setup.html" class="action-btn" style="text-decoration: none; margin-right: 10px;">
-                        <i class="fas fa-info-circle"></i> 使用说明
-                    </a>
-                    <button class="action-btn" id="sortBtn">
-                        <i class="fas fa-sort"></i> 排序
-                    </button>
-                    <button class="action-btn" id="refreshBtn" title="刷新笔记">
-                        <i class="fas fa-sync-alt"></i> 刷新
-                    </button>
-                    <span class="last-update" id="lastUpdate"></span>
-                </div>
-            </div>
-
-            <!-- 搜索栏 -->
-            <div class="search-container">
-                <div class="search-box">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" id="searchInput" placeholder="搜索笔记、标签或内容...">
-                    <button class="search-btn" id="searchBtn">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- 筛选标签 -->
-            <div class="filter-tags" id="filterTags">
-                <div class="loading">加载中...</div>
-            </div>
-        </header>
-
-        <div class="content-section">
-            <!-- 笔记网格 -->
-            <div class="notes-grid" id="notesGrid">
-                <div class="loading">加载中...</div>
-            </div>
-
-            <!-- 分页 -->
-            <div class="pagination" id="pagination" style="display: none;">
-                <button class="page-btn" id="prevPage" disabled>
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <div class="page-numbers" id="pageNumbers"></div>
-                <button class="page-btn" id="nextPage" disabled>
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
-
-            <!-- 空状态 -->
-            <div class="empty-state" id="emptyState" style="display: none;">
-                <i class="fas fa-search"></i>
-                <h3>未找到相关笔记</h3>
-                <p>尝试更换关键词或清除筛选条件</p>
-                <button class="btn-primary" onclick="clearFilters()">清除筛选</button>
-            </div>
-        </div>
-    </div>
 
     <script src="script.js"></script>
     <script src="github-api.js"></script>
@@ -208,558 +142,227 @@
     </script>
 
     <script>
-        // 添加自定义样式
-        const style = document.createElement('style');
-        style.textContent = `
-            .last-update {
-                color: var(--text-secondary);
-                font-size: 0.85rem;
-                margin-left: 10px;
-            }
-            #refreshBtn {
-                transition: all 0.3s ease;
-            }
-            #refreshBtn.spinning {
-                animation: spin 1s linear infinite;
-            }
-            @keyframes spin {
-                from { transform: rotate(0deg); }
-                to { transform: rotate(360deg); }
-            }
-            /* 宽屏笔记网格优化 */
-            .notes-grid {
-                grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-                gap: clamp(20px, 2.5vw, 30px);
-                margin: 30px 0;
-                max-width: 2400px;
-                margin-left: auto;
-                margin-right: auto;
-            }
-            .note-card {
-                padding: clamp(25px, 3vw, 35px);
-                min-height: 220px;
-            }
-            @media (max-width: 1600px) {
-                .notes-grid {
-                    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-                }
-            }
-            @media (max-width: 1200px) {
-                .notes-grid {
-                    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-                }
-            }
-        `;
-        document.head.appendChild(style);
-    </script>
+        // 头像点击跳转到个人信息页
 
-    <script>
+        // 主题切换
+        document.querySelectorAll('.theme-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const theme = this.dataset.theme;
+                document.documentElement.setAttribute('data-theme', theme);
+                document.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
         // 全局变量
         let allNotes = [];
         let filteredNotes = [];
         let currentPage = 1;
-        const notesPerPage = 9;
+        const notesPerPage = 12;
         let currentSort = 'date-desc';
         let currentFilter = null;
         let currentSearch = '';
 
-        // 背景粒子效果
-        function createBackgroundParticles() {
-            const particlesContainer = document.getElementById('particles');
-            const particleCount = 30;
-
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle bg-particle';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.animationDelay = Math.random() * 15 + 's';
-                particle.style.animationDuration = (20 + Math.random() * 10) + 's';
-                particle.style.opacity = '0.2';
-                particlesContainer.appendChild(particle);
-            }
-        }
-
-        // 鼠标跟随粒子效果
-        function initMouseFollowParticles() {
-            const canvas = document.createElement('canvas');
-            canvas.id = 'mouse-canvas';
-            document.body.appendChild(canvas);
-
-            const ctx = canvas.getContext('2d');
-            const particles = [];
-            const mouse = { x: 0, y: 0 };
-
-            function resize() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            }
-            resize();
-            window.addEventListener('resize', resize);
-
-            document.addEventListener('mousemove', (e) => {
-                mouse.x = e.clientX;
-                mouse.y = e.clientY;
-
-                for (let i = 0; i < 5; i++) {
-                    particles.push({
-                        x: mouse.x,
-                        y: mouse.y,
-                        vx: (Math.random() - 0.5) * 2,
-                        vy: (Math.random() - 0.5) * 2,
-                        life: 1,
-                        size: Math.random() * 3 + 2
-                    });
-                }
-            });
-
-            function animate() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-                particles.forEach((particle, index) => {
-                    particle.x += particle.vx;
-                    particle.y += particle.vy;
-                    particle.life -= 0.02;
-
-                    if (particle.life <= 0) {
-                        particles.splice(index, 1);
-                        return;
-                    }
-
-                    const alpha = particle.life;
-                    const gradient = ctx.createRadialGradient(
-                        particle.x, particle.y, 0,
-                        particle.x, particle.y, particle.size * 2
-                    );
-                    gradient.addColorStop(0, `rgba(102, 126, 234, ${alpha})`);
-                    gradient.addColorStop(0.5, `rgba(240, 147, 251, ${alpha * 0.5})`);
-                    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-
-                    ctx.fillStyle = gradient;
-                    ctx.beginPath();
-                    ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-                    ctx.fill();
-                });
-
-                requestAnimationFrame(animate);
-            }
-
-            animate();
-        }
-
-        // 加载笔记数据
-        async function loadNotes() {
-            try {
-                // 使用GitHub API扫描所有笔记
-                allNotes = await githubNoteManager.scanAllNotes();
-
-                // 获取URL参数
-                const urlParams = new URLSearchParams(window.location.search);
-                currentSearch = urlParams.get('search') || '';
-                const tag = urlParams.get('tag');
-
-                if (currentSearch) {
-                    document.getElementById('searchInput').value = currentSearch;
-                }
-
-                if (tag) {
-                    currentFilter = tag;
-                }
-
-                filterAndSortNotes();
-                loadFilterTags();
-                updateLastUpdateTime();
-
-            } catch (error) {
-                console.error('加载笔记失败:', error);
-                document.getElementById('notesGrid').innerHTML = '<div class="error-state"><i class="fas fa-exclamation-circle"></i><p>加载失败，请刷新页面重试</p></div>';
-            }
-        }
-
-        // 更新最后更新时间
-        function updateLastUpdateTime() {
-            const lastUpdateEl = document.getElementById('lastUpdate');
-            if (lastUpdateEl) {
-                const now = new Date();
-                lastUpdateEl.textContent = `最后更新: ${now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}`;
-            }
-        }
-
-        // 手动刷新
-        async function refreshNotes() {
-            const refreshBtn = document.getElementById('refreshBtn');
-            refreshBtn.classList.add('spinning');
-
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', async function() {
             try {
                 await loadNotes();
-                showNotification('笔记列表已更新', 'success');
             } catch (error) {
-                console.error('刷新失败:', error);
-                showNotification('刷新失败，请重试', 'error');
-            } finally {
-                refreshBtn.classList.remove('spinning');
+                console.error('加载笔记失败:', error);
+                document.getElementById('notesGrid').innerHTML =
+                    '<div style="text-align: center; padding: 40px; color: var(--text-secondary);">加载失败，请检查网络连接</div>';
             }
-        }
+        });
 
-        // 加载筛选标签
-        async function loadFilterTags() {
+        // 加载笔记
+        async function loadNotes() {
+            const notesGrid = document.getElementById('notesGrid');
+            notesGrid.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--text-secondary);">加载中...</div>';
+
             try {
-                // 从allNotes中获取所有标签
-                const allTags = new Set();
-                allNotes.filter(note => note && note.id).forEach(note => {
-                    (note.tags || []).forEach(tag => allTags.add(tag));
-                });
+                if (!window.githubNoteManager || !window.githubNoteManager.config.token) {
+                    throw new Error('GitHub配置未就绪');
+                }
 
-                const filterTagsContainer = document.getElementById('filterTags');
-                const tags = Array.from(allTags);
+                allNotes = await window.githubNoteManager.scanAllNotes();
+                console.log('加载到笔记数量:', allNotes.length);
 
-                if (tags.length === 0) {
-                    filterTagsContainer.innerHTML = '<span class="empty-text">暂无标签</span>';
+                if (allNotes.length === 0) {
+                    notesGrid.innerHTML =
+                        '<div style="text-align: center; padding: 40px; color: var(--text-secondary);">暂无笔记</div>';
                     return;
                 }
 
-                let html = '<span class="filter-label">筛选：</span>';
-                html += `<span class="tag ${!currentFilter ? 'active' : ''}" data-tag="">全部</span>`;
-
-                tags.forEach(tag => {
-                    const activeClass = currentFilter === tag ? 'active' : '';
-                    // 转义特殊字符，防止XSS和乱码
-                    const escapedTag = tag
-                        .replace(/&/g, '&amp;')
-                        .replace(/</g, '&lt;')
-                        .replace(/>/g, '&gt;')
-                        .replace(/"/g, '&quot;')
-                        .replace(/'/g, '&#39;');
-                    html += `<span class="tag ${activeClass}" data-tag="${tag}">${escapedTag}</span>`;
-                });
-
-                filterTagsContainer.innerHTML = html;
-
-                // 绑定标签点击事件
-                filterTagsContainer.querySelectorAll('.tag').forEach(tagEl => {
-                    tagEl.addEventListener('click', () => {
-                        const tag = tagEl.dataset.tag;
-                        currentFilter = tag || null;
-                        currentPage = 1;
-                        filterAndSortNotes();
-                        loadFilterTags(); // 重新加载以更新active状态
-                    });
-                });
-
+                filteredNotes = [...allNotes];
+                displayNotes();
+                loadTags();
+                updateLastUpdateTime();
             } catch (error) {
-                console.error('加载标签失败:', error);
+                console.error('加载笔记失败:', error);
+                notesGrid.innerHTML =
+                    '<div style="text-align: center; padding: 40px; color: var(--danger);">加载失败: ' + error.message + '</div>';
             }
         }
 
-        // 筛选和排序笔记
-        function filterAndSortNotes() {
-            filteredNotes = [...allNotes];
+        // 显示笔记
+        function displayNotes() {
+            const notesGrid = document.getElementById('notesGrid');
 
-            // 按标签筛选
-            if (currentFilter) {
-                filteredNotes = filteredNotes.filter(note =>
-                    (note.tags || []).includes(currentFilter)
-                );
+            if (filteredNotes.length === 0) {
+                document.getElementById('emptyState').style.display = 'block';
+                notesGrid.innerHTML = '';
+                return;
             }
 
-            // 搜索过滤
-            if (currentSearch) {
-                const query = currentSearch.toLowerCase();
-                filteredNotes = filteredNotes.filter(note =>
-                    (note.title || '').toLowerCase().includes(query) ||
-                    (note.excerpt || '').toLowerCase().includes(query) ||
-                    (note.content || '').toLowerCase().includes(query) ||
-                    (note.tags || []).some(tag => (tag || '').toLowerCase().includes(query))
-                );
-            }
+            document.getElementById('emptyState').style.display = 'none';
 
             // 排序
-            switch (currentSort) {
-                case 'date-desc':
-                    filteredNotes.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
-                    break;
-                case 'date-asc':
-                    filteredNotes.sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
-                    break;
-                case 'title-asc':
-                    filteredNotes.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
-                    break;
-                case 'title-desc':
-                    filteredNotes.sort((a, b) => (b.title || '').localeCompare(a.title || ''));
-                    break;
-            }
-
-            renderNotes();
-            renderPagination();
-        }
-
-        // 渲染笔记列表
-        function renderNotes() {
-            const notesGrid = document.getElementById('notesGrid');
-            const emptyState = document.getElementById('emptyState');
-
-            // 过滤掉null和undefined的笔记
-            const validNotes = filteredNotes.filter(note => note && note.id);
-
-            if (validNotes.length === 0) {
-                notesGrid.style.display = 'none';
-                emptyState.style.display = 'block';
-                return;
-            }
-
-            notesGrid.style.display = 'grid';
-            emptyState.style.display = 'none';
-
-            const start = (currentPage - 1) * notesPerPage;
-            const end = start + notesPerPage;
-            const pageNotes = validNotes.slice(start, end);
-
-            // 转义HTML特殊字符
-            const escapeHtml = (str) => {
-                if (!str) return '';
-                return String(str)
-                    .replace(/&/g, '&amp;')
-                    .replace(/</g, '&lt;')
-                    .replace(/>/g, '&gt;')
-                    .replace(/"/g, '&quot;')
-                    .replace(/'/g, '&#39;')
-                    .replace(/`/g, '&#96;')
-                    .replace(/\|/g, '&#124;');
-            };
-
-            notesGrid.innerHTML = pageNotes.map(note => `
-                <div class="note-card" onclick="location.href='note.html?id=${note.id}'">
-                    <div class="note-header">
-                        <h3>${escapeHtml(note.title) || '无标题'}</h3>
-                        <span class="note-date">${escapeHtml(note.date) || ''}</span>
-                    </div>
-                    <p class="note-excerpt">${escapeHtml(note.excerpt) || '无摘要'}</p>
-                    <div class="note-tags">
-                        ${(note.tags || []).map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('')}
-                    </div>
-                    <div class="note-footer">
-                        <span class="read-more">
-                            阅读更多 <i class="fas fa-arrow-right"></i>
-                        </span>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // 渲染分页
-        function renderPagination() {
-            // 过滤掉null和undefined的笔记，计算有效笔记数量
-            const validNotes = filteredNotes.filter(note => note && note.id);
-            const totalPages = Math.ceil(validNotes.length / notesPerPage);
-
-            if (totalPages <= 1) {
-                document.getElementById('pagination').style.display = 'none';
-                return;
-            }
-
-            document.getElementById('pagination').style.display = 'flex';
-
-            const prevBtn = document.getElementById('prevPage');
-            const nextBtn = document.getElementById('nextPage');
-            const pageNumbers = document.getElementById('pageNumbers');
-
-            prevBtn.disabled = currentPage === 1;
-            nextBtn.disabled = currentPage === totalPages;
-
-            let html = '';
-            for (let i = 1; i <= totalPages; i++) {
-                if (i === currentPage) {
-                    html += `<span class="page-number active">${i}</span>`;
-                } else {
-                    html += `<span class="page-number" onclick="changePage(${i})">${i}</span>`;
+            filteredNotes.sort((a, b) => {
+                switch (currentSort) {
+                    case 'date-desc':
+                        return new Date(b.date) - new Date(a.date);
+                    case 'date-asc':
+                        return new Date(a.date) - new Date(b.date);
+                    case 'title-asc':
+                        return a.title.localeCompare(b.title);
+                    case 'title-desc':
+                        return b.title.localeCompare(a.title);
+                    default:
+                        return 0;
                 }
-            }
+            });
 
-            pageNumbers.innerHTML = html;
-
-            prevBtn.onclick = () => changePage(currentPage - 1);
-            nextBtn.onclick = () => changePage(currentPage + 1);
+            // 生成HTML
+            notesGrid.innerHTML = filteredNotes.map(note => {
+                const commentCount = note.comments ? note.comments.length : 0;
+                return `
+                    <div class="note-card" onclick="location.href='note.html?id=${note.id}'">
+                        <div class="note-card-header">
+                            <div class="note-card-icon">📝</div>
+                            <div>
+                                <div class="note-card-title">${escapeHtml(note.title)}</div>
+                                <div class="note-card-date">${formatDate(note.date)}</div>
+                            </div>
+                        </div>
+                        <div class="note-card-excerpt">${escapeHtml(note.excerpt || '')}</div>
+                        ${note.tags && note.tags.length > 0 ? `
+                            <div class="note-card-tags">
+                                ${note.tags.map(tag => `<span class="note-card-tag">${escapeHtml(tag)}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                        <div class="note-card-footer">
+                            <div class="note-card-meta">
+                                <i class="fas fa-comments"></i>
+                                <span>${commentCount} 评论</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
-        // 切换页面
-        function changePage(page) {
-            currentPage = page;
-            renderNotes();
-            renderPagination();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        // 加载标签
+        function loadTags() {
+            const filterTags = document.getElementById('filterTags');
+            const allTags = new Set();
+
+            allNotes.forEach(note => {
+                if (note.tags && note.tags.length > 0) {
+                    note.tags.forEach(tag => allTags.add(tag));
+                }
+            });
+
+            if (allTags.size === 0) {
+                filterTags.innerHTML = '';
+                return;
+            }
+
+            let html = '<button class="btn btn-secondary" onclick="clearFilters()" style="margin-right: 8px; margin-bottom: 8px;">全部</button>';
+            allTags.forEach(tag => {
+                const isActive = currentFilter === tag;
+                html += `<button class="btn ${isActive ? 'btn-primary' : 'btn-secondary'}" onclick="filterByTag('${tag}')" style="margin-right: 8px; margin-bottom: 8px;">${escapeHtml(tag)}</button>`;
+            });
+            filterTags.innerHTML = html;
+        }
+
+        // 按标签筛选
+        function filterByTag(tag) {
+            currentFilter = tag;
+            filteredNotes = allNotes.filter(note => note.tags && note.tags.includes(tag));
+            displayNotes();
+            loadTags();
         }
 
         // 清除筛选
         function clearFilters() {
             currentFilter = null;
             currentSearch = '';
-            currentPage = 1;
             document.getElementById('searchInput').value = '';
-            filterAndSortNotes();
-            loadFilterTags();
+            filteredNotes = [...allNotes];
+            displayNotes();
+            loadTags();
         }
 
-        // 绑定事件
-        function bindEvents() {
-            // 搜索
-            const searchInput = document.getElementById('searchInput');
-            const searchBtn = document.getElementById('searchBtn');
-
-            function performSearch() {
-                currentSearch = searchInput.value.trim();
-                currentPage = 1;
-                filterAndSortNotes();
-            }
-
-            searchBtn.addEventListener('click', performSearch);
-            searchInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    performSearch();
-                }
-            });
-
-            // 排序
-            document.getElementById('sortBtn').addEventListener('click', () => {
-                const sortOptions = ['date-desc', 'date-asc', 'title-asc', 'title-desc'];
-                const currentIndex = sortOptions.indexOf(currentSort);
-                const nextIndex = (currentIndex + 1) % sortOptions.length;
-                currentSort = sortOptions[nextIndex];
-
-                const sortText = {
-                    'date-desc': '日期降序',
-                    'date-asc': '日期升序',
-                    'title-asc': '标题 A-Z',
-                    'title-desc': '标题 Z-A'
-                };
-
-                document.getElementById('sortBtn').innerHTML = `<i class="fas fa-sort"></i> ${sortText[currentSort]}`;
-                filterAndSortNotes();
-            });
-
-            // 刷新按钮
-            document.getElementById('refreshBtn').addEventListener('click', refreshNotes);
-
-            // 主题切换
-            initThemeSwitcher();
-        }
-
-        // 主题切换器
-        function initThemeSwitcher() {
-            const themeToggle = document.getElementById('themeToggle');
-            const themePanel = document.getElementById('themePanel');
-            const themeOptions = document.querySelectorAll('.theme-option');
-            const body = document.body;
-
-            const savedTheme = localStorage.getItem('theme') || 'violet';
-            setTheme(savedTheme);
-
-            themeToggle.addEventListener('click', (e) => {
-                e.stopPropagation();
-                themePanel.classList.toggle('open');
-            });
-
-            themeOptions.forEach(option => {
-                option.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const theme = option.dataset.theme;
-                    setTheme(theme);
-                    themePanel.classList.remove('open');
+        // 搜索
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            currentSearch = e.target.value.toLowerCase();
+            if (currentSearch === '') {
+                filteredNotes = currentFilter
+                    ? allNotes.filter(note => note.tags && note.tags.includes(currentFilter))
+                    : [...allNotes];
+            } else {
+                filteredNotes = allNotes.filter(note => {
+                    if (currentFilter && (!note.tags || !note.tags.includes(currentFilter))) {
+                        return false;
+                    }
+                    return note.title.toLowerCase().includes(currentSearch) ||
+                           note.content.toLowerCase().includes(currentSearch) ||
+                           (note.tags && note.tags.some(tag => tag.toLowerCase().includes(currentSearch)));
                 });
-            });
-
-            document.addEventListener('click', () => {
-                themePanel.classList.remove('open');
-            });
-
-            function setTheme(theme) {
-                body.setAttribute('data-theme', theme);
-                localStorage.setItem('theme', theme);
-
-                themeOptions.forEach(opt => {
-                    opt.classList.toggle('active', opt.dataset.theme === theme);
-                });
-
-                body.style.transition = 'background 0.5s ease';
-                setTimeout(() => {
-                    body.style.transition = '';
-                }, 500);
             }
-        }
-
-        // 显示通知
-        function showNotification(message, type) {
-            const notification = document.createElement('div');
-            notification.className = `notification notification-${type}`;
-            notification.innerHTML = `
-                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
-                <span>${message}</span>
-            `;
-
-            const style = document.createElement('style');
-            style.textContent = `
-                .notification {
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    padding: 16px 24px;
-                    border-radius: 12px;
-                    color: #fff;
-                    font-weight: 500;
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-                    z-index: 1000;
-                    animation: slideInRight 0.3s ease-out, slideOutRight 0.3s ease-in 2.7s;
-                    max-width: 400px;
-                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-                    background: ${type === 'success' ? 'linear-gradient(135deg, #4ade80 0%, #22c55e 100%)' : 'linear-gradient(135deg, #f87171 0%, #ef4444 100%)'};
-                }
-                @keyframes slideInRight {
-                    from { transform: translateX(400px); opacity: 0; }
-                    to { transform: translateX(0); opacity: 1; }
-                }
-                @keyframes slideOutRight {
-                    from { transform: translateX(0); opacity: 1; }
-                    to { transform: translateX(400px); opacity: 0; }
-                }
-            `;
-            if (!document.querySelector('style[data-notification-notes]')) {
-                style.setAttribute('data-notification-notes', 'true');
-                document.head.appendChild(style);
-            }
-
-            document.body.appendChild(notification);
-
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
-        }
-
-        // 自动刷新（每2分钟）
-        let autoRefreshInterval;
-
-        // 页面加载完成后初始化
-        window.addEventListener('load', () => {
-            createBackgroundParticles();
-            initMouseFollowParticles();
-            loadNotes();
-            bindEvents();
-
-            // 启动自动刷新
-            autoRefreshInterval = setInterval(async () => {
-                try {
-                    await loadNotes();
-                } catch (error) {
-                    console.warn('自动刷新失败:', error);
-                }
-            }, 120000); // 2分钟
+            displayNotes();
         });
 
-        // 页面关闭时清除定时器
-        window.addEventListener('beforeunload', () => {
-            if (autoRefreshInterval) {
-                clearInterval(autoRefreshInterval);
-            }
+        // 排序
+        document.getElementById('sortBtn').addEventListener('click', function() {
+            const sorts = [
+                { value: 'date-desc', label: '最新发布' },
+                { value: 'date-asc', label: '最旧发布' },
+                { value: 'title-asc', label: '标题 A-Z' },
+                { value: 'title-desc', label: '标题 Z-A' }
+            ];
+            const currentIndex = sorts.findIndex(s => s.value === currentSort);
+            const nextIndex = (currentIndex + 1) % sorts.length;
+            currentSort = sorts[nextIndex].value;
+            displayNotes();
         });
+
+        // 刷新
+        document.getElementById('refreshBtn').addEventListener('click', async function() {
+            this.classList.add('spinning');
+            await loadNotes();
+            setTimeout(() => this.classList.remove('spinning'), 1000);
+        });
+
+        // 工具函数
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function updateLastUpdateTime() {
+            const lastUpdate = document.getElementById('lastUpdate');
+            if (lastUpdate) {
+                const now = new Date();
+                lastUpdate.textContent = '最后更新: ' + now.toLocaleTimeString('zh-CN');
+            }
+        }
     </script>
 </body>
 

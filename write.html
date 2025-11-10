@@ -1,392 +1,255 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="diary">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>写笔记 - 个人笔记网站</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .write-container {
-            max-width: 2400px;
-            margin: 0 auto;
-            padding: clamp(30px, 4vw, 60px);
-        }
-        .write-title {
-            font-size: clamp(2.5rem, 5vw, 4rem);
-            font-weight: 700;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-align: center;
-            margin-bottom: clamp(30px, 5vw, 50px);
-        }
-        .write-form {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: clamp(16px, 2vw, 28px);
-            padding: clamp(35px, 5vw, 70px) clamp(40px, 6vw, 80px);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
-        .form-group { margin-bottom: 30px; }
-        .form-group label {
-            display: block;
-            margin-bottom: 12px;
-            color: #fff;
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-        .form-group input, .form-group textarea, .form-group select {
-            width: 100%;
-            padding: 16px 20px;
-            border: 2px solid rgba(255,255,255,0.2);
-            border-radius: 12px;
-            background: rgba(255,255,255,0.1);
-            color: #fff;
-            font-family: inherit;
-            font-size: 1.05rem;
-            box-sizing: border-box;
-            transition: all 0.3s ease;
-        }
-        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-            outline: none;
-        }
-        .form-group textarea {
-            min-height: clamp(400px, 60vh, 700px);
-            resize: vertical;
-            line-height: 1.7;
-        }
-        .btn {
-            padding: clamp(14px, 2vw, 20px) clamp(30px, 4vw, 45px);
-            border: none;
-            border-radius: clamp(8px, 1.5vw, 14px);
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: clamp(25px, 3vw, 35px);
-            font-size: clamp(1rem, 1.5vw, 1.2rem);
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-        }
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
-        }
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .warning {
-            background: rgba(74, 222, 128, 0.2);
-            border: 1px solid #4ade80;
-            border-radius: 12px;
-            padding: 18px 24px;
-            margin-bottom: 30px;
-            color: #4ade80;
-            font-size: 1.05rem;
-        }
-        .nav {
-            margin-bottom: 40px;
-            padding: 20px 0;
-        }
-        .nav a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-        }
-        .nav a:hover {
-            color: #764ba2;
-        }
-        .html-editor-wrapper {
-            border: 2px solid rgba(255,255,255,0.2);
-            border-radius: 12px;
-            overflow: hidden;
-            background: rgba(255,255,255,0.1);
-        }
-        .html-editor-toolbar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            padding: 15px 20px;
-            background: rgba(0,0,0,0.4);
-            border-bottom: 1px solid rgba(255,255,255,0.2);
-        }
-        .html-editor-toolbar button {
-            padding: 10px 16px;
-            background: rgba(255,255,255,0.15);
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 8px;
-            color: #fff;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 1rem;
-            font-weight: 500;
-        }
-        .html-editor-toolbar button:hover {
-            background: rgba(255,255,255,0.25);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-        .html-editor-toolbar button:active {
-            transform: translateY(0);
-        }
-        .html-editor {
-            min-height: 600px;
-            padding: 30px;
-            background: rgba(255,255,255,0.08);
-            color: #fff;
-            line-height: 1.8;
-            outline: none;
-            overflow-y: auto;
-            font-size: 1.05rem;
-        }
-        .html-editor:empty:before {
-            content: attr(placeholder);
-            color: var(--text-secondary);
-        }
-        .html-editor h1, .html-editor h2, .html-editor h3 {
-            margin: 25px 0 15px;
-            color: var(--primary);
-        }
-        .html-editor p {
-            margin: 18px 0;
-        }
-        .html-editor ul, .html-editor ol {
-            margin: 18px 0 18px 35px;
-        }
-        .html-editor li {
-            margin: 10px 0;
-        }
-        .html-editor a {
-            color: var(--primary);
-            text-decoration: underline;
-        }
-        .html-editor code {
-            background: rgba(0,0,0,0.4);
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.95em;
-        }
-        .html-editor pre {
-            background: rgba(0,0,0,0.4);
-            padding: 25px;
-            border-radius: 10px;
-            overflow-x: auto;
-            margin: 25px 0;
-        }
-        .html-editor pre code {
-            background: none;
-            padding: 0;
-        }
-        @media (max-width: 1200px) {
-            .write-container { padding: 40px 30px; }
-            .write-form { padding: 40px 45px; }
-        }
-        @media (max-width: 768px) {
-            .write-container { padding: 30px 20px; }
-            .write-form { padding: 30px 25px; }
-            .write-title { font-size: 2.5rem; }
-            .html-editor-toolbar { padding: 12px 15px; }
-            .html-editor-toolbar button { padding: 8px 12px; font-size: 0.95rem; }
-            .html-editor { padding: 20px; min-height: 400px; }
-        }
-    </style>
 </head>
-<body data-theme="violet">
-    <div class="container">
-        <div class="write-container">
-            <div class="nav">
-                <a href="index.html"><i class="fas fa-home"></i> 首页</a> | 
-                <a href="notes.html"><i class="fas fa-book"></i> 所有笔记</a>
-            </div>
 
-            <h1 class="write-title"><i class="fas fa-pen"></i> 写笔记</h1>
-
-            <form class="write-form" id="noteForm">
-                <div class="warning" id="githubStatus">
-                    <i class="fas fa-info-circle"></i> 系统使用加密token，无需配置 <a href="setup.html" style="color: #fff; text-decoration: underline;">使用说明</a>
+<body style="background: var(--bg-primary);">
+    <!-- 顶部导航栏 -->
+    <header style="background: var(--card-bg); border-bottom: 1px solid var(--border-color); padding: 16px 40px; position: sticky; top: 0; z-index: 10;">
+        <div style="max-width: 1400px; margin: 0 auto; display: flex; align-items: center; gap: 20px;">
+            <a href="index.html" style="text-decoration: none; color: var(--text-primary); display: flex; align-items: center; gap: 8px; font-size: 14px;">
+                <i class="fas fa-arrow-left"></i> 返回首页
+            </a>
+            <a href="notes.html" style="text-decoration: none; color: var(--text-primary); display: flex; align-items: center; gap: 8px; font-size: 14px;">
+                <i class="fas fa-list"></i> 所有笔记
+            </a>
+            <div style="flex: 1;"></div>
+            <div class="theme-switcher" style="position: relative;">
+                <div class="theme-toggle-btn" style="width: 32px; height: 32px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-secondary); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-palette"></i>
                 </div>
-
-                <div class="form-group">
-                    <label><i class="fas fa-heading"></i> 笔记标题</label>
-                    <input type="text" id="noteTitle" placeholder="请输入笔记标题" required>
-                </div>
-
-                <div class="form-group">
-                    <label><i class="fas fa-tags"></i> 标签（用逗号分隔）</label>
-                    <input type="text" id="noteTags" placeholder="例如: 技术,学习">
-                </div>
-
-                <div class="form-group">
-                    <label><i class="fas fa-key"></i> 笔记密钥（可选）</label>
-                    <input type="password" id="noteKey" placeholder="设置后修改笔记需要此密钥（留空则允许所有人修改）">
-                    <small style="color: var(--text-secondary); display: block; margin-top: 5px;">
-                        <i class="fas fa-info-circle"></i> 可选：设置一个密码来保护您的笔记，修改时需要输入此密钥
-                    </small>
-                </div>
-
-                <div class="form-group">
-                    <label><i class="fas fa-file-alt"></i> 笔记格式</label>
-                    <select id="noteType" style="width: 100%; padding: 12px 16px; border: 2px solid rgba(255,255,255,0.2); border-radius: 10px; background: rgba(255,255,255,0.1); color: #fff; font-family: inherit; font-size: 1rem;">
-                        <option value="markdown">Markdown 文本格式</option>
-                        <option value="html">HTML 富文本格式</option>
-                    </select>
-                    <small style="color: var(--text-secondary); display: block; margin-top: 5px;">
-                        <i class="fas fa-info-circle"></i> Markdown：使用文本标记语法；HTML：可视化编辑，支持富文本
-                    </small>
-                </div>
-
-                <div class="form-group" id="markdownContentGroup">
-                    <label><i class="fas fa-align-left"></i> 笔记内容（Markdown）</label>
-                    <textarea id="noteContent" placeholder="在这里写下您的笔记...&#10;&#10;支持Markdown语法：&#10;# 一级标题&#10;## 二级标题&#10;- 列表项&#10;> 引用" required></textarea>
-                </div>
-
-                <div class="form-group" id="htmlContentGroup" style="display: none;">
-                    <label><i class="fas fa-code"></i> 笔记内容（HTML）</label>
-                    <div class="html-editor-wrapper">
-                        <div class="html-editor-toolbar">
-                            <button type="button" onclick="document.execCommand('bold', false, null)"><i class="fas fa-bold"></i></button>
-                            <button type="button" onclick="document.execCommand('italic', false, null)"><i class="fas fa-italic"></i></button>
-                            <button type="button" onclick="document.execCommand('underline', false, null)"><i class="fas fa-underline"></i></button>
-                            <span style="margin: 0 8px; color: var(--text-secondary);">|</span>
-                            <button type="button" onclick="document.execCommand('formatBlock', false, 'h1')">H1</button>
-                            <button type="button" onclick="document.execCommand('formatBlock', false, 'h2')">H2</button>
-                            <button type="button" onclick="document.execCommand('formatBlock', false, 'h3')">H3</button>
-                            <span style="margin: 0 8px; color: var(--text-secondary);">|</span>
-                            <button type="button" onclick="document.execCommand('insertUnorderedList', false, null)"><i class="fas fa-list-ul"></i></button>
-                            <button type="button" onclick="document.execCommand('insertOrderedList', false, null)"><i class="fas fa-list-ol"></i></button>
-                            <span style="margin: 0 8px; color: var(--text-secondary);">|</span>
-                            <button type="button" onclick="document.execCommand('createLink', false, prompt('请输入链接URL:'))"><i class="fas fa-link"></i></button>
+                <div class="theme-panel" style="position: absolute; top: 40px; right: 0; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; min-width: 180px; opacity: 0; visibility: hidden; transform: translateY(10px); transition: all 0.2s ease; box-shadow: var(--shadow-md);">
+                    <h4 style="margin: 0 0 8px 0; font-size: 12px; color: var(--text-secondary); font-weight: 500; text-transform: uppercase;">选择主题</h4>
+                    <div class="theme-options" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+                        <div class="theme-option active" data-theme="diary" style="padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-tertiary); cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-secondary);">
+                            <i class="fas fa-sun"></i>
+                            <span>米白日记</span>
                         </div>
-                        <div id="htmlContent" class="html-editor" contenteditable="true" placeholder="在这里编写您的HTML笔记..."></div>
+                        <div class="theme-option" data-theme="dark" style="padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-tertiary); cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-secondary);">
+                            <i class="fas fa-moon"></i>
+                            <span>夜间模式</span>
+                        </div>
+                        <div class="theme-option" data-theme="paper" style="padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-tertiary); cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-secondary);">
+                            <i class="fas fa-scroll"></i>
+                            <span>暖黄护眼</span>
+                        </div>
+                        <div class="theme-option" data-theme="minimal" style="padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-tertiary); cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-secondary);">
+                            <i class="fas fa-gem"></i>
+                            <span>极简灰</span>
+                        </div>
                     </div>
                 </div>
+            </div>
+            <a href="profile.html" style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--accent)); display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; font-weight: 600; cursor: pointer; text-decoration: none;" id="userAvatar">T</a>
+        </div>
+    </header>
 
-                <button type="submit" class="btn" id="submitBtn" disabled>
-                    <i class="fas fa-paper-plane"></i> 发表笔记
-                </button>
+    <!-- 主内容区 - 全屏 -->
+    <main style="max-width: 1000px; margin: 0 auto; padding: 40px;">
+        <h1 style="font-size: 28px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px;">写新笔记</h1>
+        <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 32px;">记录您的想法和灵感</p>
+
+        <!-- 写笔记表单 -->
+        <div style="background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); padding: 32px;">
+            <form id="noteForm">
+                <!-- 标题 -->
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: var(--text-primary);">标题 <span style="color: var(--danger);">*</span></label>
+                    <input type="text" id="title" required style="width: 100%; padding: 12px 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 15px; transition: border-color 0.3s ease;" placeholder="输入笔记标题...">
+                </div>
+
+                <!-- 摘要 -->
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: var(--text-primary);">摘要</label>
+                    <textarea id="excerpt" rows="3" style="width: 100%; padding: 12px 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 15px; line-height: 1.6; resize: vertical; font-family: inherit;" placeholder="简单描述一下这篇笔记的内容..."></textarea>
+                </div>
+
+                <!-- 标签 -->
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: var(--text-primary);">标签</label>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;" id="tagList"></div>
+                    <input type="text" id="tagInput" style="width: 100%; padding: 12px 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 15px;" placeholder="输入标签后按回车添加...">
+                    <p style="font-size: 12px; color: var(--text-tertiary); margin-top: 6px;">用逗号分隔多个标签</p>
+                </div>
+
+                <!-- 内容 -->
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: var(--text-primary);">内容 <span style="color: var(--danger);">*</span></label>
+                    <textarea id="content" required rows="16" style="width: 100%; padding: 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 15px; line-height: 1.8; resize: vertical; font-family: 'Monaco', 'Menlo', 'Courier New', monospace;" placeholder="使用 Markdown 格式编写您的笔记..."></textarea>
+                    <p style="font-size: 12px; color: var(--text-tertiary); margin-top: 6px;">支持 Markdown 语法</p>
+                </div>
+
+                <!-- 作者标识 -->
+                <div style="margin-bottom: 32px;">
+                    <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: var(--text-primary);">作者标识（可选）</label>
+                    <input type="text" id="authorKey" style="width: 100%; padding: 12px 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 15px;" placeholder="用于标识作者身份（可选）">
+                </div>
+
+                <!-- 提交按钮 -->
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <button type="submit" id="submitBtn" style="padding: 12px 32px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; box-shadow: var(--shadow-sm);">
+                        <i class="fas fa-paper-plane"></i> 发布笔记
+                    </button>
+                    <button type="button" onclick="clearForm()" style="padding: 12px 32px; background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 8px; font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.2s ease;">
+                        <i class="fas fa-eraser"></i> 清空
+                    </button>
+                    <span id="status" style="font-size: 13px; color: var(--text-secondary);"></span>
+                </div>
             </form>
         </div>
-    </div>
+    </main>
 
     <script src="github-api.js"></script>
     <script>
-        // 加密Token配置（与note.html相同）
-        window.setupEncryptedToken({
-            token: "lNR9YHMTLt0NT4G74I8p3qDY+Qxf7XJAf1ZupELPZpORCw+VQyk7wQ4JIN467U1t3bpXCwa/PKW+H89k7sUFL2mtyU+74rof+MkdLfBTWLFRl4ABnitXNeG4fNo0PToItXVIGvotqhIEJbdWnw==",
-            iv: "qNWMHi6UqGFcdWee",
-            salt: "P3RiVIlxU1RLiUV8YbefVQ==",
-            iterations: 100000,
-            password: "lei20060113"
+        // 主题切换
+        document.querySelectorAll('.theme-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const theme = this.dataset.theme;
+                document.documentElement.setAttribute('data-theme', theme);
+                document.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+            });
         });
-    </script>
-    <script>
+
+        // 主题面板悬停效果
+        document.querySelector('.theme-switcher').addEventListener('mouseenter', function() {
+            this.querySelector('.theme-panel').style.opacity = '1';
+            this.querySelector('.theme-panel').style.visibility = 'visible';
+            this.querySelector('.theme-panel').style.transform = 'translateY(0)';
+        });
+        document.querySelector('.theme-switcher').addEventListener('mouseleave', function() {
+            this.querySelector('.theme-panel').style.opacity = '0';
+            this.querySelector('.theme-panel').style.visibility = 'hidden';
+            this.querySelector('.theme-panel').style.transform = 'translateY(10px)';
+        });
+
+        // 更换头像
+        function changeAvatar() {
+            const avatar = document.getElementById('userAvatar');
+            const colors = [
+                'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+                'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+                'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
+            ];
+            const currentColor = avatar.style.background;
+            let newColor = colors[Math.floor(Math.random() * colors.length)];
+            if (currentColor === newColor) {
+                newColor = colors[(colors.indexOf(newColor) + 1) % colors.length];
+            }
+            avatar.style.background = newColor;
+        }
+
+        // 标签管理
         let tags = [];
-        let noteType = 'markdown';
 
-        // 在tokenLoaded事件后启用提交按钮
-        window.addEventListener('tokenLoaded', () => {
-            const statusDiv = document.getElementById('githubStatus');
-            const submitBtn = document.getElementById('submitBtn');
-            statusDiv.style.background = 'rgba(74, 222, 128, 0.2)';
-            statusDiv.style.borderColor = '#4ade80';
-            statusDiv.style.color = '#4ade80';
-            statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> 系统已配置加密token，笔记将保存到云端';
-            submitBtn.disabled = false;
+        document.getElementById('tagInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' || e.key === ',') {
+                e.preventDefault();
+                const value = this.value.trim();
+                if (value) {
+                    addTag(value.replace(',', ''));
+                    this.value = '';
+                }
+            }
         });
 
-        // 切换笔记格式
-        function switchNoteType() {
-            const noteTypeSelect = document.getElementById('noteType');
-            const markdownGroup = document.getElementById('markdownContentGroup');
-            const htmlGroup = document.getElementById('htmlContentGroup');
-
-            noteType = noteTypeSelect.value;
-
-            if (noteType === 'markdown') {
-                markdownGroup.style.display = 'block';
-                htmlGroup.style.display = 'none';
-            } else {
-                markdownGroup.style.display = 'none';
-                htmlGroup.style.display = 'block';
+        function addTag(tag) {
+            if (tag && !tags.includes(tag)) {
+                tags.push(tag);
+                renderTags();
             }
         }
 
-        // 绑定格式切换事件
-        document.getElementById('noteType').addEventListener('change', switchNoteType);
+        function removeTag(index) {
+            tags.splice(index, 1);
+            renderTags();
+        }
 
-        document.getElementById('noteForm').addEventListener('submit', async (e) => {
+        function renderTags() {
+            const tagList = document.getElementById('tagList');
+            tagList.innerHTML = tags.map((tag, index) => `
+                <span style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; color: var(--text-primary);">
+                    ${tag}
+                    <i class="fas fa-times" onclick="removeTag(${index})" style="cursor: pointer; color: var(--text-tertiary); font-size: 12px;"></i>
+                </span>
+            `).join('');
+        }
+
+        // 清空表单
+        function clearForm() {
+            if (confirm('确定要清空所有内容吗？')) {
+                document.getElementById('noteForm').reset();
+                tags = [];
+                renderTags();
+                document.getElementById('status').textContent = '';
+            }
+        }
+
+        // 提交表单
+        document.getElementById('noteForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            const title = document.getElementById('noteTitle').value.trim();
-            const tagsStr = document.getElementById('noteTags').value.trim();
-            const noteKey = document.getElementById('noteKey').value.trim();
-            const noteType = document.getElementById('noteType').value;
-
-            let content = '';
-            if (noteType === 'markdown') {
-                content = document.getElementById('noteContent').value.trim();
-            } else {
-                content = document.getElementById('htmlContent').innerHTML.trim();
-            }
+            const title = document.getElementById('title').value.trim();
+            const content = document.getElementById('content').value.trim();
+            const excerpt = document.getElementById('excerpt').value.trim();
+            const authorKey = document.getElementById('authorKey').value.trim();
 
             if (!title || !content) {
-                alert('请填写标题和内容');
+                alert('请填写标题和内容！');
                 return;
             }
 
-            tags = tagsStr ? tagsStr.split(',').map(t => t.trim()).filter(t => t) : [];
-
             const submitBtn = document.getElementById('submitBtn');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 保存中...';
+            const status = document.getElementById('status');
             submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 发布中...';
+            status.textContent = '正在发布，请稍候...';
 
             try {
-                const timestamp = Date.now();
+                if (!window.githubNoteManager || !window.githubNoteManager.config.token) {
+                    throw new Error('GitHub配置未就绪，请先配置token');
+                }
+
                 const note = {
-                    id: `note-${timestamp}`,
-                    title,
-                    date: new Date().toISOString().split('T')[0],
-                    excerpt: noteType === 'markdown'
-                        ? content.substring(0, 100) + (content.length > 100 ? '...' : '')
-                        : content.replace(/<[^>]*>/g, '').substring(0, 100) + '...',
-                    tags: tags,
+                    id: 'note-' + Date.now(),
+                    title: title,
                     content: content,
-                    authorKey: noteKey || null,
-                    type: noteType  // 添加类型字段
+                    excerpt: excerpt || content.substring(0, 100) + '...',
+                    tags: tags,
+                    date: new Date().toISOString().split('T')[0],
+                    authorKey: authorKey || null,
+                    type: 'markdown',
+                    comments: []
                 };
 
-                // 根据类型保存到不同位置
-                if (noteType === 'html') {
-                    await githubNoteManager.saveHtmlNote(note);
-                } else {
-                    await githubNoteManager.saveNote(note);
-                }
-                await githubNoteManager.updateNotesList(note);
+                await window.githubNoteManager.saveNote(note);
+                status.textContent = '发布成功！';
+                status.style.color = 'var(--success)';
 
-                alert('笔记保存成功！\n\n已保存到您的GitHub仓库。');
-                window.location.href = 'notes.html';
+                setTimeout(() => {
+                    alert('发布成功！');
+                    window.location.href = 'notes.html';
+                }, 500);
 
             } catch (error) {
-                console.error('保存失败:', error);
-                alert('保存失败: ' + error.message + '\n\n请稍后重试或联系管理员。');
-                submitBtn.innerHTML = originalText;
+                console.error('发布失败:', error);
+                status.textContent = '发布失败: ' + error.message;
+                status.style.color = 'var(--danger)';
                 submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> 发布笔记';
             }
         });
-
-        window.addEventListener('load', checkGitHubConfig);
     </script>
 </body>
+
 </html>
