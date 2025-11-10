@@ -128,7 +128,7 @@
         </main>
     </div>
 
-    <script src="github-api.js?v=1762760200"></script>
+    <script src="github-api.js?v=1762760300"></script>
 
     <script>
         // 配置加密token
@@ -317,7 +317,13 @@
                     if (e.target.closest('.edit-btn')) {
                         return;
                     }
-                    location.href = `note.html?id=${note.id}`;
+                    // HTML类型笔记直接跳转到HTML文件，保持完整设计
+                    if (note.type === 'html' && note.content.startsWith('notecontent/')) {
+                        location.href = note.content;
+                    } else {
+                        // 其他类型跳转到note.html
+                        location.href = `note.html?id=${note.id}`;
+                    }
                 };
 
                 // 构建HTML
