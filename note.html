@@ -277,82 +277,8 @@
                     tagsContainer.style.display = 'none';
                 }
 
-                // 渲染正文（HTML 或 Markdown）
-                if (note.type === 'html') {
-                    if (note.content.startsWith('notecontent/')) {
-                        // 加载 HTML 文件
-                        const htmlFile = note.content;
-                        fetch(htmlFile)
-                            .then(response => response.text())
-                            .then(html => {
-                                const parser = new DOMParser();
-                                const doc = parser.parseFromString(html, 'text/html');
-
-                                // 提取所有style标签
-                                const styles = doc.querySelectorAll('style');
-                                let styleText = '';
-                                styles.forEach(style => {
-                                    styleText += style.textContent + '\n';
-                                });
-
-                                // 提取body内容
-                                const bodyContent = doc.body.innerHTML;
-
-                                // 将内容包裹在隔离容器中
-                                const wrappedContent = `<div class="note-html-wrapper">${bodyContent}</div>`;
-                                document.getElementById('noteContent').innerHTML = wrappedContent;
-
-                                // 添加隔离样式，防止影响页面其他部分
-                                const styleElement = document.createElement('style');
-                                styleElement.textContent = `
-                                    /* 隔离样式作用域 */
-                                    #noteContent {
-                                        position: relative;
-                                        z-index: 1;
-                                    }
-
-                                    #noteContent .note-html-wrapper {
-                                        /* 移除body的默认样式 */
-                                        margin: 0 !important;
-                                        padding: 0 !important;
-                                        background: transparent !important;
-                                        min-height: auto !important;
-                                    }
-
-                                    /* 重写原始样式中的body和html选择器 */
-                                    ${styleText
-                                        .replace(/body\s*\{/g, '#noteContent .note-html-wrapper {')
-                                        .replace(/html\s*\{/g, '#noteContent .note-html-wrapper {')
-                                        .replace(/:root\s*\{/g, '#noteContent .note-html-wrapper {')
-                                    }
-
-                                    /* 确保评论区域不受影响 */
-                                    #noteContent ~ * {
-                                        position: relative;
-                                        z-index: 10;
-                                    }
-                                `;
-
-                                // 移除旧样式并添加新样式
-                                document.querySelectorAll('style[data-note-content]').forEach(s => s.remove());
-                                styleElement.setAttribute('data-note-content', 'true');
-                                document.head.appendChild(styleElement);
-                            })
-                            .catch(error => {
-                                console.error('加载 HTML 文件失败:', error);
-                                document.getElementById('noteContent').innerHTML = '<p>加载内容失败</p>';
-                            });
-                    } else {
-                        // 直接显示 HTML 内容
-                        document.getElementById('noteContent').innerHTML = note.content;
-                    }
-                } else if (note.type === 'markdown') {
-                    // 兼容旧版 Markdown 格式
-                    document.getElementById('noteContent').innerHTML = marked.parse(note.content);
-                } else {
-                    // 其他类型直接显示
-                    document.getElementById('noteContent').innerHTML = note.content;
-                }
+                // 渲染正文 - 简化加载逻辑
+                renderNoteContent(note);
 
                 // 渲染评论
                 loadComments(noteId);
@@ -483,6 +409,66 @@
         function formatDateTime(dateStr) {
             const date = new Date(dateStr);
             return date.toLocaleString('zh-CN');
+        }
+
+        // 渲染笔记内容
+        function renderNoteContent(note) {
+            const contentDiv = document.getElementById('noteContent');
+
+            if (note.type === 'html' && note.content.startsWith('notecontent/')) {
+                // 加载 HTML 文件
+                fetch(note.content)
+                    .then(response => response.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+
+                        // 提取body内容
+                        const bodyContent = doc.body.innerHTML;
+
+                        // 提取所有style标签内容
+                        const styles = doc.querySelectorAll('style');
+                        let styleText = '';
+                        styles.forEach(style => {
+                            styleText += style.textContent + '\n';
+                        });
+
+                        // 包裹在容器中
+                        contentDiv.innerHTML = `<div class="note-html-content">${bodyContent}</div>`;
+
+                        // 添加隔离样式
+                        if (styleText) {
+                            const styleElement = document.createElement('style');
+                            styleElement.setAttribute('data-note-content', 'true');
+                            styleElement.textContent = `
+                                #noteContent {
+                                    position: relative;
+                                    z-index: 1;
+                                }
+                                #noteContent .note-html-content {
+                                    margin: 0 !important;
+                                    padding: 0 !important;
+                                    background: transparent !important;
+                                    min-height: auto !important;
+                                }
+                                ${styleText.replace(/body\s*\{/g, '#noteContent .note-html-content {')}
+                                #noteContent ~ * { position: relative; z-index: 10; }
+                            `;
+                            document.querySelectorAll('style[data-note-content]').forEach(s => s.remove());
+                            document.head.appendChild(styleElement);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('加载 HTML 文件失败:', error);
+                        contentDiv.innerHTML = '<p style="color: var(--danger);">加载内容失败</p>';
+                    });
+            } else if (note.type === 'markdown') {
+                // Markdown 格式
+                contentDiv.innerHTML = marked.parse(note.content);
+            } else {
+                // 其他类型
+                contentDiv.innerHTML = note.content;
+            }
         }
 
         function escapeHtml(text) {

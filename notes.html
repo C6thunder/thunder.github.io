@@ -228,7 +228,6 @@
                 }
 
                 allNotes = await window.githubNoteManager.scanAllNotes();
-                console.log('加载到笔记数量:', allNotes.length);
 
                 if (allNotes.length === 0) {
                     notesGrid.innerHTML =
@@ -404,8 +403,7 @@
         // 按标签筛选
         function filterByTag(tag) {
             currentFilter = tag;
-            filteredNotes = allNotes.filter(note => note.tags && note.tags.includes(tag));
-            displayNotesBatch();
+            applyFilters();
             loadTags();
         }
 
@@ -414,30 +412,40 @@
             currentFilter = null;
             currentSearch = '';
             document.getElementById('searchInput').value = '';
-            filteredNotes = [...allNotes];
-            displayNotesBatch();
+            applyFilters();
             loadTags();
         }
 
-        // 搜索
+        // 搜索 - 优化性能，使用防抖
+        let searchTimer = null;
         document.getElementById('searchInput').addEventListener('input', function(e) {
-            currentSearch = e.target.value.toLowerCase();
-            if (currentSearch === '') {
-                filteredNotes = currentFilter
-                    ? allNotes.filter(note => note.tags && note.tags.includes(currentFilter))
-                    : [...allNotes];
-            } else {
-                filteredNotes = allNotes.filter(note => {
-                    if (currentFilter && (!note.tags || !note.tags.includes(currentFilter))) {
-                        return false;
-                    }
-                    return note.title.toLowerCase().includes(currentSearch) ||
-                           (note.excerpt && note.excerpt.toLowerCase().includes(currentSearch)) ||
-                           (note.tags && note.tags.some(tag => tag.toLowerCase().includes(currentSearch)));
-                });
-            }
-            displayNotesBatch();
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => {
+                currentSearch = e.target.value.toLowerCase();
+                applyFilters();
+            }, 300); // 300ms 防抖
         });
+
+        // 应用筛选和搜索
+        function applyFilters() {
+            filteredNotes = allNotes.filter(note => {
+                // 标签筛选
+                if (currentFilter && (!note.tags || !note.tags.includes(currentFilter))) {
+                    return false;
+                }
+                // 搜索筛选
+                if (currentSearch) {
+                    const searchFields = [
+                        note.title,
+                        note.excerpt,
+                        ...(note.tags || [])
+                    ].join(' ').toLowerCase();
+                    return searchFields.includes(currentSearch);
+                }
+                return true;
+            });
+            displayNotesBatch();
+        }
 
         // 排序
         document.getElementById('sortBtn').addEventListener('click', function() {

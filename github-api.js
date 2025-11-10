@@ -221,29 +221,16 @@ class GitHubNoteManager {
 
     // 初始化（只使用加密token）
     async init() {
-        console.log('🔄 GitHubNoteManager.init() 开始...');
-        console.log('📋 encryptedConfig 状态:', this.encryptedConfig);
-
-        // 检查是否配置了加密token
         if (!this.encryptedConfig) {
-            console.error('❌ 未配置加密token！');
-            console.log('ℹ️ 请确保在HTML中调用 window.setupEncryptedToken()');
+            console.error('未配置加密token');
             return;
         }
 
-        console.log('🔑 正在解密token...');
-        // 尝试解密token
         const decryptedToken = await this.getDecryptedToken();
-        console.log('🔑 解密结果:', decryptedToken ? '成功' : '失败');
-
         if (decryptedToken) {
             this.config.token = decryptedToken;
-            console.log('✅ 已从加密配置加载token，用户可直接评论');
-            console.log('🔑 Token前缀:', decryptedToken.substring(0, 10) + '...');
-            return;
         } else {
-            console.error('❌ Token解密失败，请检查加密配置');
-            console.error('🔑 加密配置:', this.encryptedConfig);
+            console.error('Token解密失败，请检查加密配置');
         }
     }
 
@@ -273,184 +260,90 @@ class GitHubNoteManager {
         const url = `${this.apiBase}/repos/${this.config.owner}/${this.config.repo}/contents/${path}?ref=${this.config.branch}`;
 
         try {
-            const response = await fetch(url, {
-                headers: this.getHeaders()
-            });
+            const response = await fetch(url, { headers: this.getHeaders() });
 
-            if (response.status === 404) {
-                return null; // 文件不存在
-            }
+            if (response.status === 404) return null;
 
             if (!response.ok) {
-                const errorText = await response.text();
-                // 只有在非404错误时才打印详细信息
-                if (response.status !== 404) {
-                    console.error('GitHub API错误:', {
-                        status: response.status,
-                        statusText: response.statusText,
-                        url: url,
-                        tokenPrefix: this.config.token ? this.config.token.substring(0, 10) + '...' : '未设置',
-                        error: errorText
-                    });
-                }
-                throw new Error(`获取文件失败: ${response.status} ${response.statusText}`);
+                throw new Error(`获取文件失败: ${response.status}`);
             }
 
             const data = await response.json();
-            // 使用新的UTF-8解码方法
             const contentString = this.base64ToUtf8(data.content);
             return JSON.parse(contentString);
         } catch (error) {
-            // 只在非404错误时打印异常
-            if (error.message.indexOf('404') === -1) {
+            if (!error.message.includes('404')) {
                 console.error('获取文件异常:', { path, error: error.message });
             }
             throw error;
         }
     }
 
-    // 创建或更新文件
+    // 创建或更新文件（JSON格式）
     async saveFile(path, content, message) {
-        this.validateConfig();
-
-        try {
-            // 先检查文件是否存在
-            const existing = await this.getFile(path);
-
-            // 使用新的UTF-8处理方法
-            const jsonString = JSON.stringify(content, null, 2);
-            const base64Content = this.utf8ToBase64(jsonString);
-
-            const url = `${this.apiBase}/repos/${this.config.owner}/${this.config.repo}/contents/${path}`;
-
-            const body = {
-                message,
-                content: base64Content,
-                branch: this.config.branch
-            };
-
-            // 如果文件存在，需要包含sha
-            if (existing) {
-                const fileUrl = `${this.apiBase}/repos/${this.config.owner}/${this.config.repo}/contents/${path}?ref=${this.config.branch}`;
-                const fileResponse = await fetch(fileUrl, {
-                    headers: this.getHeaders()
-                });
-                const fileData = await fileResponse.json();
-                body.sha = fileData.sha;
-            }
-
-            const response = await fetch(url, {
-                method: 'PUT',
-                headers: this.getHeaders(),
-                body: JSON.stringify(body)
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('保存文件失败:', {
-                    status: response.status,
-                    statusText: response.statusText,
-                    path: path,
-                    message: message,
-                    error: errorText
-                });
-                throw new Error(`保存文件失败: ${response.status} ${response.statusText}`);
-            }
-
-            return await response.json();
-        } catch (error) {
-            console.error('保存文件异常:', { path, error: error.message });
-            throw error;
-        }
+        const jsonString = JSON.stringify(content, null, 2);
+        return await this._saveFileInternal(path, jsonString, message);
     }
 
     // 保存原始文件（不转换为JSON）
     async saveRawFile(path, content, message) {
-        this.validateConfig();
-
-        try {
-            // 先检查文件是否存在
-            let sha = null;
-            try {
-                const fileUrl = `${this.apiBase}/repos/${this.config.owner}/${this.config.repo}/contents/${path}?ref=${this.config.branch}`;
-                const fileResponse = await fetch(fileUrl, {
-                    headers: this.getHeaders()
-                });
-                if (fileResponse.ok) {
-                    const fileData = await fileResponse.json();
-                    sha = fileData.sha;
-                }
-            } catch (error) {
-                // 文件不存在，继续创建
-            }
-
-            // 直接将内容转换为base64，不包装为JSON
-            const base64Content = this.utf8ToBase64(content);
-
-            const url = `${this.apiBase}/repos/${this.config.owner}/${this.config.repo}/contents/${path}`;
-
-            const body = {
-                message,
-                content: base64Content,
-                branch: this.config.branch
-            };
-
-            // 如果文件存在，需要包含sha
-            if (sha) {
-                body.sha = sha;
-            }
-
-            const response = await fetch(url, {
-                method: 'PUT',
-                headers: this.getHeaders(),
-                body: JSON.stringify(body)
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('保存文件失败:', {
-                    status: response.status,
-                    statusText: response.statusText,
-                    path: path,
-                    message: message,
-                    error: errorText
-                });
-                throw new Error(`保存文件失败: ${response.status} ${response.statusText}`);
-            }
-
-            return await response.json();
-        } catch (error) {
-            console.error('保存文件异常:', { path, error: error.message });
-            throw error;
-        }
+        return await this._saveFileInternal(path, content, message, true);
     }
 
-    // 保存笔记（Markdown）
+    // 内部通用保存方法
+    async _saveFileInternal(path, content, message, isRaw = false) {
+        this.validateConfig();
+        const base64Content = this.utf8ToBase64(content);
+
+        // 获取文件sha（如果存在）
+        let sha = null;
+        try {
+            const fileUrl = `${this.apiBase}/repos/${this.config.owner}/${this.config.repo}/contents/${path}?ref=${this.config.branch}`;
+            const fileResponse = await fetch(fileUrl, { headers: this.getHeaders() });
+            if (fileResponse.ok) {
+                const fileData = await fileResponse.json();
+                sha = fileData.sha;
+            }
+        } catch (error) {
+            // 文件不存在，继续创建
+        }
+
+        const body = { message, content: base64Content, branch: this.config.branch };
+        if (sha) body.sha = sha;
+
+        const response = await fetch(`${this.apiBase}/repos/${this.config.owner}/${this.config.repo}/contents/${path}`, {
+            method: 'PUT',
+            headers: this.getHeaders(),
+            body: JSON.stringify(body)
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`保存文件失败: ${response.status} ${response.statusText} - ${errorText}`);
+        }
+
+        return await response.json();
+    }
+
+    // 保存笔记
     async saveNote(note) {
         const timestamp = Date.now();
-        const filename = `notes/note-${timestamp}.json`;
-        const message = `Add note: ${note.title}`;
 
-        return await this.saveFile(filename, note, message);
-    }
+        if (note.type === 'html') {
+            // HTML笔记：保存到notecontent/文件夹
+            const filename = `notecontent/note-${timestamp}.html`;
+            await this.saveRawFile(filename, note.content, `Add HTML note: ${note.title}`);
 
-    // 保存HTML笔记到notecontent/文件夹
-    async saveHtmlNote(note) {
-        const timestamp = Date.now();
-        const filename = `notecontent/note-${timestamp}.html`;
-        const message = `Add HTML note: ${note.title}`;
-
-        // 将笔记的content保存为HTML文件
-        await this.saveRawFile(filename, note.content, message);
-
-        // 更新notes.json中的笔记列表
-        const noteWithPath = {
-            ...note,
-            content: filename
-        };
-        await this.updateNotesList(noteWithPath);
-
-        return { success: true, note: noteWithPath };
+            // 更新notes.json中的笔记列表
+            const noteWithPath = { ...note, content: filename };
+            await this.updateNotesList(noteWithPath);
+            return { success: true, note: noteWithPath };
+        } else {
+            // Markdown笔记：保存到notes/文件夹
+            const filename = `notes/note-${timestamp}.json`;
+            const message = `Add note: ${note.title}`;
+            return await this.saveFile(filename, note, message);
+        }
     }
 
     // 保存评论到独立的 comments 文件
@@ -622,17 +515,18 @@ class GitHubNoteManager {
 
     // 更新笔记
     async updateNote(noteId, updatedNote) {
-        // HTML 笔记需要更新 notecontent/ 文件夹中的 HTML 文件
-        if (updatedNote.type === 'html') {
-            // 获取原始笔记以获取文件路径
-            const allNotes = await this.scanAllNotes();
-            const originalNote = allNotes.find(n => n.id === noteId);
+        // 直接从 notes.json 获取原始笔记以优化性能
+        const notesList = await this.getFile('notes.json');
+        const originalNote = notesList?.notes?.find(n => n.id === noteId);
 
-            if (originalNote && originalNote.content && originalNote.content.startsWith('notecontent/')) {
-                // 保存新的HTML内容到原文件路径
-                await this.saveRawFile(originalNote.content, updatedNote.content, `Update HTML note: ${updatedNote.title}`);
-            }
-        } else {
+        if (!originalNote) {
+            throw new Error('笔记不存在');
+        }
+
+        // HTML 笔记需要更新 notecontent/ 文件夹中的 HTML 文件
+        if (updatedNote.type === 'html' && originalNote.content?.startsWith('notecontent/')) {
+            await this.saveRawFile(originalNote.content, updatedNote.content, `Update HTML note: ${updatedNote.title}`);
+        } else if (updatedNote.type !== 'html') {
             // Markdown 笔记才保存到 notes/ 文件夹
             const filename = `notes/${noteId}.json`;
             const message = `Update note: ${updatedNote.title}`;
@@ -640,15 +534,10 @@ class GitHubNoteManager {
         }
 
         // 更新 notes.json 中的笔记列表
-        const notesList = await this.getFile('notes.json');
-        if (notesList && notesList.notes) {
+        if (notesList?.notes) {
             const noteIndex = notesList.notes.findIndex(note => note.id === noteId);
             if (noteIndex !== -1) {
-                // 更新列表中的笔记
-                notesList.notes[noteIndex] = {
-                    ...updatedNote,
-                    excerpt: updatedNote.excerpt
-                };
+                notesList.notes[noteIndex] = { ...updatedNote, excerpt: updatedNote.excerpt };
                 notesList.lastUpdated = new Date().toISOString();
                 await this.saveFile('notes.json', notesList, `Update notes list: modify ${updatedNote.title}`);
             }
@@ -657,17 +546,14 @@ class GitHubNoteManager {
         return { success: true };
     }
 
-    // 获取单个笔记（包括HTML笔记和评论）
+    // 获取单个笔记
     async getNoteById(noteId) {
-        // 从notes文件夹扫描获取笔记
-        const allNotes = await this.scanAllNotes();
-        const note = allNotes.find(n => n.id === noteId);
+        // 直接从 notes.json 获取笔记以优化性能
+        const notesList = await this.getFile('notes.json');
+        const note = notesList?.notes?.find(n => n.id === noteId);
 
         if (note) {
-            // 确保comments数组存在
-            if (!note.comments) {
-                note.comments = [];
-            }
+            note.comments ||= []; // 确保comments数组存在
             return { note, type: note.type || 'markdown' };
         }
 
@@ -723,42 +609,15 @@ class GitHubNoteManager {
 const githubNoteManager = new GitHubNoteManager();
 
 // 全局函数：配置加密token并初始化
-// 调用方式：window.setupEncryptedToken(encryptedConfig);
-/**
- * 设置加密token配置
- * @type {(config: EncryptedTokenConfig) => void}
- */
 window.setupEncryptedToken = function (encryptedConfig) {
-    console.log('🔧 window.setupEncryptedToken() 被调用');
-    console.log('📋 收到的配置:', encryptedConfig);
-
     githubNoteManager.setEncryptedConfig(encryptedConfig);
-    console.log('📋 已设置 encryptedConfig');
-
-    // 初始化以加载加密token
-    console.log('🔄 开始初始化...');
     githubNoteManager.init().then(() => {
-        console.log('✅ 初始化完成');
-        // 通知其他组件token已加载
         window.dispatchEvent(new CustomEvent('tokenLoaded'));
-    }).catch(err => {
-        console.error('❌ 初始化失败:', err);
     });
 };
 
 // 导出给全局使用
-try {
-    window.githubNoteManager = githubNoteManager;
-
-    // 验证导出是否成功
-    if (typeof window.githubNoteManager === 'undefined') {
-        console.error('❌ 导出 githubNoteManager 失败');
-    } else {
-        console.log('✅ GitHub Note Manager 已成功加载');
-    }
-} catch (error) {
-    console.error('❌ 加载 GitHub API 时出错:', error);
-}
+window.githubNoteManager = githubNoteManager;
 
 // 添加全局错误处理
 window.addEventListener('error', function(e) {
