@@ -580,6 +580,16 @@ class GitHubNoteManager {
         }
     }
 
+    // 获取评论数量
+    async getCommentCount(noteId) {
+        try {
+            const comments = await this.getComments(noteId);
+            return comments.length;
+        } catch (error) {
+            return 0;
+        }
+    }
+
     // 测试连接
     async testConnection() {
         this.validateConfig();

@@ -128,7 +128,7 @@
         </main>
     </div>
 
-    <script src="github-api.js?v=1762755200"></script>
+    <script src="github-api.js?v=1762755300"></script>
 
     <script>
         // 配置加密token
@@ -195,7 +195,7 @@
             });
         }
 
-        // 加载笔记
+        // 加载笔记（分批加载）
         async function loadNotes() {
             const notesGrid = document.getElementById('notesGrid');
             notesGrid.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--text-secondary);">加载中...</div>';
@@ -215,7 +215,7 @@
                 }
 
                 filteredNotes = [...allNotes];
-                displayNotes();
+                displayNotesBatch();
                 loadTags();
                 updateLastUpdateTime();
             } catch (error) {
@@ -225,16 +225,9 @@
             }
         }
 
-        // 显示笔记
-        function displayNotes() {
+        // 分批显示笔记
+        async function displayNotesBatch() {
             const notesGrid = document.getElementById('notesGrid');
-
-            if (filteredNotes.length === 0) {
-                document.getElementById('emptyState').style.display = 'block';
-                notesGrid.innerHTML = '';
-                return;
-            }
-
             document.getElementById('emptyState').style.display = 'none';
 
             // 排序
@@ -253,35 +246,68 @@
                 }
             });
 
-            // 生成HTML
-            notesGrid.innerHTML = filteredNotes.map(note => {
-                // 评论已独立存储到 comments 文件夹，暂不显示评论数
-                const commentCount = 0;
-                return `
-                    <div class="note-card" onclick="location.href='note.html?id=${note.id}'">
-                        <div class="note-card-header">
-                            <div class="note-card-icon">📝</div>
-                            <div>
-                                <div class="note-card-title">${escapeHtml(note.title)}</div>
-                                <div class="note-card-date">${formatDate(note.date)}</div>
-                            </div>
+            if (filteredNotes.length === 0) {
+                document.getElementById('emptyState').style.display = 'block';
+                notesGrid.innerHTML = '';
+                return;
+            }
+
+            // 初始显示前3个
+            const batchSize = 3;
+            let currentIndex = 0;
+
+            // 渲染第一批
+            await renderBatch(0, Math.min(batchSize, filteredNotes.length));
+            currentIndex = batchSize;
+
+            // 滚动加载更多
+            const loadMore = () => {
+                if (currentIndex >= filteredNotes.length) {
+                    window.removeEventListener('scroll', loadMore);
+                    return;
+                }
+                renderBatch(currentIndex, Math.min(currentIndex + batchSize, filteredNotes.length));
+                currentIndex += batchSize;
+            };
+
+            window.addEventListener('scroll', loadMore);
+        }
+
+        // 渲染一批笔记
+        async function renderBatch(start, end) {
+            const notesGrid = document.getElementById('notesGrid');
+            const batch = filteredNotes.slice(start, end);
+
+            for (const note of batch) {
+                const commentCount = await window.githubNoteManager.getCommentCount(note.id);
+                const noteCard = document.createElement('div');
+                noteCard.className = 'note-card';
+                noteCard.onclick = () => location.href = `note.html?id=${note.id}`;
+                noteCard.innerHTML = `
+                    <div class="note-card-header">
+                        <div class="note-card-icon">📝</div>
+                        <div>
+                            <div class="note-card-title">${escapeHtml(note.title)}</div>
+                            <div class="note-card-date">${formatDate(note.date)}</div>
                         </div>
-                        <div class="note-card-excerpt">${escapeHtml(note.excerpt || '')}</div>
-                        ${note.tags && note.tags.length > 0 ? `
-                            <div class="note-card-tags">
-                                ${note.tags.map(tag => `<span class="note-card-tag">${escapeHtml(tag)}</span>`).join('')}
-                            </div>
-                        ` : ''}
-                        <div class="note-card-footer">
-                            <div class="note-card-meta">
-                                <i class="fas fa-comments"></i>
-                                <span>${commentCount} 评论</span>
-                            </div>
+                    </div>
+                    <div class="note-card-excerpt">${escapeHtml(note.excerpt || '')}</div>
+                    ${note.tags && note.tags.length > 0 ? `
+                        <div class="note-card-tags">
+                            ${note.tags.map(tag => `<span class="note-card-tag">${escapeHtml(tag)}</span>`).join('')}
+                        </div>
+                    ` : ''}
+                    <div class="note-card-footer">
+                        <div class="note-card-meta">
+                            <i class="fas fa-comments"></i>
+                            <span>${commentCount} 评论</span>
                         </div>
                     </div>
                 `;
-            }).join('');
+                notesGrid.appendChild(noteCard);
+            }
         }
+
 
         // 加载标签
         function loadTags() {

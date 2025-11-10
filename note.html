@@ -157,7 +157,7 @@
         </main>
     </div>
 
-    <script src="github-api.js?v=1762755200"></script>
+    <script src="github-api.js?v=1762755300"></script>
 
     <script>
         // 配置加密token
@@ -233,6 +233,13 @@
                 document.getElementById('noteTitle').textContent = note.title;
                 document.getElementById('noteDate').textContent = formatDate(note.date);
                 document.getElementById('noteAuthor').textContent = note.authorKey || '匿名';
+
+                // 显示编辑按钮（如果有修改密钥，说明允许编辑）
+                const editBtn = document.getElementById('editBtn');
+                if (note.editKey) {
+                    editBtn.style.display = 'inline-flex';
+                    editBtn.onclick = () => showEditDialog(note);
+                }
 
                 // 渲染标签
                 const tagsContainer = document.getElementById('noteTags');
@@ -377,6 +384,20 @@
                 btn.innerHTML = '<i class="fas fa-paper-plane"></i> 发表评论';
             }
         });
+
+        // 显示编辑对话框
+        function showEditDialog(note) {
+            const editKey = prompt('请输入修改密钥:');
+            if (editKey === null) return;  // 用户取消
+
+            if (editKey !== note.editKey) {
+                alert('修改密钥错误！');
+                return;
+            }
+
+            // 跳转到编辑页面，携带笔记ID
+            window.location.href = `write.html?edit=${note.id}`;
+        }
 
         // 工具函数
         function formatDate(dateStr) {

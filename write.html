@@ -90,9 +90,18 @@
                 </div>
 
                 <!-- 作者标识 -->
-                <div style="margin-bottom: 32px;">
+                <div style="margin-bottom: 24px;">
                     <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: var(--text-primary);">作者标识（可选）</label>
                     <input type="text" id="authorKey" style="width: 100%; padding: 12px 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 15px;" placeholder="用于标识作者身份（可选）">
+                </div>
+
+                <!-- 修改密钥 -->
+                <div style="margin-bottom: 32px;">
+                    <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: var(--text-primary);">
+                        修改密钥 <span style="font-size: 12px; color: var(--text-tertiary); font-weight: 400;">（可选，用于修改此笔记）</span>
+                    </label>
+                    <input type="password" id="editKey" style="width: 100%; padding: 12px 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 15px;" placeholder="设置一个修改密钥以备后续修改（可选）">
+                    <p style="font-size: 12px; color: var(--text-tertiary); margin-top: 6px;">⚠️ 如果设置了修改密钥，修改此笔记时需要输入相同密钥</p>
                 </div>
 
                 <!-- 提交按钮 -->
@@ -109,7 +118,7 @@
         </div>
     </main>
 
-    <script src="github-api.js?v=1762755200"></script>
+    <script src="github-api.js?v=1762755300"></script>
 
     <script>
         // 配置加密token
@@ -218,6 +227,7 @@
             const content = document.getElementById('content').value.trim();
             const excerpt = document.getElementById('excerpt').value.trim();
             const authorKey = document.getElementById('authorKey').value.trim();
+            const editKey = document.getElementById('editKey').value.trim();
 
             if (!title || !content) {
                 alert('请填写标题和内容！');
@@ -242,6 +252,7 @@
                     tags: tags,
                     date: new Date().toISOString().split('T')[0],
                     authorKey: authorKey || null,
+                    editKey: editKey || null,  // 保存修改密钥
                     type: 'html',  // 改为 HTML 类型
                     comments: []
                 };
@@ -282,6 +293,131 @@
                     }
                 }, 100);
             });
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', async function() {
+            // 检查是否是编辑模式
+            const urlParams = new URLSearchParams(window.location.search);
+            const editNoteId = urlParams.get('edit');
+
+            if (editNoteId) {
+                // 编辑模式
+                await waitForGitHubConfig();
+                await loadNoteForEdit(editNoteId);
+            }
+        });
+
+        // 加载笔记进行编辑
+        async function loadNoteForEdit(noteId) {
+            try {
+                const result = await window.githubNoteManager.getNoteById(noteId);
+                if (!result) {
+                    alert('笔记不存在！');
+                    window.location.href = 'notes.html';
+                    return;
+                }
+
+                const note = result.note;
+
+                // 填充表单
+                document.getElementById('title').value = note.title;
+                document.getElementById('excerpt').value = note.excerpt || '';
+                document.getElementById('content').value = note.content;
+                document.getElementById('authorKey').value = note.authorKey || '';
+                document.getElementById('editKey').value = note.editKey || '';
+
+                // 填入标签
+                if (note.tags && note.tags.length > 0) {
+                    tags = [...note.tags];
+                    renderTags();
+                }
+
+                // 修改页面标题和按钮
+                document.title = '编辑笔记 - 个人笔记网站';
+                document.querySelector('h1').textContent = '编辑笔记';
+                document.querySelector('p').textContent = '修改您的笔记内容';
+
+                const submitBtn = document.getElementById('submitBtn');
+                submitBtn.innerHTML = '<i class="fas fa-save"></i> 保存修改';
+                submitBtn.onclick = saveNoteEdit;
+
+                // 修改表单提交事件
+                const form = document.getElementById('noteForm');
+                form.onsubmit = (e) => {
+                    e.preventDefault();
+                    saveNoteEdit();
+                };
+            } catch (error) {
+                console.error('加载笔记失败:', error);
+                alert('加载笔记失败: ' + error.message);
+                window.location.href = 'notes.html';
+            }
+        }
+
+        // 保存编辑
+        async function saveNoteEdit() {
+            const title = document.getElementById('title').value.trim();
+            const content = document.getElementById('content').value.trim();
+            const excerpt = document.getElementById('excerpt').value.trim();
+            const authorKey = document.getElementById('authorKey').value.trim();
+            const editKey = document.getElementById('editKey').value.trim();
+
+            if (!title || !content) {
+                alert('请填写标题和内容！');
+                return;
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const noteId = urlParams.get('edit');
+
+            const submitBtn = document.getElementById('submitBtn');
+            const status = document.getElementById('status');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 保存中...';
+            status.textContent = '正在保存，请稍候...';
+
+            try {
+                await waitForGitHubConfig();
+
+                // 获取原始笔记
+                const result = await window.githubNoteManager.getNoteById(noteId);
+                const originalNote = result.note;
+
+                // 验证修改密钥
+                if (originalNote.editKey && editKey !== originalNote.editKey) {
+                    alert('修改密钥错误！');
+                    return;
+                }
+
+                // 更新笔记
+                const updatedNote = {
+                    ...originalNote,
+                    title: title,
+                    content: content,
+                    excerpt: excerpt || content.substring(0, 100) + '...',
+                    tags: tags,
+                    authorKey: authorKey || null,
+                    editKey: editKey || null,  // 允许修改密钥
+                    date: new Date().toISOString().split('T')[0]
+                };
+
+                await window.githubNoteManager.updateNote(noteId, updatedNote);
+                status.textContent = '保存成功！';
+                status.style.color = 'var(--success)';
+
+                setTimeout(() => {
+                    alert('保存成功！');
+                    window.location.href = 'note.html?id=' + noteId;
+                }, 500);
+
+            } catch (error) {
+                console.error('保存失败:', error);
+                status.textContent = '保存失败: ' + error.message;
+                status.style.color = 'var(--danger)';
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-save"></i> 保存修改';
+            }
         }
     </script>
 </body>
