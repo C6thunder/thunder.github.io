@@ -157,7 +157,7 @@
         </main>
     </div>
 
-    <script src="github-api.js?v=1762755100"></script>
+    <script src="github-api.js?v=1762755200"></script>
 
     <script>
         // 配置加密token
@@ -274,12 +274,23 @@
                 }
 
                 // 渲染评论
-                renderComments(note.comments || []);
+                loadComments(noteId);
 
             } catch (error) {
                 console.error('加载笔记失败:', error);
                 document.getElementById('noteContent').innerHTML =
                     '<div style="text-align: center; padding: 60px; color: var(--danger);">加载失败: ' + error.message + '</div>';
+            }
+        }
+
+        // 加载评论
+        async function loadComments(noteId) {
+            try {
+                const comments = await window.githubNoteManager.getComments(noteId);
+                renderComments(comments);
+            } catch (error) {
+                console.error('加载评论失败:', error);
+                renderComments([]);
             }
         }
 
@@ -349,8 +360,8 @@
                 document.getElementById('commentAuthor').value = '';
                 document.getElementById('commentContent').value = '';
 
-                // 重新加载笔记
-                await loadNote(noteId);
+                // 重新加载评论
+                await loadComments(noteId);
 
                 status.textContent = '发表成功！';
                 status.style.color = 'var(--success)';

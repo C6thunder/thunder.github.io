@@ -128,7 +128,7 @@
         </main>
     </div>
 
-    <script src="github-api.js?v=1762755000"></script>
+    <script src="github-api.js?v=1762755200"></script>
 
     <script>
         // 配置加密token
@@ -255,7 +255,8 @@
 
             // 生成HTML
             notesGrid.innerHTML = filteredNotes.map(note => {
-                const commentCount = note.comments ? note.comments.length : 0;
+                // 评论已独立存储到 comments 文件夹，暂不显示评论数
+                const commentCount = 0;
                 return `
                     <div class="note-card" onclick="location.href='note.html?id=${note.id}'">
                         <div class="note-card-header">
