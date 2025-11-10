@@ -431,7 +431,7 @@
                         return false;
                     }
                     return note.title.toLowerCase().includes(currentSearch) ||
-                           note.content.toLowerCase().includes(currentSearch) ||
+                           (note.excerpt && note.excerpt.toLowerCase().includes(currentSearch)) ||
                            (note.tags && note.tags.some(tag => tag.toLowerCase().includes(currentSearch)));
                 });
             }

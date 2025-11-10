@@ -1,0 +1,93 @@
+{
+  "version": "3.0",
+  "description": "笔记索引文件 - 统一管理所有笔记",
+  "notes": [
+    {
+      "id": "note-001",
+      "title": "我的第一篇笔记",
+      "date": "2025-11-10",
+      "excerpt": "欢迎来到我的个人笔记网站！这是第一篇笔记，介绍网站的基本功能和使用方法。",
+      "tags": [
+        "入门",
+        "介绍"
+      ],
+      "content": "notecontent/note-001.html",
+      "authorKey": null,
+      "type": "html",
+      "editKey": "mynote123",
+      "style": "温馨欢迎风格",
+      "featured": true
+    },
+    {
+      "id": "note-002",
+      "title": "学习笔记：JavaScript基础",
+      "date": "2025-11-09",
+      "excerpt": "整理了JavaScript的核心概念，包括变量、函数、对象等基础知识点。",
+      "tags": [
+        "JavaScript",
+        "编程",
+        "学习"
+      ],
+      "content": "notecontent/note-002.html",
+      "authorKey": "js2024",
+      "type": "html",
+      "editKey": "mynote123",
+      "style": "技术文档风格",
+      "featured": true
+    },
+    {
+      "id": "note-003",
+      "title": "读书笔记：《代码整洁之道》",
+      "date": "2025-11-08",
+      "excerpt": "深度解读经典编程书籍，总结代码整洁的核心原则和实践方法。",
+      "tags": [
+        "读书笔记",
+        "代码质量",
+        "编程思想",
+        "最佳实践"
+      ],
+      "content": "notecontent/note-003.html",
+      "authorKey": "book2024",
+      "type": "html",
+      "editKey": "mynote123",
+      "style": "优雅读书笔记风格",
+      "featured": true
+    },
+    {
+      "id": "note-004",
+      "title": "Git使用指南",
+      "date": "2025-11-07",
+      "excerpt": "Git版本控制系统的常用命令和最佳实践，适合初学者学习。",
+      "tags": [
+        "Git",
+        "工具",
+        "版本控制"
+      ],
+      "content": "notecontent/note-004.html",
+      "authorKey": "git2024",
+      "type": "html",
+      "editKey": "mynote123",
+      "style": "终端命令行风格",
+      "featured": true
+    },
+    {
+      "id": "note-005",
+      "title": "我的兴趣爱好",
+      "date": "2025-11-06",
+      "excerpt": "分享我的六大兴趣爱好：阅读、音乐、运动、技术、旅行和美食，探讨如何让生活更丰富多彩。",
+      "tags": [
+        "生活分享",
+        "兴趣爱好",
+        "个人成长",
+        "生活方式"
+      ],
+      "content": "notecontent/note-005.html",
+      "authorKey": "life2024",
+      "type": "html",
+      "editKey": "mynote123",
+      "style": "生活彩色风格",
+      "featured": true
+    }
+  ],
+  "lastUpdated": "2025-11-22T22:00:00Z"
+}

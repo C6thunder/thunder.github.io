@@ -486,59 +486,77 @@ class GitHubNoteManager {
         }
     }
 
-    // 扫描所有笔记（Markdown + HTML）
+    // 扫描所有笔记（从 notes.json 读取）
     async scanAllNotes() {
-        const [markdownNotes, htmlNotes] = await Promise.all([
-            this.scanFolder('notes'),
-            this.scanFolder('htmlnotes')
-        ]);
+        try {
+            // 从 notes.json 读取笔记列表
+            const notesData = await this.getFile('notes.json');
 
-        // 合并并按日期排序
-        const allNotes = [...markdownNotes, ...htmlNotes].sort((a, b) => {
-            return new Date(b.date) - new Date(a.date);
-        });
+            if (!notesData || !notesData.notes || !Array.isArray(notesData.notes)) {
+                console.warn('notes.json 格式错误或不存在');
+                return [];
+            }
 
-        return allNotes;
+            // 返回笔记列表，按日期排序
+            const allNotes = notesData.notes.sort((a, b) => {
+                return new Date(b.date) - new Date(a.date);
+            });
+
+            console.log(`成功读取 ${allNotes.length} 个笔记`);
+
+            return allNotes;
+        } catch (error) {
+            console.error('读取 notes.json 失败:', error);
+            return [];
+        }
     }
 
-    // 更新notes.json
+    // 更新notes.json（根目录）
     async updateNotesList(note) {
-        let notesList = await this.getFile('notes/notes.json');
+        let notesList = await this.getFile('notes.json');
 
         if (!notesList) {
             notesList = { notes: [] };
         }
 
-        notesList.notes.unshift(note);
+        // 检查笔记是否已存在
+        const existsIndex = notesList.notes.findIndex(n => n.id === note.id);
+        if (existsIndex !== -1) {
+            // 更新已存在的笔记
+            notesList.notes[existsIndex] = note;
+        } else {
+            // 添加新笔记
+            notesList.notes.unshift(note);
+        }
 
-        return await this.saveFile('notes/notes.json', notesList, `Update notes list: add ${note.title}`);
+        // 更新最后修改时间
+        notesList.lastUpdated = new Date().toISOString();
+
+        return await this.saveFile('notes.json', notesList, `Update notes list: ${existsIndex !== -1 ? 'update' : 'add'} ${note.title}`);
     }
 
     // 更新笔记
     async updateNote(noteId, updatedNote) {
-        // 根据笔记类型选择保存路径
-        const folder = updatedNote.type === 'html' ? 'htmlnotes' : 'notes';
-        const filename = `${folder}/${noteId}.json`;
-        const message = `Update note: ${updatedNote.title}`;
+        // HTML 笔记不保存单独的 JSON 文件（内容在 notecontent 中）
+        // Markdown 笔记才保存到 notes/ 文件夹
+        if (updatedNote.type !== 'html') {
+            const filename = `notes/${noteId}.json`;
+            const message = `Update note: ${updatedNote.title}`;
+            await this.saveFile(filename, updatedNote, message);
+        }
 
-        // 1. 更新单个笔记文件
-        await this.saveFile(filename, updatedNote, message);
-
-        // 2. 更新notes.json中的笔记列表
-        let notesList = await this.getFile('notes/notes.json');
+        // 更新 notes.json 中的笔记列表
+        const notesList = await this.getFile('notes.json');
         if (notesList && notesList.notes) {
             const noteIndex = notesList.notes.findIndex(note => note.id === noteId);
             if (noteIndex !== -1) {
                 // 更新列表中的笔记
-                const excerpt = updatedNote.excerpt || (updatedNote.type === 'html'
-                    ? updatedNote.content.replace(/<[^>]*>/g, '').substring(0, 100) + '...'
-                    : updatedNote.content.substring(0, 100) + (updatedNote.content.length > 100 ? '...' : ''));
-
                 notesList.notes[noteIndex] = {
                     ...updatedNote,
-                    excerpt
+                    excerpt: updatedNote.excerpt
                 };
-                await this.saveFile('notes/notes.json', notesList, `Update notes list: modify ${updatedNote.title}`);
+                notesList.lastUpdated = new Date().toISOString();
+                await this.saveFile('notes.json', notesList, `Update notes list: modify ${updatedNote.title}`);
             }
         }
 
