@@ -218,6 +218,9 @@
                 const themeToggleBtn = document.querySelector('.theme-toggle-btn');
                 const themePanel = document.querySelector('.theme-panel');
 
+                // 页面加载时恢复主题
+                const savedTheme = localStorage.getItem('selectedTheme') || 'diary';
+
                 // 更新主题选项状态
                 document.querySelectorAll('.theme-option').forEach(opt => {
                     if (opt.dataset.theme === savedTheme) {
