@@ -235,6 +235,9 @@ const CONFIG = {
 - ✅ CDN 加速（使用 cdnjs）
 
 
+## 演示网站
+- https://c6thunder.github.io/thunder.github.io
+
 ## ❓ 常见问题
 
 ### Q: Token 加密有什么用？
