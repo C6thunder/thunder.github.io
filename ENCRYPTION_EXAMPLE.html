@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>加密 Token 配置示例</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            line-height: 1.8;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #764ba2;
+            margin-top: 30px;
+        }
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            position: relative;
+        }
+        .code-block::before {
+            content: 'HTML';
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-size: 12px;
+            color: #888;
+            background: #1a1a1a;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border: 1px solid #ffc107;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border: 1px solid #28a745;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            padding: 15px;
+            border: 1px solid #17a2b8;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .step {
+            background: #e8f4f8;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #667eea;
+        }
+        .step-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        ul {
+            margin-left: 20px;
+        }
+        li {
+            margin: 8px 0;
+        }
+        .highlight {
+            background: #fffacd;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 GitHub Token 加密配置示例</h1>
+
+        <div class="info">
+            <strong>📌 说明</strong>: 本页面演示如何在 HTML 中正确配置加密的 GitHub Token。
+        </div>
+
+        <h2>🔧 步骤 1: 运行加密脚本</h2>
+        <div class="step">
+            <p><span class="step-number">1</span><strong>生成加密配置</strong></p>
+            <div class="code-block">python3 .local_encrypt.py</div>
+            <p>按照提示输入你的 GitHub Token 和加密密码。</p>
+        </div>
+
+        <div class="step">
+            <p><span class="step-number">2</span><strong>复制输出代码</strong></p>
+            <p>脚本会输出类似下方的配置代码，复制它。</p>
+        </div>
+
+        <h2>📝 步骤 2: 在 HTML 中配置</h2>
+
+        <div class="success">
+            <strong>✅ 关键要点</strong>:
+            <ul>
+                <li>加密配置必须在引入 <code>github-api.js</code> <strong>之前</strong></li>
+                <li>使用 <code>window.setupEncryptedToken()</code> 函数</li>
+                <li>不要修改输出代码中的任何内容</li>
+            </ul>
+        </div>
+
+        <h3>示例 HTML 页面结构</h3>
+        <div class="code-block"><!-- ✅ 正确的配置顺序 -->
+
+<!-- 1️⃣ 首先：配置加密 Token（注意顺序！） -->
+<script>
+    window.setupEncryptedToken({
+        token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6InRlc3Q...",  // 加密后的 token
+        iv: "aGVsbG93b3JsZHN1cGVy",                                         // 初始化向量
+        salt: "c2FsdGZyb21weXRob24",                                        // 随机盐值
+        iterations: 100000,                                                 // PBKDF2 迭代次数
+        password: "your-secure-password"                                    // 解密密码
+    });
+</script>
+
+<!-- 2️⃣ 然后：引入 GitHub API -->
+<script src="github-api.js"></script>
+
+<!-- 3️⃣ 最后：其他页面脚本 -->
+<script>
+    // 监听 Token 加载完成事件
+    window.addEventListener('tokenLoaded', function() {
+        console.log('✅ GitHub Token 已加载，可以开始使用 API');
+        // 在这里初始化其他功能
+    });
+</script></div>
+
+        <h2>⚠️ 常见错误</h2>
+
+        <div class="warning">
+            <h4>❌ 错误示例 1: 顺序错误</h4>
+            <div class="code-block"><!-- ❌ 错误的顺序 -->
+<script src="github-api.js"></script>  <!-- 先引入 API -->
+<script>
+    window.setupEncryptedToken(...);  <!-- 再配置 Token -->
+</script>
+<!-- 这样会导致错误！ --></div>
+        </div>
+
+        <div class="warning">
+            <h4>❌ 错误示例 2: 修改了配置代码</h4>
+            <div class="code-block"><!-- ❌ 不要修改输出代码 -->
+<script>
+// 错误：手动修改了字段名或值
+window.setupEncryptedToken({
+    myToken: "...",     // 错误：应该是 'token'
+    ivData: "...",      // 错误：应该是 'iv'
+    iterations: 50000,  // 错误：修改了迭代次数
+    pass: "..."         // 错误：应该是 'password'
+});
+</script></div>
+        </div>
+
+        <h2>✅ 验证配置</h2>
+
+        <div class="step">
+            <p><span class="step-number">1</span><strong>打开浏览器开发者工具</strong></p>
+            <p>按 F12 打开控制台</p>
+        </div>
+
+        <div class="step">
+            <p><span class="step-number">2</span><strong>检查日志信息</strong></p>
+            <p>如果配置正确，你会看到：</p>
+            <div class="code-block">✅ GitHub Token 已加载，可以开始使用 API</div>
+        </div>
+
+        <div class="step">
+            <p><span class="step-number">3</span><strong>测试 API 调用</strong></p>
+            <p>在控制台输入：</p>
+            <div class="code-block">console.log(window.githubNoteManager.config.token);</div>
+            <p>如果显示完整的 token 字符串，说明配置成功。</p>
+        </div>
+
+        <h2>🔒 安全注意事项</h2>
+
+        <div class="info">
+            <h4>⚡ 最佳实践</h4>
+            <ul>
+                <li><span class="highlight">不要提交</span>: 永远不要将配置提交到公开的 Git 仓库</li>
+                <li><span class="highlight">保护密码</span>: 加密密码不会存储在代码中，请务必记住</li>
+                <li><span class="highlight">定期更换</span>: 建议每 90 天更换一次 Token</li>
+                <li><span class="highlight">最小权限</span>: 只授予必要的仓库权限</li>
+                <li><span class="highlight">监控使用</span>: 定期检查 Token 的使用情况</li>
+            </ul>
+        </div>
+
+        <h2>🆘 故障排除</h2>
+
+        <div class="warning">
+            <h4>问题 1: "未加载加密token" 错误</h4>
+            <p><strong>原因</strong>: 配置顺序错误或配置代码有误</p>
+            <p><strong>解决</strong>: 确保配置代码在引入 github-api.js 之前</p>
+        </div>
+
+        <div class="warning">
+            <h4>问题 2: Token 解密失败</h4>
+            <p><strong>原因</strong>: 密码错误或配置数据损坏</p>
+            <p><strong>解决</strong>: 重新运行加密脚本生成新配置</p>
+        </div>
+
+        <div class="warning">
+            <h4>问题 3: 页面加载后没有反应</h4>
+            <p><strong>原因</strong>: 监听器未正确设置或 Token 未加载</p>
+            <p><strong>解决</strong>: 检查是否正确监听了 'tokenLoaded' 事件</p>
+        </div>
+
+        <h2>📚 更多资源</h2>
+
+        <ul>
+            <li>📖 <strong>详细指南</strong>: 查看 <code>ENCRYPTION_GUIDE.md</code></li>
+            <li>💻 <strong>项目主页</strong>: 查看 <code>README.md</code></li>
+            <li>🛠️ <strong>加密脚本</strong>: 查看 <code>.local_encrypt.py</code></li>
+            <li>🔗 <strong>GitHub API 文档</strong>: <a href="https://docs.github.com/en/rest">GitHub REST API</a></li>
+        </ul>
+
+        <div class="success">
+            <h4>✅ 配置成功标志</h4>
+            <p>当看到以下信息时，说明配置成功：</p>
+            <ul>
+                <li>浏览器控制台显示 "✅ GitHub Token 已加载"</li>
+                <li>可以正常浏览和发布博客</li>
+                <li>评论功能正常工作</li>
+            </ul>
+        </div>
+
+        <hr style="margin: 40px 0; border: none; border-top: 2px solid #eee;">
+
+        <p style="text-align: center; color: #666;">
+            <strong>需要帮助？</strong><br>
+            发送邮件至: <a href="mailto:thunder153460@gmail.com">thunder153460@gmail.com</a>
+        </p>
+    </div>
+</body>
+</html>

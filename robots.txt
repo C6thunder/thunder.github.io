@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 
 # Sitemap 位置
-Sitemap: https://thunder.github.io/sitemap.xml
+Sitemap: https://c6thunder.github.io/thunder.github.io/sitemap.xml
