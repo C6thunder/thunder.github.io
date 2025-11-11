@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>笔记详情 - 个人笔记网站</title>
+    <title>博客详情 - 个人博客网站</title>
     <link rel="stylesheet" href="style.css?v=2023111900">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -23,7 +23,7 @@
         <!-- 左侧导航栏 -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <div class="sidebar-logo">我的笔记</div>
+                <div class="sidebar-logo">我的博客</div>
                 <div class="sidebar-subtitle">记录生活点滴</div>
                 <div class="sidebar-toggle-btn" title="隐藏导航栏">
                     <i class="fas fa-arrow-left"></i>
@@ -37,11 +37,11 @@
                 </a>
                 <a href="notes.html" class="nav-item">
                     <i class="fas fa-sticky-note"></i>
-                    <span>所有笔记</span>
+                    <span>所有博客</span>
                 </a>
                 <a href="write.html" class="nav-item">
                     <i class="fas fa-pen"></i>
-                    <span>写笔记</span>
+                    <span>写博客</span>
                 </a>
             </nav>
 
@@ -105,13 +105,13 @@
                 </div>
             </div>
 
-            <!-- 笔记内容 - 无卡片，全屏 -->
+            <!-- 博客内容 - 无卡片，全屏 -->
             <div style="max-width: 900px; margin: 0 auto; padding: 40px;">
                 <div id="noteContainer" style="background: transparent;">
-                    <!-- 笔记标题 -->
+                    <!-- 博客标题 -->
                     <h1 id="noteTitle" style="font-size: 36px; font-weight: 600; color: var(--text-primary); margin-bottom: 16px; line-height: 1.3;">加载中...</h1>
 
-                    <!-- 笔记元信息 -->
+                    <!-- 博客元信息 -->
                     <div id="noteMeta" style="display: flex; align-items: center; gap: 20px; margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); flex-wrap: wrap;">
                         <div style="display: flex; align-items: center; gap: 6px; color: var(--text-secondary); font-size: 14px;">
                             <i class="fas fa-calendar"></i>
@@ -126,11 +126,11 @@
                     <!-- 标签 -->
                     <div id="noteTags" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px;"></div>
 
-                    <!-- 笔记正文 -->
+                    <!-- 博客正文 -->
                     <div id="noteContent" style="font-size: 16px; line-height: 1.8; color: var(--text-primary);">
                         <div style="text-align: center; padding: 60px 20px; color: var(--text-secondary);">
                             <i class="fas fa-spinner fa-spin" style="font-size: 32px; margin-bottom: 16px;"></i>
-                            <p>正在加载笔记内容...</p>
+                            <p>正在加载博客内容...</p>
                         </div>
                     </div>
                 </div>
@@ -218,7 +218,7 @@
 
     <script>
 
-        // 移除主题适配 - 让每篇笔记保持自己的独特设计风格
+        // 移除主题适配 - 让每篇博客保持自己的独特设计风格
         // 注：如果需要主题适配，可以在这里实现更智能的方案
 
         // 页面加载完成后初始化
@@ -228,7 +228,7 @@
 
             if (!noteId) {
                 document.getElementById('noteContent').innerHTML =
-                    '<div style="text-align: center; padding: 60px; color: var(--danger);">未找到笔记ID</div>';
+                    '<div style="text-align: center; padding: 60px; color: var(--danger);">未找到博客ID</div>';
                 return;
             }
 
@@ -257,20 +257,20 @@
             });
         }
 
-        // 加载笔记
+        // 加载博客
         async function loadNote(noteId) {
             try {
-                // 从 notes.json 获取所有笔记，找到匹配的笔记
+                // 从 notes.json 获取所有博客，找到匹配的博客
                 const allNotes = await window.githubNoteManager.scanAllNotes();
                 const note = allNotes.find(n => n.id === noteId);
 
                 if (!note) {
                     document.getElementById('noteContent').innerHTML =
-                        '<div style="text-align: center; padding: 60px; color: var(--danger);">笔记不存在</div>';
+                        '<div style="text-align: center; padding: 60px; color: var(--danger);">博客不存在</div>';
                     return;
                 }
 
-                // 渲染笔记内容
+                // 渲染博客内容
                 document.getElementById('noteTitle').textContent = note.title;
                 document.getElementById('noteDate').textContent = formatDate(note.date);
                 document.getElementById('noteAuthor').textContent = note.authorKey || '匿名';
@@ -297,10 +297,10 @@
 
                 // 渲染评论
                 loadComments(noteId);
-                // 不进行主题适配，让笔记保持自己的独特设计
+                // 不进行主题适配，让博客保持自己的独特设计
 
             } catch (error) {
-                console.error('加载笔记失败:', error);
+                console.error('加载博客失败:', error);
                 document.getElementById('noteContent').innerHTML =
                     '<div style="text-align: center; padding: 60px; color: var(--danger);">加载失败: ' + error.message + '</div>';
             }
@@ -411,7 +411,7 @@
                 return;
             }
 
-            // 跳转到编辑页面，携带笔记ID
+            // 跳转到编辑页面，携带博客ID
             window.location.href = `write.html?edit=${note.id}`;
         }
 
@@ -426,7 +426,7 @@
             return date.toLocaleString('zh-CN');
         }
 
-        // 渲染笔记内容
+        // 渲染博客内容
         function renderNoteContent(note) {
             const contentDiv = document.getElementById('noteContent');
 

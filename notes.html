@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>所有笔记 - 个人笔记网站</title>
+    <title>所有博客 - 个人博客网站</title>
     <link rel="stylesheet" href="style.css?v=2023111900">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="config.js?v=1762755000"></script>
@@ -23,7 +23,7 @@
         <!-- 左侧导航栏 -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <div class="sidebar-logo">我的笔记</div>
+                <div class="sidebar-logo">我的博客</div>
                 <div class="sidebar-subtitle">记录生活点滴</div>
                 <div class="sidebar-toggle-btn" title="隐藏导航栏">
                     <i class="fas fa-arrow-left"></i>
@@ -37,11 +37,11 @@
                 </a>
                 <a href="notes.html" class="nav-item active">
                     <i class="fas fa-sticky-note"></i>
-                    <span>所有笔记</span>
+                    <span>所有博客</span>
                 </a>
                 <a href="write.html" class="nav-item">
                     <i class="fas fa-pen"></i>
-                    <span>写笔记</span>
+                    <span>写博客</span>
                 </a>
             </nav>
 
@@ -92,19 +92,19 @@
             <div class="content-container">
                 <!-- 页面头部 -->
                 <div class="page-header">
-                    <h1 class="page-title">所有笔记</h1>
-                    <p class="page-subtitle">浏览和管理您的所有笔记</p>
+                    <h1 class="page-title">所有博客</h1>
+                    <p class="page-subtitle">浏览和管理您的所有博客</p>
                 </div>
 
                 <!-- 工具栏 -->
                 <div class="card" style="padding: 16px; margin-bottom: 24px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
                     <a href="write.html" class="btn btn-primary" style="text-decoration: none;">
-                        <i class="fas fa-plus"></i> 写笔记
+                        <i class="fas fa-plus"></i> 写博客
                     </a>
                     <button class="btn btn-secondary" id="sortBtn">
                         <i class="fas fa-sort"></i> 排序
                     </button>
-                    <button class="btn btn-secondary" id="refreshBtn" title="刷新笔记">
+                    <button class="btn btn-secondary" id="refreshBtn" title="刷新博客">
                         <i class="fas fa-sync-alt"></i> 刷新
                     </button>
                     <span class="last-update" id="lastUpdate" style="margin-left: auto; font-size: 12px; color: var(--text-tertiary);"></span>
@@ -114,7 +114,7 @@
                 <div class="search-container" style="margin-bottom: 24px;">
                     <div class="search-box" style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 16px; display: flex; align-items: center; gap: 8px;">
                         <i class="fas fa-search" style="color: var(--text-tertiary);"></i>
-                        <input type="text" id="searchInput" placeholder="搜索笔记、标签或内容..." style="border: none; background: transparent; outline: none; color: var(--text-primary); flex: 1; font-size: 14px;">
+                        <input type="text" id="searchInput" placeholder="搜索博客、标签或内容..." style="border: none; background: transparent; outline: none; color: var(--text-primary); flex: 1; font-size: 14px;">
                     </div>
                 </div>
 
@@ -123,7 +123,7 @@
                     <div class="loading" style="color: var(--text-secondary);">加载中...</div>
                 </div>
 
-                <!-- 笔记列表 -->
+                <!-- 博客列表 -->
                 <div class="notes-list" id="notesGrid">
                     <div class="loading" style="color: var(--text-secondary); text-align: center; padding: 40px;">加载中...</div>
                 </div>
@@ -131,7 +131,7 @@
                 <!-- 空状态 -->
                 <div class="empty-state" id="emptyState" style="display: none; text-align: center; padding: 60px 20px;">
                     <i class="fas fa-search" style="font-size: 48px; color: var(--text-tertiary); margin-bottom: 16px;"></i>
-                    <h3 style="color: var(--text-primary); margin-bottom: 8px;">未找到相关笔记</h3>
+                    <h3 style="color: var(--text-primary); margin-bottom: 8px;">未找到相关博客</h3>
                     <p style="color: var(--text-secondary); margin-bottom: 20px;">尝试更换关键词或清除筛选条件</p>
                     <button class="btn btn-primary" onclick="clearFilters()">清除筛选</button>
                 </div>
@@ -262,7 +262,7 @@
                     });
                 });
             } catch (error) {
-                console.error('加载笔记失败:', error);
+                console.error('加载博客失败:', error);
                 document.getElementById('notesGrid').innerHTML =
                     '<div style="text-align: center; padding: 40px; color: var(--danger);">' + error.message + '</div>';
             }
@@ -288,7 +288,7 @@
             });
         }
 
-        // 加载笔记（使用缓存）
+        // 加载博客（使用缓存）
         async function loadNotes() {
             const notesGrid = document.getElementById('notesGrid');
             notesGrid.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--text-secondary);">加载中...</div>';
@@ -310,7 +310,7 @@
 
                 if (allNotes.length === 0) {
                     notesGrid.innerHTML =
-                        '<div style="text-align: center; padding: 40px; color: var(--text-secondary);">暂无笔记</div>';
+                        '<div style="text-align: center; padding: 40px; color: var(--text-secondary);">暂无博客</div>';
                     return;
                 }
 
@@ -319,13 +319,13 @@
                 loadTags();
                 updateLastUpdateTime();
             } catch (error) {
-                console.error('加载笔记失败:', error);
+                console.error('加载博客失败:', error);
                 notesGrid.innerHTML =
                     '<div style="text-align: center; padding: 40px; color: var(--danger);">加载失败: ' + error.message + '</div>';
             }
         }
 
-        // 分批显示笔记
+        // 分批显示博客
         async function displayNotesBatch() {
             const notesGrid = document.getElementById('notesGrid');
             const emptyState = document.getElementById('emptyState');
@@ -374,7 +374,7 @@
             window.addEventListener('scroll', window._scrollListener);
         }
 
-        // 渲染一批笔记
+        // 渲染一批博客
         async function renderBatch(start, end) {
             const notesGrid = document.getElementById('notesGrid');
             const batch = filteredNotes.slice(start, end);
@@ -401,7 +401,7 @@
                     if (e.target.closest('.edit-btn')) {
                         return;
                     }
-                    // 所有笔记都跳转到note.html，在note.html中加载内容
+                    // 所有博客都跳转到note.html，在note.html中加载内容
                     location.href = `note.html?id=${note.id}`;
                 };
 
@@ -563,7 +563,7 @@
             return date.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
         }
 
-        // 编辑笔记
+        // 编辑博客
         window.editNote = function(noteId, editKey, event) {
             event.stopPropagation(); // 阻止事件冒泡
             const inputKey = prompt('请输入修改密钥:');

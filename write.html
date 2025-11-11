@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>写笔记 - 个人笔记网站</title>
+    <title>写博客 - 个人博客网站</title>
     <link rel="stylesheet" href="style.css?v=2023111900">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="config.js?v=1762755000"></script>
@@ -23,7 +23,7 @@
         <!-- 左侧导航栏 -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <div class="sidebar-logo">我的笔记</div>
+                <div class="sidebar-logo">我的博客</div>
                 <div class="sidebar-subtitle">记录生活点滴</div>
                 <div class="sidebar-toggle-btn" title="隐藏导航栏">
                     <i class="fas fa-arrow-left"></i>
@@ -37,11 +37,11 @@
                 </a>
                 <a href="notes.html" class="nav-item">
                     <i class="fas fa-sticky-note"></i>
-                    <span>所有笔记</span>
+                    <span>所有博客</span>
                 </a>
                 <a href="write.html" class="nav-item active">
                     <i class="fas fa-pen"></i>
-                    <span>写笔记</span>
+                    <span>写博客</span>
                 </a>
             </nav>
 
@@ -92,23 +92,23 @@
             <div class="content-container">
                 <!-- 页面头部 -->
                 <div class="page-header">
-                    <h1 class="page-title">写新笔记</h1>
+                    <h1 class="page-title">写新博客</h1>
                     <p class="page-subtitle">记录您的想法和灵感</p>
                 </div>
 
-                <!-- 写笔记表单 -->
+                <!-- 写博客表单 -->
                 <div class="card" style="padding: 32px;">
             <form id="noteForm">
                 <!-- 标题 -->
                 <div style="margin-bottom: 24px;">
                     <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: var(--text-primary);">标题 <span style="color: var(--danger);">*</span></label>
-                    <input type="text" id="title" required style="width: 100%; padding: 12px 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 15px; transition: border-color 0.3s ease;" placeholder="输入笔记标题...">
+                    <input type="text" id="title" required style="width: 100%; padding: 12px 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 15px; transition: border-color 0.3s ease;" placeholder="输入博客标题...">
                 </div>
 
                 <!-- 摘要 -->
                 <div style="margin-bottom: 24px;">
                     <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: var(--text-primary);">摘要</label>
-                    <textarea id="excerpt" rows="3" style="width: 100%; padding: 12px 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 15px; line-height: 1.6; resize: vertical; font-family: inherit;" placeholder="简单描述一下这篇笔记的内容..."></textarea>
+                    <textarea id="excerpt" rows="3" style="width: 100%; padding: 12px 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 15px; line-height: 1.6; resize: vertical; font-family: inherit;" placeholder="简单描述一下这篇博客的内容..."></textarea>
                 </div>
 
                 <!-- 标签 -->
@@ -122,7 +122,7 @@
                 <!-- 内容 -->
                 <div style="margin-bottom: 24px;">
                     <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: var(--text-primary);">内容 <span style="color: var(--danger);">*</span></label>
-                    <textarea id="content" required rows="16" style="width: 100%; padding: 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 15px; line-height: 1.8; resize: vertical; font-family: 'Monaco', 'Menlo', 'Courier New', monospace;" placeholder="使用 HTML 格式编写您的笔记..."></textarea>
+                    <textarea id="content" required rows="16" style="width: 100%; padding: 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 15px; line-height: 1.8; resize: vertical; font-family: 'Monaco', 'Menlo', 'Courier New', monospace;" placeholder="使用 HTML 格式编写您的博客..."></textarea>
                     <p style="font-size: 12px; color: var(--text-tertiary); margin-top: 6px;">支持 HTML 标签，例如：&lt;h1&gt;, &lt;h2&gt;, &lt;p&gt;, &lt;code&gt;, &lt;pre&gt;, &lt;ul&gt;, &lt;ol&gt;, &lt;li&gt;, &lt;strong&gt;, &lt;em&gt;, &lt;blockquote&gt;</p>
                 </div>
 
@@ -135,16 +135,16 @@
                 <!-- 修改密钥 -->
                 <div style="margin-bottom: 32px;">
                     <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: var(--text-primary);">
-                        修改密钥 <span style="font-size: 12px; color: var(--text-tertiary); font-weight: 400;">（可选，用于修改此笔记）</span>
+                        修改密钥 <span style="font-size: 12px; color: var(--text-tertiary); font-weight: 400;">（可选，用于修改此博客）</span>
                     </label>
                     <input type="password" id="editKey" style="width: 100%; padding: 12px 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 15px;" placeholder="设置一个修改密钥以备后续修改（可选）">
-                    <p style="font-size: 12px; color: var(--text-tertiary); margin-top: 6px;">⚠️ 如果设置了修改密钥，修改此笔记时需要输入相同密钥</p>
+                    <p style="font-size: 12px; color: var(--text-tertiary); margin-top: 6px;">⚠️ 如果设置了修改密钥，修改此博客时需要输入相同密钥</p>
                 </div>
 
                 <!-- 提交按钮 -->
                 <div style="display: flex; gap: 12px; align-items: center;">
                     <button type="submit" id="submitBtn" style="padding: 12px 32px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; box-shadow: var(--shadow-sm);">
-                        <i class="fas fa-paper-plane"></i> 发布笔记
+                        <i class="fas fa-paper-plane"></i> 发布博客
                     </button>
                     <button type="button" onclick="clearForm()" style="padding: 12px 32px; background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 8px; font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.2s ease;">
                         <i class="fas fa-eraser"></i> 清空
@@ -324,7 +324,7 @@
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = isEdit
                     ? '<i class="fas fa-save"></i> 保存修改'
-                    : '<i class="fas fa-paper-plane"></i> 发布笔记';
+                    : '<i class="fas fa-paper-plane"></i> 发布博客';
             }
         }
 
@@ -443,12 +443,12 @@
             }
         });
 
-        // 加载笔记进行编辑
+        // 加载博客进行编辑
         async function loadNoteForEdit(noteId) {
             try {
                 const result = await window.githubNoteManager.getNoteById(noteId);
                 if (!result) {
-                    alert('笔记不存在！');
+                    alert('博客不存在！');
                     window.location.href = 'notes.html';
                     return;
                 }
@@ -469,9 +469,9 @@
                 }
 
                 // 修改页面标题和按钮
-                document.title = '编辑笔记 - 个人笔记网站';
-                document.querySelector('h1').textContent = '编辑笔记';
-                document.querySelector('p').textContent = '修改您的笔记内容';
+                document.title = '编辑博客 - 个人博客网站';
+                document.querySelector('h1').textContent = '编辑博客';
+                document.querySelector('p').textContent = '修改您的博客内容';
 
                 const submitBtn = document.getElementById('submitBtn');
                 submitBtn.innerHTML = '<i class="fas fa-save"></i> 保存修改';
@@ -483,8 +483,8 @@
                     await handleSubmit(true);
                 };
             } catch (error) {
-                console.error('加载笔记失败:', error);
-                alert('加载笔记失败: ' + error.message);
+                console.error('加载博客失败:', error);
+                alert('加载博客失败: ' + error.message);
                 window.location.href = 'notes.html';
             }
         }
