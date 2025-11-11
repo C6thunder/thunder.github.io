@@ -6,7 +6,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>个人笔记网站 - 首页</title>
-    <link rel="stylesheet" href="style.css?v=2023111400">
+    <link rel="stylesheet" href="style.css?v=2023111800">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="config.js?v=1762755000"></script>
     <script>
@@ -25,6 +25,9 @@
             <div class="sidebar-header">
                 <div class="sidebar-logo">我的笔记</div>
                 <div class="sidebar-subtitle">记录生活点滴</div>
+                <div class="sidebar-toggle-btn" title="隐藏导航栏">
+                    <i class="fas fa-arrow-left"></i>
+                </div>
             </div>
 
             <nav class="nav-menu">
@@ -78,6 +81,11 @@
                 </a>
             </div>
         </aside>
+
+        <!-- 悬浮显示按钮 (默认隐藏) -->
+        <div class="sidebar-show-btn" style="display: none;" title="显示导航栏">
+            <i class="fas fa-arrow-right"></i>
+        </div>
 
         <!-- 主内容区 -->
         <main class="main-content">
@@ -181,6 +189,38 @@
     </div>
 
     <script>
+        // 导航栏隐藏/显示功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            const toggleBtn = document.querySelector('.sidebar-toggle-btn');
+            const showBtn = document.querySelector('.sidebar-show-btn');
+
+            // 恢复上次的状态
+            const sidebarHidden = localStorage.getItem('sidebarHidden') === 'true';
+            if (sidebarHidden) {
+                sidebar.classList.add('hidden');
+                mainContent.classList.add('full-width');
+                showBtn.style.display = 'flex';
+            }
+
+            // 隐藏按钮点击事件
+            toggleBtn.addEventListener('click', function() {
+                sidebar.classList.add('hidden');
+                mainContent.classList.add('full-width');
+                showBtn.style.display = 'flex';
+                localStorage.setItem('sidebarHidden', 'true');
+            });
+
+            // 显示按钮点击事件
+            showBtn.addEventListener('click', function() {
+                sidebar.classList.remove('hidden');
+                mainContent.classList.remove('full-width');
+                showBtn.style.display = 'none';
+                localStorage.setItem('sidebarHidden', 'false');
+            });
+        });
+
         // 设置今天日期
         const today = new Date();
         const dateStr = today.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });

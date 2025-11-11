@@ -6,7 +6,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>个人信息 - Thunder的个人笔记</title>
-    <link rel="stylesheet" href="style.css?v=2023111600">
+    <link rel="stylesheet" href="style.css?v=2023111800">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="config.js?v=1762755000"></script>
     <script>
@@ -25,6 +25,9 @@
             <div class="sidebar-header">
                 <div class="sidebar-logo">我的笔记</div>
                 <div class="sidebar-subtitle">记录生活点滴</div>
+                <div class="sidebar-toggle-btn" title="隐藏导航栏">
+                    <i class="fas fa-arrow-left"></i>
+                </div>
             </div>
 
             <nav class="nav-menu">
@@ -70,7 +73,8 @@
                     </div>
                 </div>
                 <a href="profile.html" class="user-info" style="text-decoration: none; color: inherit;">
-                    <img src="img/avatar.jpg" class="user-avatar" id="userAvatar" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;" data-config="avatar">
+                    <img src="img/avatar.jpg" class="user-avatar" id="userAvatar"
+                        style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;" data-config="avatar">
                     <div class="user-details">
                         <div class="user-name" id="userName">Thunder</div>
                         <div class="user-email" id="userEmail">thunder@example.com</div>
@@ -78,6 +82,12 @@
                 </a>
             </div>
         </aside>
+
+        <!-- 主内容区 -->
+        <!-- 悬浮显示按钮 (默认隐藏) -->
+        <div class="sidebar-show-btn" style="display: none;" title="显示导航栏">
+            <i class="fas fa-arrow-right"></i>
+        </div>
 
         <!-- 主内容区 -->
         <main class="main-content">
@@ -90,47 +100,71 @@
 
                 <!-- 个人信息卡片 -->
                 <!-- 背景图容器 - 作为主背景 -->
-                <div style="position: relative; height: 480px; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15); margin-bottom: 32px;">
+                <div
+                    style="position: relative; height: 480px; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15); margin-bottom: 32px;">
                     <!-- 背景图片层 -->
-                    <div style="position: absolute; inset: 0; background: linear-gradient(135deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.2) 100%), url('img/girl-ocean-view.jpg'); background-size: cover; background-position: center 20%; background-repeat: no-repeat;"></div>
+                    <div
+                        style="position: absolute; inset: 0; background: linear-gradient(135deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.2) 100%), url('img/girl-ocean-view.jpg'); background-size: cover; background-position: center 20%; background-repeat: no-repeat;">
+                    </div>
 
                     <!-- 顶部暗角渐变 -->
-                    <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.1) 30%, transparent 60%);"></div>
+                    <div
+                        style="position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.1) 30%, transparent 60%);">
+                    </div>
 
                     <!-- 底部白色渐变遮罩 - 更柔和 -->
-                    <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.75) 30%, rgba(255,255,255,0.3) 60%, transparent 100%);"></div>
+                    <div
+                        style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.75) 30%, rgba(255,255,255,0.3) 60%, transparent 100%);">
+                    </div>
 
-                    <!-- 头像 - 居中偏上 -->
-                    <div style="position: absolute; top: 180px; left: 50%; transform: translateX(-50%); width: 100px; height: 100px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.95); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 0 6px rgba(255,255,255,0.15); overflow: hidden; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 2; transition: all 0.3s ease;" id="profileAvatar">
-                        <img src="img/avatar.jpg" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" data-config="avatar">
+                    <!-- 头像 - 居中偏上，可翻转 -->
+                    <div style="position: absolute; top: 180px; left: 50%; transform: translateX(-50%); width: 100px; height: 100px; perspective: 1000px; z-index: 10;"
+                        id="profileAvatar">
+                        <div style="position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; cursor: pointer;"
+                            id="avatarFlip">
+                            <!-- 正面：头像 -->
+                            <div
+                                style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 50%; border: 3px solid rgba(255,255,255,0.95); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 0 6px rgba(255,255,255,0.15); overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                                <img src="img/avatar.jpg" style="width: 100%; height: 100%; object-fit: cover;"
+                                    data-config="avatar">
+                            </div>
+                            <!-- 反面：用户名文字 -->
+                            <div
+                                style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; transform: rotateY(180deg); border-radius: 15px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.9) 100%); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);">
+                                <span
+                                    style="font-size: 20px; font-weight: 700; background: linear-gradient(45deg, #667eea 0%, #764ba2 50%, #f093fb 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 8px rgba(102, 126, 234, 0.5));">Thunder</span>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- 用户信息区域 -->
-                    <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 100px 40px 32px; text-align: center; z-index: 3;">
-                        <h2 style="font-size: 34px; font-weight: 700; color: var(--text-primary); margin: 0 0 8px 0; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);" id="profileName">Thunder</h2>
-                        <p style="color: var(--text-secondary); font-size: 15px; margin: 0 0 20px 0; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);" id="profileGender">
-                            <i class="fas fa-code" style="color: #667eea; margin-right: 6px;"></i> 软件工程师
-                        </p>
+                    <div
+                        style="position: absolute; bottom: 0; left: 0; right: 0; padding: 100px 40px 32px; text-align: center; z-index: 3;">
 
                         <!-- 社交链接按钮 -->
                         <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
-                            <a href="https://github.com/C6thunder" target="_blank" class="social-btn" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--card-bg); color: var(--text-primary); border-radius: 20px; font-size: 13px; font-weight: 500; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);">
+                            <a href="https://github.com/C6thunder" target="_blank" class="social-btn"
+                                style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--card-bg); color: var(--text-primary); border-radius: 20px; font-size: 13px; font-weight: 500; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);">
                                 <i class="fab fa-github" style="color: #24292e;"></i> GitHub
                             </a>
-                            <button onclick="showEmails()" class="social-btn" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--card-bg); color: var(--text-primary); border: none; border-radius: 20px; font-size: 13px; font-weight: 500; box-shadow: var(--shadow-sm); cursor: pointer; border: 1px solid var(--border-color);">
+                            <button onclick="showEmails()" class="social-btn"
+                                style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--card-bg); color: var(--text-primary); border: none; border-radius: 20px; font-size: 13px; font-weight: 500; box-shadow: var(--shadow-sm); cursor: pointer; border: 1px solid var(--border-color);">
                                 <i class="fas fa-envelope" style="color: #e74c3c;"></i> 邮箱
                             </button>
-                            <button onclick="showMessage()" class="social-btn" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--card-bg); color: var(--text-primary); border: none; border-radius: 20px; font-size: 13px; font-weight: 500; box-shadow: var(--shadow-sm); cursor: pointer; border: 1px solid var(--border-color);">
+                            <button onclick="showMessage()" class="social-btn"
+                                style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--card-bg); color: var(--text-primary); border: none; border-radius: 20px; font-size: 13px; font-weight: 500; box-shadow: var(--shadow-sm); cursor: pointer; border: 1px solid var(--border-color);">
                                 <i class="fas fa-quote-left" style="color: #3498db;"></i> 寄语
                             </button>
                         </div>
                     </div>
 
                     <!-- 装饰性元素 -->
-                    <div style="position: absolute; top: 30px; right: 30px; color: rgba(255,255,255,0.6); font-size: 32px; z-index: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">
+                    <div
+                        style="position: absolute; top: 30px; right: 30px; color: rgba(255,255,255,0.6); font-size: 32px; z-index: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">
                         <i class="fas fa-star"></i>
                     </div>
-                    <div style="position: absolute; top: 60px; left: 40px; color: rgba(255,255,255,0.4); font-size: 20px; z-index: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">
+                    <div
+                        style="position: absolute; top: 60px; left: 40px; color: rgba(255,255,255,0.4); font-size: 20px; z-index: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">
                         <i class="fas fa-heart"></i>
                     </div>
                 </div>
@@ -139,19 +173,21 @@
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
                     <!-- 个人信息 -->
                     <div class="card" style="padding: 24px;">
-                        <h3 style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+                        <h3
+                            style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
                             <i class="fas fa-user"></i> 基本信息
                         </h3>
                         <div style="display: flex; flex-direction: column; gap: 16px;">
                             <div>
                                 <div style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 4px;">姓名</div>
-                                <div style="font-size: 15px; color: var(--text-primary); font-weight: 600;">Thunder</div>
+                                <div style="font-size: 15px; color: var(--text-primary); font-weight: 600;">Thunder
+                                </div>
                             </div>
                             <div>
                                 <div style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 4px;">职业</div>
                                 <div style="font-size: 15px; color: var(--text-primary);">
                                     <i class="fas fa-code" style="color: #667eea; margin-right: 6px;"></i>
-                                    软件工程师
+                                    学生 &nbsp ʕ•ᴥ•ʔ
                                 </div>
                             </div>
                             <div>
@@ -165,7 +201,7 @@
                                 <div style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 4px;">兴趣</div>
                                 <div style="font-size: 15px; color: var(--text-primary);">
                                     <i class="fas fa-heart" style="color: #fa709a; margin-right: 6px;"></i>
-                                    编程、阅读、旅行
+                                    编程、阅读
                                 </div>
                             </div>
                         </div>
@@ -173,7 +209,8 @@
 
                     <!-- 联系方式 -->
                     <div class="card" style="padding: 24px;">
-                        <h3 style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+                        <h3
+                            style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
                             <i class="fas fa-address-card"></i> 联系方式
                         </h3>
                         <div style="display: flex; flex-direction: column; gap: 16px;">
@@ -181,19 +218,22 @@
                                 <div style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 4px;">邮箱</div>
                                 <div style="font-size: 15px; color: var(--text-primary);">
                                     <i class="fas fa-envelope" style="color: #4facfe; margin-right: 6px;"></i>
-                                    thunder@example.com
+                                    15346046526@163.com
                                 </div>
                             </div>
                             <div>
-                                <div style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 4px;">备用邮箱</div>
+                                <div style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 4px;">备用邮箱
+                                </div>
                                 <div style="font-size: 15px; color: var(--text-primary);">
                                     <i class="fas fa-envelope-open" style="color: #00f2fe; margin-right: 6px;"></i>
-                                    thunder.dev@outlook.com
+                                    thunder153460@gmail.com
                                 </div>
                             </div>
                             <div>
-                                <div style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 4px;">GitHub</div>
-                                <a href="https://github.com/C6thunder" target="_blank" style="font-size: 15px; color: var(--primary); text-decoration: none;">
+                                <div style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 4px;">GitHub
+                                </div>
+                                <a href="https://github.com/C6thunder" target="_blank"
+                                    style="font-size: 15px; color: var(--primary); text-decoration: none;">
                                     <i class="fab fa-github" style="margin-right: 6px;"></i>
                                     github.com/C6thunder
                                 </a>
@@ -211,14 +251,18 @@
 
                 <!-- 个人简介 -->
                 <div class="card" style="padding: 32px; margin-top: 24px;">
-                    <h3 style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+                    <h3
+                        style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
                         <i class="fas fa-quote-left"></i> 个人寄语
                     </h3>
-                    <div style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); border-left: 3px solid var(--primary); padding: 32px; border-radius: 12px; position: relative; overflow: hidden;">
-                        <div style="position: absolute; top: 10px; left: 20px; font-size: 40px; color: var(--primary); opacity: 0.1;">
+                    <div
+                        style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); border-left: 3px solid var(--primary); padding: 32px; border-radius: 12px; position: relative; overflow: hidden;">
+                        <div
+                            style="position: absolute; top: 10px; left: 20px; font-size: 40px; color: var(--primary); opacity: 0.1;">
                             <i class="fas fa-quote-left"></i>
                         </div>
-                        <p style="font-size: 16px; color: var(--text-primary); line-height: 1.9; font-style: italic; margin: 0; position: relative; z-index: 1;">
+                        <p
+                            style="font-size: 16px; color: var(--text-primary); line-height: 1.9; font-style: italic; margin: 0; position: relative; z-index: 1;">
                             "保持热爱，奔赴山海。每一天都是新的开始，每一个想法都值得被记录。在技术的海洋中遨游，在代码的世界里探索未知。愿我们都能成为更好的自己！"
                         </p>
                     </div>
@@ -228,24 +272,29 @@
     </div>
 
     <!-- 邮箱模态框 -->
-    <div id="emailModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center;">
-        <div style="background: var(--card-bg); border-radius: 12px; padding: 32px; max-width: 400px; width: 90%; box-shadow: var(--shadow-lg);">
-            <h3 style="font-size: 20px; font-weight: 600; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+    <div id="emailModal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div
+            style="background: var(--card-bg); border-radius: 12px; padding: 32px; max-width: 400px; width: 90%; box-shadow: var(--shadow-lg);">
+            <h3
+                style="font-size: 20px; font-weight: 600; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
                 <i class="fas fa-envelope"></i> 邮箱地址
             </h3>
             <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
-                <div style="padding: 12px 16px; background: var(--bg-tertiary); border-radius: 8px; display: flex; align-items: center; gap: 12px;">
+                <div
+                    style="padding: 12px 16px; background: var(--bg-tertiary); border-radius: 8px; display: flex; align-items: center; gap: 12px;">
                     <i class="fas fa-envelope" style="color: #4facfe;"></i>
                     <div>
                         <div style="font-size: 13px; color: var(--text-tertiary);">主要邮箱</div>
-                        <div style="font-size: 14px; color: var(--text-primary);">thunder@example.com</div>
+                        <div style="font-size: 14px; color: var(--text-primary);">15346046526@163.com</div>
                     </div>
                 </div>
-                <div style="padding: 12px 16px; background: var(--bg-tertiary); border-radius: 8px; display: flex; align-items: center; gap: 12px;">
+                <div
+                    style="padding: 12px 16px; background: var(--bg-tertiary); border-radius: 8px; display: flex; align-items: center; gap: 12px;">
                     <i class="fas fa-envelope-open" style="color: #00f2fe;"></i>
                     <div>
                         <div style="font-size: 13px; color: var(--text-tertiary);">备用邮箱</div>
-                        <div style="font-size: 14px; color: var(--text-primary);">thunder.dev@outlook.com</div>
+                        <div style="font-size: 14px; color: var(--text-primary);">thunder153460@gmail.com</div>
                     </div>
                 </div>
             </div>
@@ -256,13 +305,18 @@
     </div>
 
     <!-- 寄语模态框 -->
-    <div id="messageModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center;">
-        <div style="background: var(--card-bg); border-radius: 12px; padding: 32px; max-width: 500px; width: 90%; box-shadow: var(--shadow-lg);">
-            <h3 style="font-size: 20px; font-weight: 600; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+    <div id="messageModal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div
+            style="background: var(--card-bg); border-radius: 12px; padding: 32px; max-width: 500px; width: 90%; box-shadow: var(--shadow-lg);">
+            <h3
+                style="font-size: 20px; font-weight: 600; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
                 <i class="fas fa-quote-left"></i> 个人寄语
             </h3>
-            <div style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); border-left: 3px solid var(--primary); padding: 24px; border-radius: 8px; margin-bottom: 24px;">
-                <p style="font-size: 15px; color: var(--text-primary); line-height: 1.8; font-style: italic; margin: 0;">
+            <div
+                style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); border-left: 3px solid var(--primary); padding: 24px; border-radius: 8px; margin-bottom: 24px;">
+                <p
+                    style="font-size: 15px; color: var(--text-primary); line-height: 1.8; font-style: italic; margin: 0;">
                     "保持热爱，奔赴山海。每一天都是新的开始，每一个想法都值得被记录。在技术的海洋中遨游，在代码的世界里探索未知。愿我们都能成为更好的自己！"
                 </p>
             </div>
@@ -273,6 +327,38 @@
     </div>
 
     <script>
+        // 导航栏隐藏/显示功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            const toggleBtn = document.querySelector('.sidebar-toggle-btn');
+            const showBtn = document.querySelector('.sidebar-show-btn');
+
+            // 恢复上次的状态
+            const sidebarHidden = localStorage.getItem('sidebarHidden') === 'true';
+            if (sidebarHidden) {
+                sidebar.classList.add('hidden');
+                mainContent.classList.add('full-width');
+                showBtn.style.display = 'flex';
+            }
+
+            // 隐藏按钮点击事件
+            toggleBtn.addEventListener('click', function() {
+                sidebar.classList.add('hidden');
+                mainContent.classList.add('full-width');
+                showBtn.style.display = 'flex';
+                localStorage.setItem('sidebarHidden', 'true');
+            });
+
+            // 显示按钮点击事件
+            showBtn.addEventListener('click', function() {
+                sidebar.classList.remove('hidden');
+                mainContent.classList.remove('full-width');
+                showBtn.style.display = 'none';
+                localStorage.setItem('sidebarHidden', 'false');
+            });
+        });
+
         // 主题切换
         const themeToggleBtn = document.querySelector('.theme-toggle-btn');
         const themePanel = document.querySelector('.theme-panel');
@@ -289,24 +375,24 @@
         });
 
         // 点击按钮切换面板显示
-        themeToggleBtn.addEventListener('click', function(e) {
+        themeToggleBtn.addEventListener('click', function (e) {
             e.stopPropagation();
             themePanel.classList.toggle('show');
         });
 
         // 点击其他地方关闭面板
-        document.addEventListener('click', function() {
+        document.addEventListener('click', function () {
             themePanel.classList.remove('show');
         });
 
         // 阻止面板内部点击事件冒泡
-        themePanel.addEventListener('click', function(e) {
+        themePanel.addEventListener('click', function (e) {
             e.stopPropagation();
         });
 
         // 主题选项点击
         document.querySelectorAll('.theme-option').forEach(option => {
-            option.addEventListener('click', function() {
+            option.addEventListener('click', function () {
                 const theme = this.dataset.theme;
                 // 保存到localStorage
                 localStorage.setItem('selectedTheme', theme);
@@ -318,6 +404,20 @@
                 // 选择后关闭面板
                 themePanel.classList.remove('show');
             });
+        });
+
+        // 头像翻转效果
+        document.addEventListener('DOMContentLoaded', function () {
+            const avatarFlip = document.getElementById('avatarFlip');
+            if (avatarFlip) {
+                avatarFlip.addEventListener('mouseenter', function () {
+                    this.style.transform = 'rotateY(180deg)';
+                });
+
+                avatarFlip.addEventListener('mouseleave', function () {
+                    this.style.transform = 'rotateY(0deg)';
+                });
+            }
         });
 
         // 更换头像颜色
@@ -343,23 +443,6 @@
             }
         }
 
-        // 头像悬停效果
-        document.addEventListener('DOMContentLoaded', function() {
-            const profileAvatar = document.getElementById('profileAvatar');
-            if (profileAvatar) {
-                profileAvatar.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateX(-50%) scale(1.08)';
-                    this.style.boxShadow = '0 15px 35px rgba(0, 0, 0, 0.35), 0 0 0 8px rgba(255,255,255,0.2)';
-                    this.style.borderColor = 'rgba(255,255,255,1)';
-                });
-                profileAvatar.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateX(-50%) scale(1)';
-                    this.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.3), 0 0 0 6px rgba(255,255,255,0.15)';
-                    this.style.borderColor = 'rgba(255,255,255,0.95)';
-                });
-            }
-        });
-
         // 显示邮箱
         function showEmails() {
             document.getElementById('emailModal').style.display = 'flex';
@@ -376,7 +459,7 @@
         }
 
         // 点击模态框外部关闭
-        window.addEventListener('click', function(e) {
+        window.addEventListener('click', function (e) {
             if (e.target.id === 'emailModal') {
                 closeModal('emailModal');
             }

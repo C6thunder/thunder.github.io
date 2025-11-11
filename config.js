@@ -15,10 +15,10 @@ window.APP_CONFIG = {
 
     // 网站基本信息
     site: {
-        title: 'Thunder的个人笔记',
+        title: 'thunder的个人笔记',
         subtitle: '记录生活点滴',
-        author: 'Thunder',
-        email: 'thunder@example.com',
+        author: 'thunder',
+        email: '15346046526@163.com',
         github: 'https://github.com/thunder'
     },
 
@@ -35,7 +35,7 @@ window.APP_CONFIG = {
 };
 
 // 提供一个函数来更新头像
-window.updateAvatar = function(newSrc) {
+window.updateAvatar = function (newSrc) {
     if (newSrc) {
         window.APP_CONFIG.avatar.src = newSrc;
         // 更新所有页面的头像
@@ -47,7 +47,7 @@ window.updateAvatar = function(newSrc) {
 };
 
 // 提供一个函数来获取当前头像
-window.getAvatar = function() {
+window.getAvatar = function () {
     return window.APP_CONFIG.avatar.src;
 };
 
@@ -57,7 +57,7 @@ if (localStorage.getItem('customAvatar')) {
 }
 
 // 自动应用配置到页面
-window.applyConfig = function() {
+window.applyConfig = function () {
     // 应用头像配置
     document.querySelectorAll('img[data-config="avatar"]').forEach(img => {
         img.src = window.APP_CONFIG.avatar.src;
