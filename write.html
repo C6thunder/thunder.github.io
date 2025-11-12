@@ -232,8 +232,11 @@
         let tags = [];
         console.log('🏷️ tags数组初始化:', tags);
 
-        document.getElementById('tagInput').addEventListener('keypress', function(e) {
-            console.log('⌨️ 输入事件触发, key:', e.key, 'value:', this.value);
+        document.getElementById('tagInput').addEventListener('input', function() {
+            console.log('⌨️ 输入事件触发, value:', this.value);
+        });
+
+        document.getElementById('tagInput').addEventListener('keydown', function(e) {
             if (e.key === 'Enter' || e.key === ',') {
                 e.preventDefault();
                 const value = this.value.trim();
