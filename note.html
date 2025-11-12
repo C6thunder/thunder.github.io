@@ -167,7 +167,25 @@
         </main>
     </div>
 
-    <script src="github-api.js?v=1762760800"></script>
+    <script src="github-api.js?v=1762760999"></script>
+
+    <script>
+        // 清除 Service Worker 缓存
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for(let registration of registrations) {
+                    registration.unregister();
+                }
+            });
+            // 删除旧的缓存
+            caches.keys().then(function(names) {
+                names.forEach(function(name) {
+                    caches.delete(name);
+                });
+            });
+            console.log('🧹 已清除 Service Worker 缓存');
+        }
+    </script>
 
     <script>
         // 导航栏隐藏/显示功能
@@ -428,9 +446,11 @@
 
         // 渲染博客内容
         async function renderNoteContent(note) {
+            console.log('🔍 renderNoteContent 调用，note类型:', note.type, 'content路径:', note.content);
             const contentDiv = document.getElementById('noteContent');
 
             if (note.type === 'html' && note.content.startsWith('notecontent/')) {
+                console.log('📝 使用 GitHub API 获取文件:', note.content);
                 // 等待 GitHub API 初始化
                 if (typeof githubNoteManager === 'undefined' || !githubNoteManager.config.token) {
                     await new Promise(resolve => {
