@@ -427,35 +427,48 @@
         }
 
         // 渲染博客内容
-        function renderNoteContent(note) {
+        async function renderNoteContent(note) {
             const contentDiv = document.getElementById('noteContent');
 
             if (note.type === 'html' && note.content.startsWith('notecontent/')) {
-                // 加载 HTML 文件
-                fetch(note.content)
-                    .then(response => response.text())
-                    .then(html => {
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(html, 'text/html');
+                // 等待 GitHub API 初始化
+                if (typeof githubNoteManager === 'undefined' || !githubNoteManager.config.token) {
+                    await new Promise(resolve => {
+                        const checkToken = () => {
+                            if (githubNoteManager && githubNoteManager.config.token) {
+                                resolve();
+                            } else {
+                                setTimeout(checkToken, 100);
+                            }
+                        };
+                        checkToken();
+                    });
+                }
 
-                        // 提取body内容
-                        const bodyContent = doc.body.innerHTML;
+                try {
+                    // 通过 GitHub API 获取 HTML 文件内容
+                    const html = await githubNoteManager.getRawFile(note.content);
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
 
-                        // 提取所有style标签内容
-                        const styles = doc.querySelectorAll('style');
-                        let styleText = '';
-                        styles.forEach(style => {
-                            styleText += style.textContent + '\n';
-                        });
+                    // 提取body内容
+                    const bodyContent = doc.body.innerHTML;
 
-                        // 包裹在容器中
-                        contentDiv.innerHTML = `<div class="note-html-content">${bodyContent}</div>`;
+                    // 提取所有style标签内容
+                    const styles = doc.querySelectorAll('style');
+                    let styleText = '';
+                    styles.forEach(style => {
+                        styleText += style.textContent + '\n';
+                    });
 
-                        // 添加隔离样式
-                        if (styleText) {
-                            const styleElement = document.createElement('style');
-                            styleElement.setAttribute('data-note-content', 'true');
-                            styleElement.textContent = `
+                    // 包裹在容器中
+                    contentDiv.innerHTML = `<div class="note-html-content">${bodyContent}</div>`;
+
+                    // 添加隔离样式
+                    if (styleText) {
+                        const styleElement = document.createElement('style');
+                        styleElement.setAttribute('data-note-content', 'true');
+                        styleElement.textContent = `
                                 #noteContent {
                                     position: relative;
                                     z-index: 1;
@@ -469,14 +482,13 @@
                                 ${styleText.replace(/body\s*\{/g, '#noteContent .note-html-content {')}
                                 #noteContent ~ * { position: relative; z-index: 10; }
                             `;
-                            document.querySelectorAll('style[data-note-content]').forEach(s => s.remove());
-                            document.head.appendChild(styleElement);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('加载 HTML 文件失败:', error);
-                        contentDiv.innerHTML = '<p style="color: var(--danger);">加载内容失败</p>';
-                    });
+                        document.querySelectorAll('style[data-note-content]').forEach(s => s.remove());
+                        document.head.appendChild(styleElement);
+                    }
+                } catch (error) {
+                    console.error('加载 HTML 文件失败:', error);
+                    contentDiv.innerHTML = '<p style="color: var(--danger);">加载内容失败</p>';
+                }
             } else if (note.type === 'markdown') {
                 // Markdown 格式
                 contentDiv.innerHTML = marked.parse(note.content);

@@ -266,6 +266,32 @@ class GitHubNoteManager {
         }
     }
 
+    // 获取原始文件内容（不解析为JSON）
+    async getRawFile(path) {
+        this.validateConfig();
+        const url = `${this.apiBase}/repos/${this.config.owner}/${this.config.repo}/contents/${path}?ref=${this.config.branch}`;
+
+        try {
+            const response = await fetch(url, { headers: this.getHeaders() });
+
+            if (response.status === 404) {
+                throw new Error(`文件不存在: ${path}`);
+            }
+
+            if (!response.ok) {
+                throw new Error(`获取文件失败: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return this.base64ToUtf8(data.content);
+        } catch (error) {
+            if (!error.message.includes('404')) {
+                console.error('获取原始文件异常:', { path, error: error.message });
+            }
+            throw error;
+        }
+    }
+
     // 创建或更新文件（JSON格式）
     async saveFile(path, content, message) {
         const jsonString = JSON.stringify(content, null, 2);
