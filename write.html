@@ -144,6 +144,17 @@
                     <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;" id="tagList"></div>
                     <input type="text" id="tagInput" style="width: 100%; padding: 12px 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 15px;" placeholder="输入标签后按回车添加...">
                     <p style="font-size: 12px; color: var(--text-tertiary); margin-top: 6px;">用逗号分隔多个标签</p>
+
+                    <!-- 标签调试提示 -->
+                    <div id="tagDebugNotice" style="display: none; margin-top: 10px; padding: 12px; background: var(--info); border-left: 4px solid var(--primary); border-radius: 4px; font-size: 13px; color: var(--text-primary);">
+                        <strong>📝 调试提示：</strong>
+                        <ol style="margin: 8px 0 0 20px; padding: 0;">
+                            <li>请按 <strong>F12</strong> 打开浏览器开发者工具</li>
+                            <li>切换到 <strong>Console</strong> 标签页</li>
+                            <li>添加标签后查看是否有 <code>🏷️ 添加标签</code> 日志</li>
+                            <li>提交后查看控制台确认标签是否正确保存</li>
+                        </ol>
+                    </div>
                 </div>
 
                 <!-- 内容 -->
@@ -234,6 +245,14 @@
                 } else {
                     console.log('⚠️ 标签值为空，不添加');
                 }
+            }
+        });
+
+        // 页面加载时显示调试提示
+        document.addEventListener('DOMContentLoaded', function() {
+            const notice = document.getElementById('tagDebugNotice');
+            if (notice) {
+                notice.style.display = 'block';
             }
         });
 
@@ -364,7 +383,7 @@
                     console.log('✅ 更新博客对象:', updatedNote);
 
                     await window.githubNoteManager.updateNote(noteId, updatedNote);
-                    status.textContent = '保存成功！';
+                    status.textContent = '保存成功！请先在控制台检查标签是否正确更新，然后手动跳转到博客查看';
                     status.style.color = 'var(--success)';
 
                     // 清除notes页面的缓存
@@ -375,10 +394,8 @@
                         window.cache.lastFetch = 0;
                     }
 
-                    setTimeout(() => {
-                        alert('保存成功！');
-                        window.location.href = `note.html?id=${noteId}`;
-                    }, 500);
+                    // 移除自动跳转，改为手动跳转
+                    console.log('✅ 保存成功！请查看控制台确认标签是否正确更新');
                 } else {
                     // 新建模式
                     // 确保获取当前tags数组的副本
@@ -401,7 +418,7 @@
                     console.log('✅ 保存博客对象:', note);
 
                     await window.githubNoteManager.saveNote(note);
-                    status.textContent = '发布成功！';
+                    status.textContent = '发布成功！请先在控制台检查标签是否正确添加（参考下方提示），然后手动跳转到博客列表';
                     status.style.color = 'var(--success)';
 
                     // 清除所有缓存 - 强制重新加载数据
@@ -418,10 +435,12 @@
                         });
                     }
 
-                    setTimeout(() => {
-                        alert('发布成功！');
-                        window.location.href = 'notes.html?fromWrite=1&refresh=1';
-                    }, 500);
+                    // 移除自动跳转，改为手动跳转
+                    console.log('✅ 发布成功！请查看控制台确认标签是否正确保存');
+                    console.log('💡 建议：在跳转到博客列表前，先在控制台检查以下日志：');
+                    console.log('   1. 是否有标签添加日志（如：🏷️ 添加标签: Vue）');
+                    console.log('   2. 是否有"📝 创建博客，标签: [\'Vue\']"日志');
+                    console.log('   3. 是否有"🆕 新建模式 - 同步更新tags.json"日志');
                 }
             } catch (error) {
                 console.error(`${isEdit ? '保存' : '发布'}失败:`, error);
