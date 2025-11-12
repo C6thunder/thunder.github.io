@@ -484,6 +484,8 @@
 
                 status.textContent = '发表成功！';
                 status.style.color = 'var(--success)';
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i> 发表评论';
                 setTimeout(() => {
                     status.textContent = '';
                 }, 3000);

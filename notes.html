@@ -622,15 +622,17 @@
                         `;
                     }).join('');
 
-                    // 创建新的容器在按钮后面
+                    // 创建新的容器包含折叠的标签
                     const newDiv = document.createElement('div');
                     newDiv.id = 'collapsedTags';
                     newDiv.style.display = 'block';
                     newDiv.style.width = '100%';
+                    newDiv.style.marginTop = '8px';
                     newDiv.innerHTML = collapsedTagsHtml;
 
-                    // 将折叠标签插入到按钮后面，确保它在按钮下方
-                    collapseBtn.parentNode.insertBefore(newDiv, collapseBtn.nextSibling);
+                    // 将折叠标签插入到filterTags容器的最后
+                    const filterTagsContainer = document.getElementById('filterTags');
+                    filterTagsContainer.appendChild(newDiv);
                     collapseBtn.innerHTML = '<i class="fas fa-chevron-up"></i> 收起';
                 }
             }
