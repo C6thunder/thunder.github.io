@@ -465,8 +465,8 @@ class GitHubNoteManager {
         return await this.saveFile('notes.json', notesList, `Update notes list: ${existsIndex !== -1 ? 'update' : 'add'} ${note.title}`);
     }
 
-    // 更新tags.json文件
-    async updateTagsJson(oldNote, newNote) {
+    // 更新tags.json文件（带重试机制）
+    async updateTagsJson(oldNote, newNote, retries = 3) {
         try {
             console.log('🔧 开始更新tags.json, oldNote:', oldNote?.tags, 'newNote:', newNote?.tags);
 
@@ -508,13 +508,21 @@ class GitHubNoteManager {
             tagsData.lastUpdated = new Date().toISOString();
             console.log('💾 保存tags.json:', tagsData);
 
-            const result = await this.saveFile('tags.json', tagsData, 'Update tags');
-            console.log('✅ tags.json保存成功:', result);
-
-            return result;
+            try {
+                const result = await this.saveFile('tags.json', tagsData, 'Update tags');
+                console.log('✅ tags.json保存成功:', result);
+                return result;
+            } catch (error) {
+                if (error.message.includes('409') && retries > 0) {
+                    console.log(`⚠️ tags.json更新失败，SHA冲突，剩余重试次数: ${retries}，等待500ms后重试...`);
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    return await this.updateTagsJson(oldNote, newNote, retries - 1);
+                }
+                throw error;
+            }
         } catch (error) {
             console.error('❌ 更新tags.json失败:', error);
-            throw error; // 重新抛出错误，让调用者知道
+            throw error;
         }
     }
 

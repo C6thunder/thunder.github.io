@@ -219,14 +219,20 @@
 
         // 标签管理
         let tags = [];
+        console.log('🏷️ tags数组初始化:', tags);
 
         document.getElementById('tagInput').addEventListener('keypress', function(e) {
+            console.log('⌨️ 输入事件触发, key:', e.key, 'value:', this.value);
             if (e.key === 'Enter' || e.key === ',') {
                 e.preventDefault();
                 const value = this.value.trim();
+                console.log('🏷️ 输入标签值:', value);
                 if (value) {
+                    console.log('📞 调用addTag函数');
                     addTag(value.replace(',', ''));
-                    this.value = '';
+                    this.value = ''; // 清空输入框
+                } else {
+                    console.log('⚠️ 标签值为空，不添加');
                 }
             }
         });
@@ -582,8 +588,14 @@
                 document.getElementById('editKey').value = '';
 
                 // 填入标签
+                console.log('📝 编辑模式 - 加载标签:', note.tags);
                 if (note.tags?.length) {
                     tags = [...note.tags];
+                    console.log('✅ 标签加载成功，当前tags:', tags);
+                    renderTags();
+                } else {
+                    console.log('⚠️ 博客没有标签');
+                    tags = []; // 确保清空
                     renderTags();
                 }
 
