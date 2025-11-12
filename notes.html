@@ -206,10 +206,21 @@
 
                 // 检查是否有其他页面触发的缓存失效
                 const invalidateFlag = localStorage.getItem('notesCacheInvalidate');
-                if (invalidateFlag) {
+                const urlParams = new URLSearchParams(window.location.search);
+                const forceRefresh = urlParams.has('refresh') || urlParams.has('fromWrite');
+
+                // 清除缓存的情况：
+                // 1. localStorage中有invalidateFlag
+                // 2. URL中有refresh参数
+                // 3. URL中有fromWrite参数（从写博客页面跳转回来）
+                if (invalidateFlag || forceRefresh) {
                     cache.notes = null;
                     cache.lastFetch = 0;
                     localStorage.removeItem('notesCacheInvalidate');
+
+                    // 清除URL参数，避免刷新页面时再次强制刷新
+                    const newUrl = window.location.origin + window.location.pathname;
+                    window.history.replaceState({}, document.title, newUrl);
                 }
 
                 await loadNotes();
@@ -616,13 +627,45 @@
 
         // 刷新（清除缓存）
         document.getElementById('refreshBtn').addEventListener('click', async function() {
-            // 清除缓存
-            cache.notes = null;
-            cache.lastFetch = 0;
+            const originalText = this.innerHTML;
+            const originalClass = this.className;
 
-            this.classList.add('spinning');
-            await loadNotes();
-            setTimeout(() => this.classList.remove('spinning'), 1000);
+            try {
+                // 更新按钮状态
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 刷新中...';
+                this.classList.add('spinning');
+
+                // 清除所有缓存
+                cache.notes = null;
+                cache.lastFetch = 0;
+                localStorage.removeItem('notesCacheInvalidate');
+
+                console.log('🔄 手动刷新缓存，重新加载数据...');
+
+                // 重新加载数据
+                await loadNotes();
+
+                // 显示成功提示
+                this.innerHTML = '<i class="fas fa-check"></i> 已刷新';
+                this.style.background = 'var(--success)';
+
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                    this.style.background = '';
+                    this.className = originalClass;
+                }, 1500);
+
+            } catch (error) {
+                console.error('刷新失败:', error);
+                this.innerHTML = '<i class="fas fa-times"></i> 刷新失败';
+                this.style.background = 'var(--danger)';
+
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                    this.style.background = '';
+                    this.className = originalClass;
+                }, 2000);
+            }
         });
 
         // 工具函数
