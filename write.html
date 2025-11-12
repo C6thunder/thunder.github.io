@@ -88,7 +88,7 @@
                                 <i class="fas fa-moon"></i>
                                 <span>夜间模式</span>
                             </div>
-                            <div class="theme-option" data-theme="paper">
+                            <div class="theme-option" data-theme="warm">
                                 <i class="fas fa-scroll"></i>
                                 <span>暖黄护眼</span>
                             </div>
@@ -325,16 +325,26 @@
                         finalExcerpt = plainText.substring(0, 100).trim() + (plainText.length > 100 ? '...' : '');
                     }
 
-                    const updatedNote = {
+                    // 对于HTML笔记，只更新metadata，不更新content字段（因为content是文件路径）
+                    const updatedNote = isHtmlType ? {
                         ...originalNote,
                         title,
                         excerpt: finalExcerpt,
                         tags,
                         authorKey: authorKey || null,
-                        // 保持原始editKey（如果用户没输入新的）
                         editKey: editKey || originalEditKey || null,
-                        // 保持原始日期，不强制更新
-                        date: originalNote.date
+                        date: originalNote.date,
+                        // 保持content字段为文件路径
+                        content: contentPath
+                    } : {
+                        ...originalNote,
+                        title,
+                        excerpt: finalExcerpt,
+                        tags,
+                        authorKey: authorKey || null,
+                        editKey: editKey || originalEditKey || null,
+                        date: originalNote.date,
+                        content
                     };
 
                     await window.githubNoteManager.updateNote(noteId, updatedNote);
@@ -465,7 +475,7 @@
             const themePanel = document.querySelector('.theme-panel');
 
             // 页面加载时恢复主题
-            const savedTheme = localStorage.getItem('selectedTheme') || 'diary';
+            const savedTheme = localStorage.getItem('selectedTheme') || 'warm';
             document.querySelectorAll('.theme-option').forEach(opt => {
                 if (opt.dataset.theme === savedTheme) {
                     opt.classList.add('active');

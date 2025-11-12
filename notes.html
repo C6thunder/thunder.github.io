@@ -88,7 +88,7 @@
                                 <i class="fas fa-moon"></i>
                                 <span>夜间模式</span>
                             </div>
-                            <div class="theme-option" data-theme="paper">
+                            <div class="theme-option" data-theme="warm">
                                 <i class="fas fa-scroll"></i>
                                 <span>暖黄护眼</span>
                             </div>
@@ -265,7 +265,7 @@
                 const themePanel = document.querySelector('.theme-panel');
 
                 // 页面加载时恢复主题
-                const savedTheme = localStorage.getItem('selectedTheme') || 'diary';
+                const savedTheme = localStorage.getItem('selectedTheme') || 'warm';
 
                 // 更新主题选项状态
                 document.querySelectorAll('.theme-option').forEach(opt => {
@@ -344,14 +344,20 @@
                     throw new Error('GitHub配置未就绪');
                 }
 
-                // 检查缓存
+                // 检查缓存 - 但对于新博客或刷新请求，强制重新加载
+                const urlParams = new URLSearchParams(window.location.search);
+                const forceRefresh = urlParams.has('refresh') || urlParams.has('fromWrite');
                 const now = Date.now();
-                if (cache.notes && (now - cache.lastFetch < cache.ttl)) {
+
+                if (cache.notes && (now - cache.lastFetch < cache.ttl) && !forceRefresh) {
+                    console.log('📦 使用缓存数据，共', cache.notes.length, '篇博客');
                     allNotes = cache.notes;
                 } else {
+                    console.log('🔄 重新获取博客数据...');
                     allNotes = await window.githubNoteManager.scanAllNotes();
                     cache.notes = allNotes;
                     cache.lastFetch = now;
+                    console.log('✅ 获取到', allNotes.length, '篇博客');
                 }
 
                 if (allNotes.length === 0) {
@@ -507,111 +513,48 @@
         }
 
 
-        // 加载标签
-        function loadTags() {
+        // 缓存all_tags数据，避免重复请求
+        let cachedAllTags = null;
+
+        // 加载标签 - 优化版：使用all_tags避免遍历所有博客
+        async function loadTags() {
             const filterTags = document.getElementById('filterTags');
-            const tagCountMap = new Map();
 
-            // 统计每个标签的使用次数
-            allNotes.forEach(note => {
-                if (note.tags && note.tags.length > 0) {
-                    note.tags.forEach(tag => {
-                        tagCountMap.set(tag, (tagCountMap.get(tag) || 0) + 1);
-                    });
+            try {
+                // 直接从GitHub API获取notes.json中的all_tags
+                const notesData = await window.githubNoteManager.getFile('notes.json');
+                const allTags = notesData.all_tags || {};
+                cachedAllTags = allTags; // 缓存数据
+
+                console.log('🏷️ 加载标签，all_tags:', allTags);
+
+                const tagCountMap = new Map(Object.entries(allTags));
+
+                if (tagCountMap.size === 0) {
+                    filterTags.innerHTML = '<span style="color: var(--text-secondary); font-size: 14px;">暂无标签</span>';
+                    return;
                 }
-            });
 
-            if (tagCountMap.size === 0) {
-                filterTags.innerHTML = '';
-                return;
-            }
-
-            // 按使用次数降序排序，取前20个
-            const sortedTags = Array.from(tagCountMap.entries())
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 20)
-                .map(([tag, count]) => ({ tag, count }));
-
-            // 判断是否需要折叠（超过9个标签）
-            const maxVisibleTags = 9;
-            const needsCollapse = sortedTags.length > maxVisibleTags;
-            const visibleTags = needsCollapse ? sortedTags.slice(0, maxVisibleTags) : sortedTags;
-            const collapsedTags = needsCollapse ? sortedTags.slice(maxVisibleTags) : [];
-
-            let html = '';
-
-            // 显示可见标签
-            visibleTags.forEach(({ tag, count }) => {
-                const isActive = currentFilter === tag;
-                html += `
-                    <button class="btn tag-with-count ${isActive ? 'btn-primary' : 'btn-secondary'}"
-                            onclick="filterByTag('${escapeHtml(tag)}')"
-                            data-count="${count}"
-                            style="margin-right: 8px; margin-bottom: 8px; position: relative;">
-                        ${escapeHtml(tag)}
-                    </button>
-                `;
-            });
-
-            // 如果有折叠的标签，添加展开/收起按钮
-            if (needsCollapse && collapsedTags.length > 0) {
-                html += `
-                    <button class="btn btn-secondary"
-                            onclick="toggleTagCollapse()"
-                            id="tagCollapseBtn"
-                            style="margin-right: 8px; margin-bottom: 8px;">
-                        <i class="fas fa-chevron-down"></i> 更多 (${collapsedTags.length})
-                    </button>
-                `;
-            }
-
-            filterTags.innerHTML = html;
-        }
-
-        // 切换标签折叠状态
-        function toggleTagCollapse() {
-            const collapseBtn = document.getElementById('tagCollapseBtn');
-            const collapsedDiv = document.getElementById('collapsedTags');
-
-            // 如果已经展开，则收起（移除折叠的标签）
-            if (collapsedDiv) {
-                collapsedDiv.remove();
-                // 重新计算并显示"更多"按钮的数量
-                const tagCountMap = new Map();
-                allNotes.forEach(note => {
-                    if (note.tags && note.tags.length > 0) {
-                        note.tags.forEach(tag => {
-                            tagCountMap.set(tag, (tagCountMap.get(tag) || 0) + 1);
-                        });
-                    }
-                });
-                const sortedTags = Array.from(tagCountMap.entries())
-                    .sort((a, b) => b[1] - a[1])
-                    .slice(0, 20);
-                const count = Math.max(0, sortedTags.length - 9);
-                collapseBtn.innerHTML = `<i class="fas fa-chevron-down"></i> 更多 (${count})`;
-            } else {
-                // 如果没有展开，则展开（创建并显示折叠的标签）
-                const tagCountMap = new Map();
-                allNotes.forEach(note => {
-                    if (note.tags && note.tags.length > 0) {
-                        note.tags.forEach(tag => {
-                            tagCountMap.set(tag, (tagCountMap.get(tag) || 0) + 1);
-                        });
-                    }
-                });
-
+                // 按使用次数降序排序，取前20个
                 const sortedTags = Array.from(tagCountMap.entries())
                     .sort((a, b) => b[1] - a[1])
                     .slice(0, 20)
                     .map(([tag, count]) => ({ tag, count }));
 
-                const maxVisibleTags = 9;
-                const collapsedTags = sortedTags.slice(maxVisibleTags);
+                console.log('🔝 排序后的标签:', sortedTags);
 
-                const collapsedTagsHtml = collapsedTags.map(({ tag, count }) => {
+                // 判断是否需要折叠（超过9个标签）
+                const maxVisibleTags = 9;
+                const needsCollapse = sortedTags.length > maxVisibleTags;
+                const visibleTags = needsCollapse ? sortedTags.slice(0, maxVisibleTags) : sortedTags;
+                const collapsedTags = needsCollapse ? sortedTags.slice(maxVisibleTags) : [];
+
+                let html = '';
+
+                // 显示可见标签
+                visibleTags.forEach(({ tag, count }) => {
                     const isActive = currentFilter === tag;
-                    return `
+                    html += `
                         <button class="btn tag-with-count ${isActive ? 'btn-primary' : 'btn-secondary'}"
                                 onclick="filterByTag('${escapeHtml(tag)}')"
                                 data-count="${count}"
@@ -619,16 +562,77 @@
                             ${escapeHtml(tag)}
                         </button>
                     `;
-                }).join('');
+                });
 
-                // 创建新的容器在按钮后面
-                const newDiv = document.createElement('div');
-                newDiv.id = 'collapsedTags';
-                newDiv.style.display = 'inline-block';
-                newDiv.innerHTML = collapsedTagsHtml;
+                // 如果有折叠的标签，添加展开/收起按钮
+                if (needsCollapse && collapsedTags.length > 0) {
+                    html += `
+                        <button class="btn btn-secondary"
+                                onclick="toggleTagCollapse()"
+                                id="tagCollapseBtn"
+                                style="margin-right: 8px; margin-bottom: 8px;">
+                            <i class="fas fa-chevron-down"></i> 更多 (${collapsedTags.length})
+                        </button>
+                    `;
+                }
 
-                collapseBtn.parentNode.insertBefore(newDiv, collapseBtn.nextSibling);
-                collapseBtn.innerHTML = '<i class="fas fa-chevron-up"></i> 收起';
+                filterTags.innerHTML = html;
+            } catch (error) {
+                console.error('加载标签失败:', error);
+                filterTags.innerHTML = '<span style="color: var(--danger); font-size: 14px;">加载标签失败</span>';
+            }
+        }
+
+        // 切换标签折叠状态 - 使用缓存的all_tags
+        function toggleTagCollapse() {
+            const collapseBtn = document.getElementById('tagCollapseBtn');
+            const collapsedDiv = document.getElementById('collapsedTags');
+
+            // 如果已经展开，则收起（移除折叠的标签）
+            if (collapsedDiv) {
+                collapsedDiv.remove();
+                // 使用缓存的all_tags计算数量
+                if (cachedAllTags) {
+                    const sortedTags = Object.entries(cachedAllTags)
+                        .sort((a, b) => b[1] - a[1])
+                        .slice(0, 20);
+                    const count = Math.max(0, sortedTags.length - 9);
+                    collapseBtn.innerHTML = `<i class="fas fa-chevron-down"></i> 更多 (${count})`;
+                }
+            } else {
+                // 如果没有展开，则展开（创建并显示折叠的标签）
+                if (cachedAllTags) {
+                    const sortedTags = Object.entries(cachedAllTags)
+                        .sort((a, b) => b[1] - a[1])
+                        .slice(0, 20)
+                        .map(([tag, count]) => ({ tag, count }));
+
+                    const maxVisibleTags = 9;
+                    const collapsedTags = sortedTags.slice(maxVisibleTags);
+
+                    const collapsedTagsHtml = collapsedTags.map(({ tag, count }) => {
+                        const isActive = currentFilter === tag;
+                        return `
+                            <button class="btn tag-with-count ${isActive ? 'btn-primary' : 'btn-secondary'}"
+                                    onclick="filterByTag('${escapeHtml(tag)}')"
+                                    data-count="${count}"
+                                    style="margin-right: 8px; margin-bottom: 8px; position: relative;">
+                                ${escapeHtml(tag)}
+                            </button>
+                        `;
+                    }).join('');
+
+                    // 创建新的容器在按钮后面
+                    const newDiv = document.createElement('div');
+                    newDiv.id = 'collapsedTags';
+                    newDiv.style.display = 'block';
+                    newDiv.style.width = '100%';
+                    newDiv.innerHTML = collapsedTagsHtml;
+
+                    // 将折叠标签插入到按钮后面，确保它在按钮下方
+                    collapseBtn.parentNode.insertBefore(newDiv, collapseBtn.nextSibling);
+                    collapseBtn.innerHTML = '<i class="fas fa-chevron-up"></i> 收起';
+                }
             }
         }
 
@@ -703,10 +707,18 @@
                 this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 刷新中...';
                 this.classList.add('spinning');
 
-                // 清除所有缓存
+                // 清除所有缓存 - 包括内存缓存、localStorage和浏览器缓存
                 cache.notes = null;
                 cache.lastFetch = 0;
                 localStorage.removeItem('notesCacheInvalidate');
+                localStorage.setItem('notesCacheInvalidate', Date.now().toString()); // 触发强制刷新
+
+                // 清除浏览器fetch缓存
+                if ('caches' in window) {
+                    caches.keys().then(names => {
+                        names.forEach(name => caches.delete(name));
+                    });
+                }
 
                 console.log('🔄 手动刷新缓存，重新加载数据...');
 

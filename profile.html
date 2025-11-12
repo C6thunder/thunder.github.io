@@ -88,7 +88,7 @@
                                 <i class="fas fa-moon"></i>
                                 <span>夜间模式</span>
                             </div>
-                            <div class="theme-option" data-theme="paper">
+                            <div class="theme-option" data-theme="warm">
                                 <i class="fas fa-scroll"></i>
                                 <span>暖黄护眼</span>
                             </div>
@@ -390,7 +390,7 @@
             const themePanel = document.querySelector('.theme-panel');
 
             // 页面加载时恢复主题
-            const savedTheme = localStorage.getItem('selectedTheme') || 'diary';
+            const savedTheme = localStorage.getItem('selectedTheme') || 'warm';
             document.documentElement.setAttribute('data-theme', savedTheme);
             document.querySelectorAll('.theme-option').forEach(opt => {
                 if (opt.dataset.theme === savedTheme) {

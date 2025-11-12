@@ -435,23 +435,60 @@ class GitHubNoteManager {
         let notesList = await this.getFile('notes.json');
 
         if (!notesList) {
-            notesList = { notes: [], version: '3.0' };
+            notesList = { notes: [], all_tags: {}, version: '3.0' };
         }
 
         if (!Array.isArray(notesList.notes)) {
             notesList.notes = [];
         }
 
+        // 确保all_tags存在
+        if (!notesList.all_tags || typeof notesList.all_tags !== 'object') {
+            notesList.all_tags = {};
+        }
+
         const existsIndex = notesList.notes.findIndex(n => n.id === note.id);
         if (existsIndex !== -1) {
+            // 编辑模式：先从all_tags中移除旧标签，再添加新标签
+            this.updateAllTags(notesList, notesList.notes[existsIndex], note);
             notesList.notes[existsIndex] = note;
         } else {
+            // 新建模式：直接添加新标签到all_tags
+            this.updateAllTags(notesList, null, note);
             notesList.notes.unshift(note);
         }
 
         notesList.lastUpdated = new Date().toISOString();
 
         return await this.saveFile('notes.json', notesList, `Update notes list: ${existsIndex !== -1 ? 'update' : 'add'} ${note.title}`);
+    }
+
+    // 更新all_tags字段
+    updateAllTags(notesList, oldNote, newNote) {
+        // 确保all_tags存在
+        if (!notesList.all_tags || typeof notesList.all_tags !== 'object') {
+            notesList.all_tags = {};
+        }
+
+        // 如果是编辑模式，先移除旧标签的计数
+        if (oldNote && oldNote.tags && Array.isArray(oldNote.tags)) {
+            oldNote.tags.forEach(tag => {
+                if (notesList.all_tags[tag]) {
+                    notesList.all_tags[tag]--;
+                    // 如果计数为0，删除该标签
+                    if (notesList.all_tags[tag] <= 0) {
+                        delete notesList.all_tags[tag];
+                    }
+                }
+            });
+        }
+
+        // 添加新标签的计数
+        if (newNote && newNote.tags && Array.isArray(newNote.tags)) {
+            newNote.tags.forEach(tag => {
+                notesList.all_tags[tag] = (notesList.all_tags[tag] || 0) + 1;
+            });
+        }
     }
 
     // 更新笔记
@@ -467,15 +504,22 @@ class GitHubNoteManager {
             throw new Error('笔记不存在');
         }
 
-        // HTML 笔记需要更新 notecontent/ 文件夹中的 HTML 文件
-        if (updatedNote.type === 'html' && originalNote.content?.startsWith('notecontent/')) {
-            await this.saveRawFile(originalNote.content, updatedNote.content, `Update HTML note: ${updatedNote.title}`);
-        } else if (updatedNote.type !== 'html') {
+        // HTML 笔记：content字段是文件路径，不需要在这里更新文件内容
+        // 文件内容已在调用updateNote之前通过saveRawFile更新
+        if (updatedNote.type !== 'html') {
             // Markdown 笔记才保存到 notes/ 文件夹
             const filename = `notes/${noteId}.json`;
             const message = `Update note: ${updatedNote.title}`;
             await this.saveFile(filename, updatedNote, message);
         }
+
+        // 确保all_tags存在
+        if (!notesList.all_tags || typeof notesList.all_tags !== 'object') {
+            notesList.all_tags = {};
+        }
+
+        // 更新 all_tags（移除旧标签，添加新标签）
+        this.updateAllTags(notesList, originalNote, updatedNote);
 
         // 更新 notes.json 中的笔记列表（使用已获取的notesList）
         const noteIndex = notesList.notes.findIndex(note => note.id === noteId);
