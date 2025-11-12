@@ -232,9 +232,13 @@
         });
 
         function addTag(tag) {
+            console.log('🏷️ 添加标签:', tag, '当前tags:', tags);
             if (tag && !tags.includes(tag)) {
                 tags.push(tag);
+                console.log('✅ 标签已添加，当前tags:', tags);
                 renderTags();
+            } else {
+                console.log('⚠️ 标签添加失败，可能已存在或为空');
             }
         }
 
@@ -325,12 +329,16 @@
                         finalExcerpt = plainText.substring(0, 100).trim() + (plainText.length > 100 ? '...' : '');
                     }
 
+                    // 确保获取当前tags数组的副本
+                    const currentTags = [...tags];
+                    console.log('✏️ 编辑博客，标签:', currentTags);
+
                     // 对于HTML笔记，只更新metadata，不更新content字段（因为content是文件路径）
                     const updatedNote = isHtmlType ? {
                         ...originalNote,
                         title,
                         excerpt: finalExcerpt,
-                        tags,
+                        tags: currentTags,
                         authorKey: authorKey || null,
                         editKey: editKey || originalEditKey || null,
                         date: originalNote.date,
@@ -340,12 +348,14 @@
                         ...originalNote,
                         title,
                         excerpt: finalExcerpt,
-                        tags,
+                        tags: currentTags,
                         authorKey: authorKey || null,
                         editKey: editKey || originalEditKey || null,
                         date: originalNote.date,
                         content
                     };
+
+                    console.log('✅ 更新博客对象:', updatedNote);
 
                     await window.githubNoteManager.updateNote(noteId, updatedNote);
                     status.textContent = '保存成功！';
@@ -365,18 +375,24 @@
                     }, 500);
                 } else {
                     // 新建模式
+                    // 确保获取当前tags数组的副本
+                    const currentTags = [...tags];
+                    console.log('📝 创建博客，标签:', currentTags);
+
                     const note = {
                         id: 'note-' + Date.now(),
                         title,
                         content,
                         excerpt: excerpt || content.substring(0, 100) + '...',
-                        tags,
+                        tags: currentTags,
                         date: new Date().toISOString().split('T')[0],
                         authorKey: authorKey || null,
                         editKey: editKey || null,
                         type: 'html',
                         comments: []
                     };
+
+                    console.log('✅ 保存博客对象:', note);
 
                     await window.githubNoteManager.saveNote(note);
                     status.textContent = '发布成功！';
