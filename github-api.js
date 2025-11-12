@@ -443,16 +443,20 @@ class GitHubNoteManager {
         }
 
         const existsIndex = notesList.notes.findIndex(n => n.id === note.id);
+        console.log('📝 updateNotesList - 博客ID:', note.id, '模式:', existsIndex !== -1 ? '编辑' : '新建', '标签:', note.tags);
+
         if (existsIndex !== -1) {
             // 编辑模式：更新博客内容
             const oldNote = notesList.notes[existsIndex];
             notesList.notes[existsIndex] = note;
             // 同步更新tags.json
+            console.log('🔄 编辑模式 - 同步更新tags.json');
             await this.updateTagsJson(oldNote, note);
         } else {
             // 新建模式：添加到列表开头
             notesList.notes.unshift(note);
             // 同步更新tags.json
+            console.log('🆕 新建模式 - 同步更新tags.json');
             await this.updateTagsJson(null, note);
         }
 
@@ -464,18 +468,24 @@ class GitHubNoteManager {
     // 更新tags.json文件
     async updateTagsJson(oldNote, newNote) {
         try {
+            console.log('🔧 开始更新tags.json, oldNote:', oldNote?.tags, 'newNote:', newNote?.tags);
+
             let tagsData = await this.getFile('tags.json');
+            console.log('📂 读取到的tags.json:', tagsData);
 
             if (!tagsData) {
+                console.log('🆕 创建新的tags.json');
                 tagsData = { tags: {} };
             }
 
             if (!tagsData.tags || typeof tagsData.tags !== 'object') {
+                console.log('🔧 初始化tags对象');
                 tagsData.tags = {};
             }
 
             // 移除旧标签计数
             if (oldNote && oldNote.tags && Array.isArray(oldNote.tags)) {
+                console.log('➖ 移除旧标签:', oldNote.tags);
                 oldNote.tags.forEach(tag => {
                     if (tagsData.tags[tag]) {
                         tagsData.tags[tag]--;
@@ -488,15 +498,23 @@ class GitHubNoteManager {
 
             // 添加新标签计数
             if (newNote && newNote.tags && Array.isArray(newNote.tags)) {
+                console.log('➕ 添加新标签:', newNote.tags);
                 newNote.tags.forEach(tag => {
                     tagsData.tags[tag] = (tagsData.tags[tag] || 0) + 1;
+                    console.log(`   ${tag}: ${tagsData.tags[tag]}`);
                 });
             }
 
             tagsData.lastUpdated = new Date().toISOString();
-            await this.saveFile('tags.json', tagsData, 'Update tags');
+            console.log('💾 保存tags.json:', tagsData);
+
+            const result = await this.saveFile('tags.json', tagsData, 'Update tags');
+            console.log('✅ tags.json保存成功:', result);
+
+            return result;
         } catch (error) {
-            console.error('更新tags.json失败:', error);
+            console.error('❌ 更新tags.json失败:', error);
+            throw error; // 重新抛出错误，让调用者知道
         }
     }
 
