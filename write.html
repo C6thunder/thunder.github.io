@@ -138,6 +138,8 @@
                         修改密钥 <span style="font-size: 12px; color: var(--text-tertiary); font-weight: 400;">（可选，用于修改此博客）</span>
                     </label>
                     <input type="password" id="editKey" style="width: 100%; padding: 12px 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 15px;" placeholder="设置一个修改密钥以备后续修改（可选）">
+                    <!-- 保存原始editKey的隐藏字段 -->
+                    <input type="hidden" id="originalEditKey" value="">
                     <p style="font-size: 12px; color: var(--text-tertiary); margin-top: 6px;">⚠️ 如果设置了修改密钥，修改此博客时需要输入相同密钥</p>
                 </div>
 
@@ -264,7 +266,11 @@
                     const result = await window.githubNoteManager.getNoteById(noteId);
                     const originalNote = result.note;
 
-                    if (originalNote.editKey && editKey !== originalNote.editKey) {
+                    // 获取原始editKey
+                    const originalEditKey = document.getElementById('originalEditKey').value;
+
+                    // 验证修改密钥
+                    if (originalEditKey && editKey !== originalEditKey) {
                         throw new Error('修改密钥错误！');
                     }
 
@@ -275,7 +281,8 @@
                         excerpt: excerpt || content.substring(0, 100) + '...',
                         tags,
                         authorKey: authorKey || null,
-                        editKey: editKey || null,
+                        // 保持原始editKey（如果用户没输入新的）
+                        editKey: editKey || originalEditKey || null,
                         date: new Date().toISOString().split('T')[0]
                     };
 
@@ -460,7 +467,12 @@
                 document.getElementById('excerpt').value = note.excerpt || '';
                 document.getElementById('content').value = note.content || '';
                 document.getElementById('authorKey').value = note.authorKey || '';
-                document.getElementById('editKey').value = note.editKey || '';
+
+                // 保存原始editKey到隐藏字段
+                document.getElementById('originalEditKey').value = note.editKey || '';
+
+                // 清空editKey输入框（用户需要重新输入以验证）
+                document.getElementById('editKey').value = '';
 
                 // 填入标签
                 if (note.tags?.length) {
@@ -482,6 +494,12 @@
                     e.preventDefault();
                     await handleSubmit(true);
                 };
+
+                // 如果博客有editKey，显示提示
+                if (note.editKey) {
+                    const status = document.getElementById('status');
+                    status.innerHTML = `<span style="color: var(--warning);">⚠️ 此博客已设置修改密钥，请输入正确密钥以保存修改</span>`;
+                }
             } catch (error) {
                 console.error('加载博客失败:', error);
                 alert('加载博客失败: ' + error.message);
