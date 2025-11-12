@@ -67,23 +67,23 @@
 
 /* 主题3: 暖黄主题 - 温暖舒适风格 */
 [data-theme="warm"] {
-    --primary: #f39c12;
-    --secondary: #e67e22;
-    --accent: #f1c40f;
+    --primary: #ff9500;
+    --secondary: #ff7700;
+    --accent: #ffad33;
     --success: #27ae60;
     --danger: #e74c3c;
-    --text-primary: #5d4037;
-    --text-secondary: #795548;
-    --text-tertiary: #a1887f;
-    --bg-primary: #fff8e1;
-    --bg-secondary: #fff3cd;
-    --bg-tertiary: #ffe082;
-    --card-bg: #ffffff;
-    --border-color: #ffd54f;
-    --border-hover: #ffb300;
-    --shadow-sm: 0 1px 3px rgba(243, 156, 18, 0.12);
-    --shadow-md: 0 2px 8px rgba(243, 156, 18, 0.18);
-    --shadow-lg: 0 4px 16px rgba(243, 156, 18, 0.24);
+    --text-primary: #4a3728;
+    --text-secondary: #6b5d4f;
+    --text-tertiary: #8d7a6a;
+    --bg-primary: #fff3e0;
+    --bg-secondary: #ffe0b2;
+    --bg-tertiary: #ffcc80;
+    --card-bg: #fffdf8;
+    --border-color: #ffb74d;
+    --border-hover: #ffa726;
+    --shadow-sm: 0 1px 3px rgba(255, 149, 0, 0.12);
+    --shadow-md: 0 2px 8px rgba(255, 149, 0, 0.18);
+    --shadow-lg: 0 4px 16px rgba(255, 149, 0, 0.24);
     --bg-gradient: linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-secondary) 100%);
 }
 
@@ -2329,86 +2329,98 @@ body {
 /* ==================== 点击特效 ==================== */
 .click-effect {
     position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+/* 自然绿主题 - 树叶特效 */
+[data-theme="diary"] .click-effect {
+    width: 8px;
+    height: 8px;
+    background: #27ae60;
+    border-radius: 0 100% 0 100%;
+    animation: leafFall 1s ease-out forwards;
+    box-shadow: 0 0 10px rgba(39, 174, 96, 0.6);
+}
+
+/* 夜间主题 - 星星特效 */
+[data-theme="dark"] .click-effect {
+    width: 12px;
+    height: 12px;
+    background: #5b9bd5;
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    animation: starTwinkle 0.8s ease-out forwards;
+    box-shadow: 0 0 15px rgba(91, 155, 213, 0.7);
+}
+
+/* 暖黄主题 - 暖色碎屑特效 */
+[data-theme="warm"] .click-effect {
     width: 10px;
     height: 10px;
-    pointer-events: none;
+    background: #ff9500;
     border-radius: 50%;
-    z-index: 9999;
-    animation: clickRipple 0.6s ease-out forwards;
+    animation: warmParticles 1.2s ease-out forwards;
+    box-shadow: 0 0 20px rgba(255, 149, 0, 0.8);
 }
 
-/* 自然绿主题 - 绿色特效 */
-[data-theme="diary"] .click-effect {
-    background: radial-gradient(circle, rgba(39, 174, 96, 0.6) 0%, rgba(39, 174, 96, 0.3) 50%, transparent 100%);
-    box-shadow: 0 0 20px rgba(39, 174, 96, 0.5);
-}
-
-/* 夜间主题 - 蓝色特效 */
-[data-theme="dark"] .click-effect {
-    background: radial-gradient(circle, rgba(91, 155, 213, 0.6) 0%, rgba(91, 155, 213, 0.3) 50%, transparent 100%);
-    box-shadow: 0 0 20px rgba(91, 155, 213, 0.5);
-}
-
-/* 暖黄主题 - 金色特效 */
-[data-theme="warm"] .click-effect {
-    background: radial-gradient(circle, rgba(243, 156, 18, 0.7) 0%, rgba(243, 156, 18, 0.4) 50%, transparent 100%);
-    box-shadow: 0 0 25px rgba(243, 156, 18, 0.6), 0 0 50px rgba(243, 156, 18, 0.3);
-    animation: clickRippleWarm 0.8s ease-out forwards;
-}
-
-/* 简约主题 - 灰色特效 */
+/* 简约主题 - 苍白雪花特效 */
 [data-theme="minimal"] .click-effect {
-    background: radial-gradient(circle, rgba(51, 51, 51, 0.5) 0%, rgba(51, 51, 51, 0.2) 50%, transparent 100%);
-    box-shadow: 0 0 15px rgba(51, 51, 51, 0.4);
+    width: 10px;
+    height: 10px;
+    background: #e0e0e0;
+    border-radius: 50%;
+    animation: snowFlake 1s ease-out forwards;
+    box-shadow: 0 0 10px rgba(224, 224, 224, 0.5);
 }
 
-/* 点击波纹动画 - 默认 */
-@keyframes clickRipple {
+/* 树叶飘落动画 */
+@keyframes leafFall {
     0% {
-        transform: scale(0);
+        transform: translate(0, 0) rotate(0deg) scale(1);
         opacity: 1;
     }
     100% {
-        transform: scale(15);
+        transform: translate(var(--random-x, 50px), 100px) rotate(360deg) scale(0.3);
         opacity: 0;
     }
 }
 
-/* 点击波纹动画 - 暖黄主题加强版 */
-@keyframes clickRippleWarm {
-    0% {
-        transform: scale(0);
-        opacity: 1;
-    }
-    50% {
-        transform: scale(10);
-        opacity: 0.8;
-    }
-    100% {
-        transform: scale(20);
-        opacity: 0;
-    }
-}
-
-/* 点击星星特效 */
-.click-star {
-    position: fixed;
-    pointer-events: none;
-    z-index: 9999;
-    animation: starFly 0.8s ease-out forwards;
-}
-
-@keyframes starFly {
+/* 星星闪烁动画 */
+@keyframes starTwinkle {
     0% {
         transform: scale(0) rotate(0deg);
         opacity: 1;
     }
     50% {
-        transform: scale(1) rotate(180deg);
+        transform: scale(1.2) rotate(180deg);
         opacity: 1;
     }
     100% {
         transform: scale(0) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* 暖色碎屑动画 */
+@keyframes warmParticles {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--random-x, 50px), 120px) scale(0.2);
+        opacity: 0;
+    }
+}
+
+/* 雪花动画 */
+@keyframes snowFlake {
+    0% {
+        transform: translate(0, 0) rotate(0deg) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--random-x, -50px), 100px) rotate(-360deg) scale(0.5);
         opacity: 0;
     }
 }

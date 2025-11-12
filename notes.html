@@ -241,9 +241,17 @@
                 // 2. URL中有refresh参数
                 // 3. URL中有fromWrite参数（从写博客页面跳转回来）
                 if (invalidateFlag || forceRefresh) {
+                    console.log('🔄 清除缓存，重新加载数据...');
                     cache.notes = null;
                     cache.lastFetch = 0;
                     localStorage.removeItem('notesCacheInvalidate');
+
+                    // 清除浏览器fetch缓存
+                    if ('caches' in window) {
+                        caches.keys().then(names => {
+                            names.forEach(name => caches.delete(name));
+                        });
+                    }
 
                     // 清除URL参数，避免刷新页面时再次强制刷新
                     const newUrl = window.location.origin + window.location.pathname;
@@ -563,16 +571,12 @@
         // 切换标签折叠状态
         function toggleTagCollapse() {
             const collapseBtn = document.getElementById('tagCollapseBtn');
-            const filterTags = document.getElementById('filterTags');
-
-            // 检查是否已经展开
             const collapsedDiv = document.getElementById('collapsedTags');
 
+            // 如果已经展开，则收起（移除折叠的标签）
             if (collapsedDiv) {
-                // 收起：隐藏折叠的标签
-                collapsedDiv.style.display = 'none';
-                collapseBtn.innerHTML = '<i class="fas fa-chevron-down"></i> 更多';
-                // 重新获取折叠标签数量
+                collapsedDiv.remove();
+                // 重新计算并显示"更多"按钮的数量
                 const tagCountMap = new Map();
                 allNotes.forEach(note => {
                     if (note.tags && note.tags.length > 0) {
@@ -587,7 +591,7 @@
                 const count = Math.max(0, sortedTags.length - 9);
                 collapseBtn.innerHTML = `<i class="fas fa-chevron-down"></i> 更多 (${count})`;
             } else {
-                // 展开：创建容器显示折叠的标签
+                // 如果没有展开，则展开（创建并显示折叠的标签）
                 const tagCountMap = new Map();
                 allNotes.forEach(note => {
                     if (note.tags && note.tags.length > 0) {

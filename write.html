@@ -310,11 +310,19 @@
                         await window.githubNoteManager.saveRawFile(contentPath, content, '更新博客内容');
                     }
 
-                    // 自动生成excerpt（如果用户没有手动修改）
+                    // 自动生成excerpt（如果用户留空或明确要求重新生成）
                     let finalExcerpt = excerpt;
-                    if (!finalExcerpt || finalExcerpt === originalNote.excerpt) {
-                        // 从content中提取前100个字符作为摘要
-                        finalExcerpt = content.substring(0, 100) + (content.length > 100 ? '...' : '');
+                    // 只有在以下情况才自动生成：
+                    // 1. 用户完全清空了excerpt字段
+                    // 2. 用户使用了"从内容生成"按钮（可以用特殊标记）
+                    const shouldAutoGenerate = !finalExcerpt || finalExcerpt.trim() === '';
+
+                    if (shouldAutoGenerate) {
+                        // 从content中提取前100个字符作为摘要，移除HTML标签
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = content;
+                        const plainText = tempDiv.textContent || tempDiv.innerText || '';
+                        finalExcerpt = plainText.substring(0, 100).trim() + (plainText.length > 100 ? '...' : '');
                     }
 
                     const updatedNote = {
@@ -325,7 +333,8 @@
                         authorKey: authorKey || null,
                         // 保持原始editKey（如果用户没输入新的）
                         editKey: editKey || originalEditKey || null,
-                        date: new Date().toISOString().split('T')[0]
+                        // 保持原始日期，不强制更新
+                        date: originalNote.date
                     };
 
                     await window.githubNoteManager.updateNote(noteId, updatedNote);
@@ -334,6 +343,11 @@
 
                     // 清除notes页面的缓存
                     localStorage.setItem('notesCacheInvalidate', Date.now().toString());
+                    // 清除内存中的缓存对象
+                    if (window.cache) {
+                        window.cache.notes = null;
+                        window.cache.lastFetch = 0;
+                    }
 
                     setTimeout(() => {
                         alert('保存成功！');
@@ -358,12 +372,23 @@
                     status.textContent = '发布成功！';
                     status.style.color = 'var(--success)';
 
-                    // 清除notes页面的缓存
+                    // 清除所有缓存 - 强制重新加载数据
                     localStorage.setItem('notesCacheInvalidate', Date.now().toString());
+                    // 清除内存中的缓存对象
+                    if (window.cache) {
+                        window.cache.notes = null;
+                        window.cache.lastFetch = 0;
+                    }
+                    // 清除浏览器fetch缓存
+                    if ('caches' in window) {
+                        caches.keys().then(names => {
+                            names.forEach(name => caches.delete(name));
+                        });
+                    }
 
                     setTimeout(() => {
                         alert('发布成功！');
-                        window.location.href = 'notes.html?fromWrite=1';
+                        window.location.href = 'notes.html?fromWrite=1&refresh=1';
                     }, 500);
                 }
             } catch (error) {
