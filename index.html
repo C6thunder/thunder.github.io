@@ -6,6 +6,31 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>个人博客网站 - 首页</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/jpeg" href="favicon.jpg" id="favicon-link">
+    <script>
+        // 设置favicon为圆形
+        (function() {
+            const favicon = document.getElementById('favicon-link');
+            if (favicon) {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const size = 32;
+                    canvas.width = size;
+                    canvas.height = size;
+                    const ctx = canvas.getContext('2d');
+                    ctx.beginPath();
+                    ctx.arc(size / 2, size / 2, size / 2, 0, 2 * Math.PI);
+                    ctx.clip();
+                    ctx.drawImage(img, 0, 0, size, size);
+                    favicon.href = canvas.toDataURL('image/png');
+                };
+                img.src = 'favicon.jpg';
+            }
+        })();
+    </script>
     <link rel="stylesheet" href="style.css?v=2023111900">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="config.js?v=1762755000"></script>
