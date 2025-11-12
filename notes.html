@@ -464,25 +464,93 @@
         // 加载标签
         function loadTags() {
             const filterTags = document.getElementById('filterTags');
-            const allTags = new Set();
+            const tagCountMap = new Map();
 
+            // 统计每个标签的使用次数
             allNotes.forEach(note => {
                 if (note.tags && note.tags.length > 0) {
-                    note.tags.forEach(tag => allTags.add(tag));
+                    note.tags.forEach(tag => {
+                        tagCountMap.set(tag, (tagCountMap.get(tag) || 0) + 1);
+                    });
                 }
             });
 
-            if (allTags.size === 0) {
+            if (tagCountMap.size === 0) {
                 filterTags.innerHTML = '';
                 return;
             }
 
-            let html = '<button class="btn btn-secondary" onclick="clearFilters()" style="margin-right: 8px; margin-bottom: 8px;">全部</button>';
-            allTags.forEach(tag => {
+            // 按使用次数降序排序，取前20个
+            const sortedTags = Array.from(tagCountMap.entries())
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 20)
+                .map(([tag, count]) => ({ tag, count }));
+
+            // 判断是否需要折叠（超过9个标签）
+            const maxVisibleTags = 9;
+            const needsCollapse = sortedTags.length > maxVisibleTags;
+            const visibleTags = needsCollapse ? sortedTags.slice(0, maxVisibleTags) : sortedTags;
+            const collapsedTags = needsCollapse ? sortedTags.slice(maxVisibleTags) : [];
+
+            let html = `
+                <button class="btn btn-secondary" onclick="clearFilters()" style="margin-right: 8px; margin-bottom: 8px;">
+                    全部
+                </button>
+            `;
+
+            // 显示可见标签
+            visibleTags.forEach(({ tag, count }) => {
                 const isActive = currentFilter === tag;
-                html += `<button class="btn ${isActive ? 'btn-primary' : 'btn-secondary'}" onclick="filterByTag('${tag}')" style="margin-right: 8px; margin-bottom: 8px;">${escapeHtml(tag)}</button>`;
+                html += `
+                    <button class="btn ${isActive ? 'btn-primary' : 'btn-secondary'}"
+                            onclick="filterByTag('${escapeHtml(tag)}')"
+                            style="margin-right: 8px; margin-bottom: 8px; position: relative;">
+                        ${escapeHtml(tag)}
+                        <span style="font-size: 10px; opacity: 0.7; margin-left: 4px;">${count}</span>
+                    </button>
+                `;
             });
+
+            // 如果有折叠的标签，添加展开按钮
+            if (needsCollapse && collapsedTags.length > 0) {
+                html += `
+                    <button class="btn btn-secondary"
+                            onclick="toggleTagCollapse()"
+                            id="tagCollapseBtn"
+                            style="margin-right: 8px; margin-bottom: 8px;">
+                        <i class="fas fa-chevron-down"></i> 更多 (${collapsedTags.length})
+                    </button>
+                `;
+                html += `<div id="collapsedTags" style="display: none;">`;
+                collapsedTags.forEach(({ tag, count }) => {
+                    const isActive = currentFilter === tag;
+                    html += `
+                        <button class="btn ${isActive ? 'btn-primary' : 'btn-secondary'}"
+                                onclick="filterByTag('${escapeHtml(tag)}')"
+                                style="margin-right: 8px; margin-bottom: 8px; position: relative;">
+                            ${escapeHtml(tag)}
+                            <span style="font-size: 10px; opacity: 0.7; margin-left: 4px;">${count}</span>
+                        </button>
+                    `;
+                });
+                html += `</div>`;
+            }
+
             filterTags.innerHTML = html;
+        }
+
+        // 切换标签折叠状态
+        function toggleTagCollapse() {
+            const collapsedDiv = document.getElementById('collapsedTags');
+            const collapseBtn = document.getElementById('tagCollapseBtn');
+
+            if (collapsedDiv.style.display === 'none') {
+                collapsedDiv.style.display = 'inline-block';
+                collapseBtn.innerHTML = '<i class="fas fa-chevron-up"></i> 收起';
+            } else {
+                collapsedDiv.style.display = 'none';
+                collapseBtn.innerHTML = '<i class="fas fa-chevron-down"></i> 更多';
+            }
         }
 
         // 按标签筛选
