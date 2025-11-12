@@ -509,11 +509,11 @@
             visibleTags.forEach(({ tag, count }) => {
                 const isActive = currentFilter === tag;
                 html += `
-                    <button class="btn ${isActive ? 'btn-primary' : 'btn-secondary'}"
+                    <button class="btn tag-with-count ${isActive ? 'btn-primary' : 'btn-secondary'}"
                             onclick="filterByTag('${escapeHtml(tag)}')"
+                            data-count="${count}"
                             style="margin-right: 8px; margin-bottom: 8px; position: relative;">
                         ${escapeHtml(tag)}
-                        <span style="font-size: 10px; opacity: 0.7; margin-left: 4px;">${count}</span>
                     </button>
                 `;
             });
@@ -571,11 +571,11 @@
                 const collapsedTagsHtml = collapsedTags.map(({ tag, count }) => {
                     const isActive = currentFilter === tag;
                     return `
-                        <button class="btn ${isActive ? 'btn-primary' : 'btn-secondary'}"
+                        <button class="btn tag-with-count ${isActive ? 'btn-primary' : 'btn-secondary'}"
                                 onclick="filterByTag('${escapeHtml(tag)}')"
+                                data-count="${count}"
                                 style="margin-right: 8px; margin-bottom: 8px; position: relative;">
                             ${escapeHtml(tag)}
-                            <span style="font-size: 10px; opacity: 0.7; margin-left: 4px;">${count}</span>
                         </button>
                     `;
                 }).join('');
@@ -734,6 +734,33 @@
             }
         }
     </script>
+
+    <style>
+        /* 标签计数悬停显示 */
+        .tag-with-count {
+            position: relative;
+        }
+
+        .tag-with-count::after {
+            content: attr(data-count);
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border-radius: 10px;
+            padding: 2px 6px;
+            font-size: 10px;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+        }
+
+        .tag-with-count:hover::after {
+            opacity: 1;
+        }
+    </style>
 </body>
 
 </html>
