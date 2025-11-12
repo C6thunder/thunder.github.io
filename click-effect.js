@@ -17,20 +17,20 @@
         initClickEffect();
     }
 
-    // 创建点击特效
+    // 创建点击特效 - 烟花效果
     function createClickEffect(e, theme) {
         const x = e.clientX;
         const y = e.clientY;
 
-        // 根据主题创建不同数量的特效
+        // 根据主题创建不同数量的特效（减少数量）
         const effectsCount = {
-            'diary': 6,     // 树叶
-            'dark': 8,      // 星星
-            'warm': 10,     // 暖色碎屑
-            'minimal': 6    // 雪花
+            'diary': 3,     // 树叶
+            'dark': 4,      // 星星
+            'warm': 4,      // 暖色碎屑
+            'minimal': 3    // 雪花
         };
 
-        const count = effectsCount[theme] || 5;
+        const count = effectsCount[theme] || 3;
 
         for (let i = 0; i < count; i++) {
             const effect = document.createElement('div');
@@ -40,22 +40,23 @@
             effect.style.left = x + 'px';
             effect.style.top = y + 'px';
 
-            // 随机偏移
-            const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.5;
-            const distance = Math.random() * 50 + 20;
+            // 随机偏移（烟花效果：先向四周散开）
+            const angle = (Math.PI * 2 * Math.random());
+            const distance = Math.random() * 40 + 20;  // 四散距离
             const offsetX = Math.cos(angle) * distance;
             const offsetY = Math.sin(angle) * distance;
 
             // 使用CSS变量设置随机偏移
             effect.style.setProperty('--random-x', offsetX + 'px');
+            effect.style.setProperty('--random-y', offsetY + 'px');
 
             // 添加到页面
             document.body.appendChild(effect);
 
-            // 动画结束后移除元素
+            // 动画结束后移除元素（延长到2秒，让烟花效果更明显）
             setTimeout(() => {
                 effect.remove();
-            }, 1500);
+            }, 2000);
         }
     }
 })();
