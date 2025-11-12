@@ -513,22 +513,22 @@
         }
 
 
-        // 缓存all_tags数据，避免重复请求
-        let cachedAllTags = null;
+        // 缓存tags数据，避免重复请求
+        let cachedTags = null;
 
-        // 加载标签 - 优化版：使用all_tags避免遍历所有博客
+        // 加载标签 - 从tags.json加载
         async function loadTags() {
             const filterTags = document.getElementById('filterTags');
 
             try {
-                // 直接从GitHub API获取notes.json中的all_tags
-                const notesData = await window.githubNoteManager.getFile('notes.json');
-                const allTags = notesData.all_tags || {};
-                cachedAllTags = allTags; // 缓存数据
+                // 直接从GitHub API获取tags.json
+                const tagsData = await window.githubNoteManager.getFile('tags.json');
+                const tags = tagsData?.tags || {};
+                cachedTags = tags; // 缓存数据
 
-                console.log('🏷️ 加载标签，all_tags:', allTags);
+                console.log('🏷️ 加载标签，tags.json:', tags);
 
-                const tagCountMap = new Map(Object.entries(allTags));
+                const tagCountMap = new Map(Object.entries(tags));
 
                 if (tagCountMap.size === 0) {
                     filterTags.innerHTML = '<span style="color: var(--text-secondary); font-size: 14px;">暂无标签</span>';
@@ -583,7 +583,7 @@
             }
         }
 
-        // 切换标签折叠状态 - 使用缓存的all_tags
+        // 切换标签折叠状态 - 使用缓存的tags
         function toggleTagCollapse() {
             const collapseBtn = document.getElementById('tagCollapseBtn');
             const collapsedDiv = document.getElementById('collapsedTags');
@@ -591,9 +591,9 @@
             // 如果已经展开，则收起（移除折叠的标签）
             if (collapsedDiv) {
                 collapsedDiv.remove();
-                // 使用缓存的all_tags计算数量
-                if (cachedAllTags) {
-                    const sortedTags = Object.entries(cachedAllTags)
+                // 使用缓存的tags计算数量
+                if (cachedTags) {
+                    const sortedTags = Object.entries(cachedTags)
                         .sort((a, b) => b[1] - a[1])
                         .slice(0, 20);
                     const count = Math.max(0, sortedTags.length - 9);
@@ -601,8 +601,8 @@
                 }
             } else {
                 // 如果没有展开，则展开（创建并显示折叠的标签）
-                if (cachedAllTags) {
-                    const sortedTags = Object.entries(cachedAllTags)
+                if (cachedTags) {
+                    const sortedTags = Object.entries(cachedTags)
                         .sort((a, b) => b[1] - a[1])
                         .slice(0, 20)
                         .map(([tag, count]) => ({ tag, count }));

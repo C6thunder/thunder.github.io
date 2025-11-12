@@ -435,27 +435,25 @@ class GitHubNoteManager {
         let notesList = await this.getFile('notes.json');
 
         if (!notesList) {
-            notesList = { notes: [], all_tags: {}, version: '3.0' };
+            notesList = { notes: [], version: '3.0' };
         }
 
         if (!Array.isArray(notesList.notes)) {
             notesList.notes = [];
         }
 
-        // 确保all_tags存在
-        if (!notesList.all_tags || typeof notesList.all_tags !== 'object') {
-            notesList.all_tags = {};
-        }
-
         const existsIndex = notesList.notes.findIndex(n => n.id === note.id);
         if (existsIndex !== -1) {
-            // 编辑模式：先从all_tags中移除旧标签，再添加新标签
-            this.updateAllTags(notesList, notesList.notes[existsIndex], note);
+            // 编辑模式：更新博客内容
+            const oldNote = notesList.notes[existsIndex];
             notesList.notes[existsIndex] = note;
+            // 同步更新tags.json
+            await this.updateTagsJson(oldNote, note);
         } else {
-            // 新建模式：直接添加新标签到all_tags
-            this.updateAllTags(notesList, null, note);
+            // 新建模式：添加到列表开头
             notesList.notes.unshift(note);
+            // 同步更新tags.json
+            await this.updateTagsJson(null, note);
         }
 
         notesList.lastUpdated = new Date().toISOString();
@@ -463,31 +461,42 @@ class GitHubNoteManager {
         return await this.saveFile('notes.json', notesList, `Update notes list: ${existsIndex !== -1 ? 'update' : 'add'} ${note.title}`);
     }
 
-    // 更新all_tags字段
-    updateAllTags(notesList, oldNote, newNote) {
-        // 确保all_tags存在
-        if (!notesList.all_tags || typeof notesList.all_tags !== 'object') {
-            notesList.all_tags = {};
-        }
+    // 更新tags.json文件
+    async updateTagsJson(oldNote, newNote) {
+        try {
+            let tagsData = await this.getFile('tags.json');
 
-        // 如果是编辑模式，先移除旧标签的计数
-        if (oldNote && oldNote.tags && Array.isArray(oldNote.tags)) {
-            oldNote.tags.forEach(tag => {
-                if (notesList.all_tags[tag]) {
-                    notesList.all_tags[tag]--;
-                    // 如果计数为0，删除该标签
-                    if (notesList.all_tags[tag] <= 0) {
-                        delete notesList.all_tags[tag];
+            if (!tagsData) {
+                tagsData = { tags: {} };
+            }
+
+            if (!tagsData.tags || typeof tagsData.tags !== 'object') {
+                tagsData.tags = {};
+            }
+
+            // 移除旧标签计数
+            if (oldNote && oldNote.tags && Array.isArray(oldNote.tags)) {
+                oldNote.tags.forEach(tag => {
+                    if (tagsData.tags[tag]) {
+                        tagsData.tags[tag]--;
+                        if (tagsData.tags[tag] <= 0) {
+                            delete tagsData.tags[tag];
+                        }
                     }
-                }
-            });
-        }
+                });
+            }
 
-        // 添加新标签的计数
-        if (newNote && newNote.tags && Array.isArray(newNote.tags)) {
-            newNote.tags.forEach(tag => {
-                notesList.all_tags[tag] = (notesList.all_tags[tag] || 0) + 1;
-            });
+            // 添加新标签计数
+            if (newNote && newNote.tags && Array.isArray(newNote.tags)) {
+                newNote.tags.forEach(tag => {
+                    tagsData.tags[tag] = (tagsData.tags[tag] || 0) + 1;
+                });
+            }
+
+            tagsData.lastUpdated = new Date().toISOString();
+            await this.saveFile('tags.json', tagsData, 'Update tags');
+        } catch (error) {
+            console.error('更新tags.json失败:', error);
         }
     }
 
@@ -513,13 +522,8 @@ class GitHubNoteManager {
             await this.saveFile(filename, updatedNote, message);
         }
 
-        // 确保all_tags存在
-        if (!notesList.all_tags || typeof notesList.all_tags !== 'object') {
-            notesList.all_tags = {};
-        }
-
-        // 更新 all_tags（移除旧标签，添加新标签）
-        this.updateAllTags(notesList, originalNote, updatedNote);
+        // 更新 tags.json
+        await this.updateTagsJson(originalNote, updatedNote);
 
         // 更新 notes.json 中的笔记列表（使用已获取的notesList）
         const noteIndex = notesList.notes.findIndex(note => note.id === noteId);
