@@ -24,8 +24,8 @@ window.APP_CONFIG = {
 
     // 主题配置
     theme: {
-        default: 'diary',  // 默认主题
-        options: ['diary', 'dark', 'paper', 'minimal']
+        default: 'warm',  // 默认主题：暖黄主题
+        options: ['diary', 'dark', 'warm', 'minimal']
     },
 
     // GitHub配置

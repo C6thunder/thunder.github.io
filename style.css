@@ -26,25 +26,25 @@
     --bg-gradient: linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-secondary) 100%);
 }
 
-/* 主题1: 米白日记 (默认) - 个人笔记风格 */
+/* 主题1: 自然绿 - 清新自然风格 */
 [data-theme="diary"] {
-    --primary: #5b8def;
-    --secondary: #34495e;
-    --accent: #6c9ff8;
-    --success: #52c41a;
-    --danger: #f5222d;
+    --primary: #27ae60;
+    --secondary: #2c5f41;
+    --accent: #2ecc71;
+    --success: #27ae60;
+    --danger: #e74c3c;
     --text-primary: #2c3e50;
     --text-secondary: #5f6a7d;
     --text-tertiary: #8c9ab0;
-    --bg-primary: #faf7f2;
-    --bg-secondary: #f5f2ed;
-    --bg-tertiary: #efe9e0;
+    --bg-primary: #f0f9f4;
+    --bg-secondary: #e8f5ed;
+    --bg-tertiary: #d9f0e3;
     --card-bg: #ffffff;
-    --border-color: #e8e2d9;
-    --border-hover: #d4c7b8;
-    --shadow-sm: 0 1px 3px rgba(139, 115, 85, 0.08);
-    --shadow-md: 0 2px 8px rgba(139, 115, 85, 0.12);
-    --shadow-lg: 0 4px 16px rgba(139, 115, 85, 0.15);
+    --border-color: #c8e6d0;
+    --border-hover: #a8d5ba;
+    --shadow-sm: 0 1px 3px rgba(39, 174, 96, 0.08);
+    --shadow-md: 0 2px 8px rgba(39, 174, 96, 0.12);
+    --shadow-lg: 0 4px 16px rgba(39, 174, 96, 0.15);
     --bg-gradient: linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-secondary) 100%);
 }
 
@@ -65,21 +65,26 @@
     --bg-gradient: linear-gradient(to bottom, #1a1d23 0%, #22252b 100%);
 }
 
-/* 主题3: 暖黄护眼 - 仿纸质感 */
-[data-theme="paper"] {
-    --primary: #d4a574;
-    --secondary: #5d4e37;
-    --accent: #c4935f;
-    --success: #8b9d83;
-    --danger: #c66;
-    --text-primary: #4a3f35;
-    --text-secondary: #6b5d4f;
-    --bg-primary: #f4ecd8;
-    --bg-secondary: #ede4d3;
-    --card-bg: #f4ecd8;
-    --border-color: #d9cbba;
-    --shadow: 0 2px 8px rgba(139, 115, 85, 0.15);
-    --bg-gradient: linear-gradient(to bottom, #ede4d3 0%, #f4ecd8 100%);
+/* 主题3: 暖黄主题 - 温暖舒适风格 */
+[data-theme="warm"] {
+    --primary: #f39c12;
+    --secondary: #e67e22;
+    --accent: #f1c40f;
+    --success: #27ae60;
+    --danger: #e74c3c;
+    --text-primary: #5d4037;
+    --text-secondary: #795548;
+    --text-tertiary: #a1887f;
+    --bg-primary: #fff8e1;
+    --bg-secondary: #fff3cd;
+    --bg-tertiary: #ffe082;
+    --card-bg: #ffffff;
+    --border-color: #ffd54f;
+    --border-hover: #ffb300;
+    --shadow-sm: 0 1px 3px rgba(243, 156, 18, 0.12);
+    --shadow-md: 0 2px 8px rgba(243, 156, 18, 0.18);
+    --shadow-lg: 0 4px 16px rgba(243, 156, 18, 0.24);
+    --bg-gradient: linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-secondary) 100%);
 }
 
 /* 主题4: 简约灰 - 极简风格 */
@@ -2319,4 +2324,91 @@ body {
 
 [data-theme="dark"] .social-btn:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* ==================== 点击特效 ==================== */
+.click-effect {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    pointer-events: none;
+    border-radius: 50%;
+    z-index: 9999;
+    animation: clickRipple 0.6s ease-out forwards;
+}
+
+/* 自然绿主题 - 绿色特效 */
+[data-theme="diary"] .click-effect {
+    background: radial-gradient(circle, rgba(39, 174, 96, 0.6) 0%, rgba(39, 174, 96, 0.3) 50%, transparent 100%);
+    box-shadow: 0 0 20px rgba(39, 174, 96, 0.5);
+}
+
+/* 夜间主题 - 蓝色特效 */
+[data-theme="dark"] .click-effect {
+    background: radial-gradient(circle, rgba(91, 155, 213, 0.6) 0%, rgba(91, 155, 213, 0.3) 50%, transparent 100%);
+    box-shadow: 0 0 20px rgba(91, 155, 213, 0.5);
+}
+
+/* 暖黄主题 - 金色特效 */
+[data-theme="warm"] .click-effect {
+    background: radial-gradient(circle, rgba(243, 156, 18, 0.7) 0%, rgba(243, 156, 18, 0.4) 50%, transparent 100%);
+    box-shadow: 0 0 25px rgba(243, 156, 18, 0.6), 0 0 50px rgba(243, 156, 18, 0.3);
+    animation: clickRippleWarm 0.8s ease-out forwards;
+}
+
+/* 简约主题 - 灰色特效 */
+[data-theme="minimal"] .click-effect {
+    background: radial-gradient(circle, rgba(51, 51, 51, 0.5) 0%, rgba(51, 51, 51, 0.2) 50%, transparent 100%);
+    box-shadow: 0 0 15px rgba(51, 51, 51, 0.4);
+}
+
+/* 点击波纹动画 - 默认 */
+@keyframes clickRipple {
+    0% {
+        transform: scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(15);
+        opacity: 0;
+    }
+}
+
+/* 点击波纹动画 - 暖黄主题加强版 */
+@keyframes clickRippleWarm {
+    0% {
+        transform: scale(0);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(10);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(20);
+        opacity: 0;
+    }
+}
+
+/* 点击星星特效 */
+.click-star {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    animation: starFly 0.8s ease-out forwards;
+}
+
+@keyframes starFly {
+    0% {
+        transform: scale(0) rotate(0deg);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1) rotate(180deg);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0) rotate(360deg);
+        opacity: 0;
+    }
 }

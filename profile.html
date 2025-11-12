@@ -35,10 +35,11 @@
     <link rel="stylesheet" href="style.css?v=2023111900">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="config.js?v=1762755000"></script>
+    <script src="click-effect.js"></script>
     <script>
         // 页面加载前就设置主题，避免闪烁
         (function() {
-            const savedTheme = localStorage.getItem('selectedTheme') || 'diary';
+            const savedTheme = localStorage.getItem('selectedTheme') || 'warm';
             document.documentElement.setAttribute('data-theme', savedTheme);
         })();
     </script>
