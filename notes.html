@@ -503,11 +503,7 @@
             const visibleTags = needsCollapse ? sortedTags.slice(0, maxVisibleTags) : sortedTags;
             const collapsedTags = needsCollapse ? sortedTags.slice(maxVisibleTags) : [];
 
-            let html = `
-                <button class="btn btn-secondary" onclick="clearFilters()" style="margin-right: 8px; margin-bottom: 8px;">
-                    全部
-                </button>
-            `;
+            let html = '';
 
             // 显示可见标签
             visibleTags.forEach(({ tag, count }) => {
@@ -522,7 +518,7 @@
                 `;
             });
 
-            // 如果有折叠的标签，添加展开按钮
+            // 如果有折叠的标签，添加展开/收起按钮
             if (needsCollapse && collapsedTags.length > 0) {
                 html += `
                     <button class="btn btn-secondary"
@@ -531,11 +527,50 @@
                             style="margin-right: 8px; margin-bottom: 8px;">
                         <i class="fas fa-chevron-down"></i> 更多 (${collapsedTags.length})
                     </button>
+                    <!-- 折叠的标签会动态插入到这里 -->
                 `;
-                html += `<div id="collapsedTags" style="display: none;">`;
-                collapsedTags.forEach(({ tag, count }) => {
+            }
+
+            // 添加清除筛选按钮（替代"全部"）
+            html += `
+                <button class="btn ${!currentFilter ? 'btn-primary' : 'btn-secondary'}"
+                        onclick="clearFilters()"
+                        style="margin-right: 8px; margin-bottom: 8px;">
+                    <i class="fas fa-times"></i> 清除筛选
+                </button>
+            `;
+
+            filterTags.innerHTML = html;
+        }
+
+        // 切换标签折叠状态
+        function toggleTagCollapse() {
+            const collapseBtn = document.getElementById('tagCollapseBtn');
+            const filterTags = document.getElementById('filterTags');
+
+            // 获取折叠的标签数据（从排序的标签中获取）
+            const tagCountMap = new Map();
+            allNotes.forEach(note => {
+                if (note.tags && note.tags.length > 0) {
+                    note.tags.forEach(tag => {
+                        tagCountMap.set(tag, (tagCountMap.get(tag) || 0) + 1);
+                    });
+                }
+            });
+
+            const sortedTags = Array.from(tagCountMap.entries())
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 20)
+                .map(([tag, count]) => ({ tag, count }));
+
+            const maxVisibleTags = 9;
+            const collapsedTags = sortedTags.slice(maxVisibleTags);
+
+            if (collapseBtn.innerHTML.includes('更多')) {
+                // 展开：插入折叠的标签到按钮后面
+                const collapsedTagsHtml = collapsedTags.map(({ tag, count }) => {
                     const isActive = currentFilter === tag;
-                    html += `
+                    return `
                         <button class="btn ${isActive ? 'btn-primary' : 'btn-secondary'}"
                                 onclick="filterByTag('${escapeHtml(tag)}')"
                                 style="margin-right: 8px; margin-bottom: 8px; position: relative;">
@@ -543,23 +578,19 @@
                             <span style="font-size: 10px; opacity: 0.7; margin-left: 4px;">${count}</span>
                         </button>
                     `;
-                });
-                html += `</div>`;
-            }
+                }).join('');
 
-            filterTags.innerHTML = html;
-        }
-
-        // 切换标签折叠状态
-        function toggleTagCollapse() {
-            const collapsedDiv = document.getElementById('collapsedTags');
-            const collapseBtn = document.getElementById('tagCollapseBtn');
-
-            if (collapsedDiv.style.display === 'none') {
-                collapsedDiv.style.display = 'inline-block';
+                // 在按钮后面插入标签
+                collapseBtn.insertAdjacentHTML('afterend', collapsedTagsHtml);
                 collapseBtn.innerHTML = '<i class="fas fa-chevron-up"></i> 收起';
             } else {
-                collapsedDiv.style.display = 'none';
+                // 收起：移除按钮后面的标签
+                let nextElement = collapseBtn.nextElementSibling;
+                while (nextElement && nextElement.tagName === 'BUTTON' && !nextElement.id) {
+                    const toRemove = nextElement;
+                    nextElement = nextElement.nextElementSibling;
+                    toRemove.remove();
+                }
                 collapseBtn.innerHTML = '<i class="fas fa-chevron-down"></i> 更多';
             }
         }
