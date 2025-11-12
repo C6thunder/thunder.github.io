@@ -49,7 +49,7 @@ class GitHubNoteManager {
         // 配置您的GitHub信息
         this.config = {
             owner: 'C6thunder',  // 您的GitHub用户名
-            repo: 'thunder.github.io',   // 您的仓库名
+            repo: 'thunder_os_data',   // 您的仓库名
             branch: 'main',  // 分支名
             token: ''  // 运行时填充
         };
