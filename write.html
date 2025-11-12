@@ -301,10 +301,18 @@
                         throw new Error('修改密钥错误！');
                     }
 
+                    // 如果是HTML类型的博客，需要同时更新HTML文件
+                    const isHtmlType = originalNote.type === 'html';
+                    let contentPath = originalNote.content;
+
+                    if (isHtmlType && contentPath && contentPath.startsWith('notecontent/')) {
+                        // 直接更新HTML文件
+                        await window.githubNoteManager.saveRawFile(contentPath, content, '更新博客内容');
+                    }
+
                     const updatedNote = {
                         ...originalNote,
                         title,
-                        content,
                         excerpt: excerpt || content.substring(0, 100) + '...',
                         tags,
                         authorKey: authorKey || null,
@@ -492,7 +500,21 @@
                 // 填充表单
                 document.getElementById('title').value = note.title || '';
                 document.getElementById('excerpt').value = note.excerpt || '';
-                document.getElementById('content').value = note.content || '';
+
+                // 如果content是HTML文件路径，需要读取文件内容
+                let contentValue = note.content || '';
+                if (note.type === 'html' && note.content && note.content.startsWith('notecontent/')) {
+                    try {
+                        // 通过GitHub API读取HTML文件内容
+                        const htmlContent = await window.githubNoteManager.getRawFile(note.content);
+                        contentValue = htmlContent;
+                    } catch (error) {
+                        console.error('读取HTML文件失败:', error);
+                        contentValue = note.content; // 失败时使用原始值
+                    }
+                }
+                document.getElementById('content').value = contentValue;
+
                 document.getElementById('authorKey').value = note.authorKey || '';
 
                 // 保存原始editKey到隐藏字段
