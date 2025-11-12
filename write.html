@@ -310,10 +310,17 @@
                         await window.githubNoteManager.saveRawFile(contentPath, content, '更新博客内容');
                     }
 
+                    // 自动生成excerpt（如果用户没有手动修改）
+                    let finalExcerpt = excerpt;
+                    if (!finalExcerpt || finalExcerpt === originalNote.excerpt) {
+                        // 从content中提取前100个字符作为摘要
+                        finalExcerpt = content.substring(0, 100) + (content.length > 100 ? '...' : '');
+                    }
+
                     const updatedNote = {
                         ...originalNote,
                         title,
-                        excerpt: excerpt || content.substring(0, 100) + '...',
+                        excerpt: finalExcerpt,
                         tags,
                         authorKey: authorKey || null,
                         // 保持原始editKey（如果用户没输入新的）

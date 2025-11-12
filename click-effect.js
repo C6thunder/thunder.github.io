@@ -1,16 +1,27 @@
 // 点击特效功能
 (function() {
-    // 监听整个页面的点击事件
-    document.addEventListener('click', function(e) {
-        // 创建波纹特效
-        createRippleEffect(e);
+    // 确保DOM加载完成
+    function initClickEffect() {
+        // 监听整个页面的点击事件
+        document.addEventListener('click', function(e) {
+            // 创建波纹特效
+            createRippleEffect(e);
 
-        // 为暖黄主题添加额外的星星特效
-        const currentTheme = document.documentElement.getAttribute('data-theme');
-        if (currentTheme === 'warm') {
-            createStarEffect(e);
-        }
-    });
+            // 为暖黄主题添加额外的星星特效
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            if (currentTheme === 'warm') {
+                createStarEffect(e);
+            }
+        });
+        console.log('✨ 点击特效已启用');
+    }
+
+    // 如果DOM已经加载完成，立即初始化
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initClickEffect);
+    } else {
+        initClickEffect();
+    }
 
     // 创建波纹特效
     function createRippleEffect(e) {
@@ -93,6 +104,4 @@
             }, 800);
         }
     }
-
-    console.log('✨ 点击特效已启用');
 })();
