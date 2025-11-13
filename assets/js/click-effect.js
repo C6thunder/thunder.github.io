@@ -1,9 +1,16 @@
 // 点击特效功能 - 增强版
 (function() {
+    const MAX_EFFECTS = 20; // 限制最大特效数量
+    let currentEffects = 0; // 当前活跃特效数量
+
     // 确保DOM加载完成
     function initClickEffect() {
         // 监听整个页面的点击事件
         document.addEventListener('click', function(e) {
+            // 限制特效数量，避免内存泄漏
+            if (currentEffects >= MAX_EFFECTS) {
+                return;
+            }
             const currentTheme = document.documentElement.getAttribute('data-theme');
             createClickEffect(e, currentTheme);
         });
@@ -30,7 +37,7 @@
             'minimal': 3    // 雪花
         };
 
-        const count = effectsCount[theme] || 3;
+        const count = Math.min(effectsCount[theme] || 3, MAX_EFFECTS - currentEffects);
 
         for (let i = 0; i < count; i++) {
             const effect = document.createElement('div');
@@ -50,12 +57,18 @@
             effect.style.setProperty('--random-x', offsetX + 'px');
             effect.style.setProperty('--random-y', offsetY + 'px');
 
+            // 增加特效计数
+            currentEffects++;
+
             // 添加到页面
             document.body.appendChild(effect);
 
-            // 动画结束后移除元素（延长到2秒，让烟花效果更明显）
+            // 动画结束后移除元素并减少计数（延长到2秒，让烟花效果更明显）
             setTimeout(() => {
-                effect.remove();
+                if (effect.parentNode) {
+                    effect.remove();
+                }
+                currentEffects = Math.max(0, currentEffects - 1);
             }, 2000);
         }
     }

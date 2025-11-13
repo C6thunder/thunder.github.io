@@ -16,7 +16,7 @@ class DataCollector {
             totalLogins: 0,
             successfulLogins: 0,
             failedLogins: 0,
-            totalVisits: 1,
+            totalVisits: 0,
             loginLogs: [],
             loginMethods: {
                 email: 0,
@@ -226,6 +226,7 @@ class DataCollector {
 class BlogLogin {
     constructor() {
         this.dataCollector = new DataCollector();
+        this.isSubmitting = false; // 防止重复提交
         // 配置：登录成功后的跳转链接（修改这里设置你的博客首页）
         this.BLOG_HOME_URL = '/blog.html'; // 可以修改为完整的URL，如 'https://yourblog.com'
         this.init();
@@ -313,39 +314,60 @@ class BlogLogin {
         const password = document.getElementById('password').value;
         const rememberMe = document.getElementById('rememberMe').checked;
 
-        // Basic validation
-        if (!email || !password) {
-            this.dataCollector.trackLogin(email || '-', 'failed', 'email');
-            this.showNotification('请填写所有字段', 'error');
-            e.preventDefault();
+        // 防止重复提交
+        if (this.isSubmitting) {
             return;
         }
+        this.isSubmitting = true;
 
-        if (!this.isValidEmail(email)) {
-            this.dataCollector.trackLogin(email, 'failed', 'email');
-            this.showNotification('请输入有效的邮箱地址', 'error');
-            e.preventDefault();
-            return;
+        try {
+            // Basic validation
+            if (!email || !password) {
+                this.dataCollector.trackLogin(email || '-', 'failed', 'email');
+                this.showNotification('请填写所有字段', 'error');
+                e.preventDefault();
+                return;
+            }
+
+            if (!this.isValidEmail(email)) {
+                this.dataCollector.trackLogin(email, 'failed', 'email');
+                this.showNotification('请输入有效的邮箱地址', 'error');
+                e.preventDefault();
+                return;
+            }
+
+            // 验证通过，填充隐藏字段
+            const timestampEl = document.getElementById('timestamp');
+            const userAgentEl = document.getElementById('userAgent');
+            if (timestampEl) timestampEl.value = new Date().toISOString();
+            if (userAgentEl) userAgentEl.value = navigator.userAgent;
+
+            // 记录登录数据
+            this.dataCollector.trackLogin(email, 'success', 'email');
+
+            if (rememberMe) {
+                localStorage.setItem('rememberedEmail', email);
+            }
+
+            // 显示成功消息
+            this.showNotification('登录成功！正在提交表单...', 'success');
+
+            // 延迟一点时间让用户看到消息，然后提交表单
+            setTimeout(() => {
+                // 再次检查表单是否存在
+                if (loginForm && typeof loginForm.submit === 'function') {
+                    loginForm.submit();
+                } else {
+                    console.error('表单提交失败：表单元素不存在');
+                    this.showNotification('表单提交失败，请重试', 'error');
+                }
+            }, 500);
+        } finally {
+            // 1秒后重置提交状态，避免长时间锁定
+            setTimeout(() => {
+                this.isSubmitting = false;
+            }, 1000);
         }
-
-        // 验证通过，填充隐藏字段
-        document.getElementById('timestamp').value = new Date().toISOString();
-        document.getElementById('userAgent').value = navigator.userAgent;
-
-        // 记录登录数据
-        this.dataCollector.trackLogin(email, 'success', 'email');
-
-        if (rememberMe) {
-            localStorage.setItem('rememberedEmail', email);
-        }
-
-        // 显示成功消息
-        this.showNotification('登录成功！正在提交表单...', 'success');
-
-        // 延迟一点时间让用户看到消息，然后提交表单
-        setTimeout(() => {
-            loginForm.submit();
-        }, 500);
     }
 
     togglePasswordVisibility() {

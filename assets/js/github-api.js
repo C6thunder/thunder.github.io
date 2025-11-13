@@ -467,62 +467,64 @@ class GitHubNoteManager {
 
     // 更新tags.json文件（带重试机制）
     async updateTagsJson(oldNote, newNote, retries = 3) {
-        try {
-            console.log('🔧 开始更新tags.json, oldNote:', oldNote?.tags, 'newNote:', newNote?.tags);
-
-            let tagsData = await this.getFile('tags.json');
-            console.log('📂 读取到的tags.json:', tagsData);
-
-            if (!tagsData) {
-                console.log('🆕 创建新的tags.json');
-                tagsData = { tags: {} };
-            }
-
-            if (!tagsData.tags || typeof tagsData.tags !== 'object') {
-                console.log('🔧 初始化tags对象');
-                tagsData.tags = {};
-            }
-
-            // 移除旧标签计数
-            if (oldNote && oldNote.tags && Array.isArray(oldNote.tags)) {
-                console.log('➖ 移除旧标签:', oldNote.tags);
-                oldNote.tags.forEach(tag => {
-                    if (tagsData.tags[tag]) {
-                        tagsData.tags[tag]--;
-                        if (tagsData.tags[tag] <= 0) {
-                            delete tagsData.tags[tag];
-                        }
-                    }
-                });
-            }
-
-            // 添加新标签计数
-            if (newNote && newNote.tags && Array.isArray(newNote.tags)) {
-                console.log('➕ 添加新标签:', newNote.tags);
-                newNote.tags.forEach(tag => {
-                    tagsData.tags[tag] = (tagsData.tags[tag] || 0) + 1;
-                    console.log(`   ${tag}: ${tagsData.tags[tag]}`);
-                });
-            }
-
-            tagsData.lastUpdated = new Date().toISOString();
-            console.log('💾 保存tags.json:', tagsData);
-
+        let attempt = 0;
+        while (attempt <= retries) {
             try {
+                console.log(`🔧 开始更新tags.json (尝试 ${attempt + 1}/${retries + 1})`);
+                console.log('   oldNote:', oldNote?.tags, 'newNote:', newNote?.tags);
+
+                let tagsData = await this.getFile('tags.json');
+                console.log('📂 读取到的tags.json:', tagsData);
+
+                if (!tagsData) {
+                    console.log('🆕 创建新的tags.json');
+                    tagsData = { tags: {} };
+                }
+
+                if (!tagsData.tags || typeof tagsData.tags !== 'object') {
+                    console.log('🔧 初始化tags对象');
+                    tagsData.tags = {};
+                }
+
+                // 移除旧标签计数
+                if (oldNote && oldNote.tags && Array.isArray(oldNote.tags)) {
+                    console.log('➖ 移除旧标签:', oldNote.tags);
+                    oldNote.tags.forEach(tag => {
+                        if (tagsData.tags[tag]) {
+                            tagsData.tags[tag]--;
+                            if (tagsData.tags[tag] <= 0) {
+                                delete tagsData.tags[tag];
+                            }
+                        }
+                    });
+                }
+
+                // 添加新标签计数
+                if (newNote && newNote.tags && Array.isArray(newNote.tags)) {
+                    console.log('➕ 添加新标签:', newNote.tags);
+                    newNote.tags.forEach(tag => {
+                        tagsData.tags[tag] = (tagsData.tags[tag] || 0) + 1;
+                        console.log(`   ${tag}: ${tagsData.tags[tag]}`);
+                    });
+                }
+
+                tagsData.lastUpdated = new Date().toISOString();
+                console.log('💾 保存tags.json:', tagsData);
+
                 const result = await this.saveFile('tags.json', tagsData, 'Update tags');
                 console.log('✅ tags.json保存成功:', result);
                 return result;
             } catch (error) {
-                if (error.message.includes('409') && retries > 0) {
-                    console.log(`⚠️ tags.json更新失败，SHA冲突，剩余重试次数: ${retries}，等待500ms后重试...`);
-                    await new Promise(resolve => setTimeout(resolve, 500));
-                    return await this.updateTagsJson(oldNote, newNote, retries - 1);
+                attempt++;
+                if (error.message.includes('409') && attempt <= retries) {
+                    const delay = Math.min(1000, 500 * attempt); // 指数退避，最大1秒
+                    console.log(`⚠️ tags.json更新失败，SHA冲突，剩余重试次数: ${retries - attempt + 1}，等待 ${delay}ms 后重试...`);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    continue;
                 }
+                console.error('❌ 更新tags.json失败:', error);
                 throw error;
             }
-        } catch (error) {
-            console.error('❌ 更新tags.json失败:', error);
-            throw error;
         }
     }
 

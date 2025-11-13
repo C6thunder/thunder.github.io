@@ -188,10 +188,8 @@
                 <div
                     style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 32px;">
                     <!-- 写博客卡片 -->
-                    <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; transition: all 0.3s ease; cursor: pointer; box-shadow: var(--shadow-sm);"
-                        onclick="location.href='/pages/main_pages/write.html'"
-                        onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(0, 0, 0, 0.15)'"
-                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='var(--shadow-sm)'">
+                    <div class="card-hover" data-href="/pages/main_pages/write.html"
+                        style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; transition: all 0.3s ease; cursor: pointer; box-shadow: var(--shadow-sm);">
                         <div
                             style="width: 48px; height: 48px; background: linear-gradient(135deg, var(--primary), #764ba2); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; margin-bottom: 16px;">
                             <i class="fas fa-pen-nib"></i>
@@ -202,10 +200,8 @@
                     </div>
 
                     <!-- 浏览博客卡片 -->
-                    <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; transition: all 0.3s ease; cursor: pointer; box-shadow: var(--shadow-sm);"
-                        onclick="location.href='/pages/main_pages/notes.html'"
-                        onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(0, 0, 0, 0.15)'"
-                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='var(--shadow-sm)'">
+                    <div class="card-hover" data-href="/pages/main_pages/notes.html"
+                        style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; transition: all 0.3s ease; cursor: pointer; box-shadow: var(--shadow-sm);">
                         <div
                             style="width: 48px; height: 48px; background: linear-gradient(135deg, #f093fb, #f5576c); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; margin-bottom: 16px;">
                             <i class="fas fa-sticky-note"></i>
@@ -216,10 +212,8 @@
                     </div>
 
                     <!-- 个人信息卡片 -->
-                    <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; transition: all 0.3s ease; cursor: pointer; box-shadow: var(--shadow-sm);"
-                        onclick="location.href='/pages/main_pages/profile.html'"
-                        onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(0, 0, 0, 0.15)'"
-                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='var(--shadow-sm)'">
+                    <div class="card-hover" data-href="/pages/main_pages/profile.html"
+                        style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; transition: all 0.3s ease; cursor: pointer; box-shadow: var(--shadow-sm);">
                         <div
                             style="width: 48px; height: 48px; background: linear-gradient(135deg, #4facfe, #00f2fe); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; margin-bottom: 16px;">
                             <i class="fas fa-user-circle"></i>
@@ -334,6 +328,27 @@
             const today = new Date();
             const dateStr = today.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
             document.getElementById('todayDate').textContent = dateStr;
+
+            // 卡片点击事件（使用事件委托）
+            document.querySelectorAll('.card-hover').forEach(card => {
+                card.addEventListener('click', function() {
+                    const href = this.getAttribute('data-href');
+                    if (href) {
+                        window.location.href = href;
+                    }
+                });
+
+                // 鼠标悬停效果
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-4px)';
+                    this.style.boxShadow = '0 12px 24px rgba(0, 0, 0, 0.15)';
+                });
+
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'var(--shadow-sm)';
+                });
+            });
 
             // 主题系统
             const themeToggleBtn = document.querySelector('.theme-toggle-btn');
