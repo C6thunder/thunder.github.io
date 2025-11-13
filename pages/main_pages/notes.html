@@ -6,17 +6,18 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>所有博客 - 个人博客网站</title>
-    <!-- Favicon -->
-    <link rel="icon" type="image/jpeg" href="img/favicon-16.jpg" sizes="16x16" id="favicon-link">
-    <link rel="icon" type="image/jpeg" href="img/favicon-32.jpg" sizes="32x32">
+
+    <script src="/assets/js/fall-effect.js"></script>
+    <script src="/assets/js/config.js?v=1762755000"></script>
+    <script src="/assets/js/click-effect.js"></script>
     <script>
         // 设置favicon为圆形
-        (function() {
+        (function () {
             const favicon = document.getElementById('favicon-link');
             if (favicon) {
                 const img = new Image();
                 img.crossOrigin = 'anonymous';
-                img.onload = function() {
+                img.onload = function () {
                     const canvas = document.createElement('canvas');
                     const size = 32;
                     canvas.width = size;
@@ -28,23 +29,27 @@
                     ctx.drawImage(img, 0, 0, size, size);
                     favicon.href = canvas.toDataURL('image/png');
                 };
-                img.src = 'img/favicon-32.jpg';
+                img.src = '/assets/img/favicon-32.jpg';
             }
         })();
     </script>
-    <link rel="stylesheet" href="style.css?v=2023111900">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="config.js?v=1762755000"></script>
-    <script src="click-effect.js"></script>
-    <script src="js/fall-effect.js"></script>
     <script>
         // 页面加载前就设置主题，避免闪烁
-        (function() {
+        (function () {
             const savedTheme = localStorage.getItem('selectedTheme') || 'warm';
             document.documentElement.setAttribute('data-theme', savedTheme);
         })();
     </script>
+
+    <link rel="stylesheet" href="/assets/css/style.css?v=2023111900">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="/assets/img/favicon-16.jpg" type="image/jpeg" sizes="16x16">
+    <link rel="icon" href="/assets/img/favicon-32.jpg" type="image/jpeg" sizes="32x32" id="favicon-link">
+
+
 </head>
+
+
 
 <body>
     <div class="app-container">
@@ -59,19 +64,20 @@
             </div>
 
             <nav class="nav-menu">
-                <a href="index.html" class="nav-item">
+                <a href="../../index.html" class="nav-item">
                     <i class="fas fa-home"></i>
                     <span>首页</span>
                 </a>
-                <a href="notes.html" class="nav-item active">
+                <a href="../main_pages/notes.html" class="nav-item active">
                     <i class="fas fa-sticky-note"></i>
                     <span>所有博客</span>
                 </a>
-                <a href="write.html" class="nav-item">
+                <a href="../main_pages/write.html" class="nav-item">
                     <i class="fas fa-pen"></i>
                     <span>写博客</span>
                 </a>
             </nav>
+
 
             <div class="sidebar-footer">
                 <div class="theme-switcher">
@@ -100,8 +106,9 @@
                         </div>
                     </div>
                 </div>
-                <a href="profile.html" class="user-info" style="text-decoration: none; color: inherit;">
-                    <img src="img/avatar.jpg" class="user-avatar" id="userAvatar" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;" data-config="avatar">
+                <a href="../main_pages/profile.html" class="user-info" style="text-decoration: none; color: inherit;">
+                    <img src="/assets/img/avatar.jpg" class="user-avatar" id="userAvatar"
+                        style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;">
                     <div class="user-details">
                         <div class="user-name" id="userName">Thunder</div>
                         <div class="user-email" id="userEmail">thunder@example.com</div>
@@ -125,7 +132,8 @@
                 </div>
 
                 <!-- 工具栏 -->
-                <div class="card" style="padding: 16px; margin-bottom: 24px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                <div class="card"
+                    style="padding: 16px; margin-bottom: 24px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
                     <a href="write.html" class="btn btn-primary" style="text-decoration: none;">
                         <i class="fas fa-plus"></i> 写博客
                     </a>
@@ -135,14 +143,17 @@
                     <button class="btn btn-secondary" id="refreshBtn" title="刷新博客">
                         <i class="fas fa-sync-alt"></i> 刷新
                     </button>
-                    <span class="last-update" id="lastUpdate" style="margin-left: auto; font-size: 12px; color: var(--text-tertiary);"></span>
+                    <span class="last-update" id="lastUpdate"
+                        style="margin-left: auto; font-size: 12px; color: var(--text-tertiary);"></span>
                 </div>
 
                 <!-- 搜索栏 -->
                 <div class="search-container" style="margin-bottom: 24px;">
-                    <div class="search-box" style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 16px; display: flex; align-items: center; gap: 8px;">
+                    <div class="search-box"
+                        style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 16px; display: flex; align-items: center; gap: 8px;">
                         <i class="fas fa-search" style="color: var(--text-tertiary);"></i>
-                        <input type="text" id="searchInput" placeholder="搜索博客、标签或内容..." style="border: none; background: transparent; outline: none; color: var(--text-primary); flex: 1; font-size: 14px;">
+                        <input type="text" id="searchInput" placeholder="搜索博客、标签或内容..."
+                            style="border: none; background: transparent; outline: none; color: var(--text-primary); flex: 1; font-size: 14px;">
                     </div>
                 </div>
 
@@ -153,12 +164,14 @@
 
                 <!-- 博客列表 -->
                 <div class="notes-list" id="notesGrid">
-                    <div class="loading" style="color: var(--text-secondary); text-align: center; padding: 40px;">加载中...</div>
+                    <div class="loading" style="color: var(--text-secondary); text-align: center; padding: 40px;">加载中...
+                    </div>
                 </div>
 
                 <!-- 空状态 -->
                 <div class="empty-state" id="emptyState" style="display: none; text-align: center; padding: 60px 20px;">
-                    <i class="fas fa-search" style="font-size: 48px; color: var(--text-tertiary); margin-bottom: 16px;"></i>
+                    <i class="fas fa-search"
+                        style="font-size: 48px; color: var(--text-tertiary); margin-bottom: 16px;"></i>
                     <h3 style="color: var(--text-primary); margin-bottom: 8px;">未找到相关博客</h3>
                     <p style="color: var(--text-secondary); margin-bottom: 20px;">尝试更换关键词或清除筛选条件</p>
                     <button class="btn btn-primary" onclick="clearFilters()">清除筛选</button>
@@ -167,7 +180,7 @@
         </main>
     </div>
 
-    <script src="github-api.js?v=1762760999"></script>
+    <script src="/assets/js/github-api.js?v=1762760999"></script>
 
     <script>
         // 配置加密token
@@ -198,7 +211,7 @@
         };
 
         // 页面加载完成后初始化
-        document.addEventListener('DOMContentLoaded', async function() {
+        document.addEventListener('DOMContentLoaded', async function () {
             // 导航栏隐藏/显示功能
             const sidebar = document.querySelector('.sidebar');
             const mainContent = document.querySelector('.main-content');
@@ -214,7 +227,7 @@
             }
 
             // 隐藏按钮点击事件
-            toggleBtn.addEventListener('click', function() {
+            toggleBtn.addEventListener('click', function () {
                 sidebar.classList.add('hidden');
                 mainContent.classList.add('full-width');
                 showBtn.style.display = 'flex';
@@ -222,7 +235,7 @@
             });
 
             // 显示按钮点击事件
-            showBtn.addEventListener('click', function() {
+            showBtn.addEventListener('click', function () {
                 sidebar.classList.remove('hidden');
                 mainContent.classList.remove('full-width');
                 showBtn.style.display = 'none';
@@ -278,24 +291,24 @@
                 });
 
                 // 点击按钮切换面板显示
-                themeToggleBtn.addEventListener('click', function(e) {
+                themeToggleBtn.addEventListener('click', function (e) {
                     e.stopPropagation();
                     themePanel.classList.toggle('show');
                 });
 
                 // 点击其他地方关闭面板
-                document.addEventListener('click', function() {
+                document.addEventListener('click', function () {
                     themePanel.classList.remove('show');
                 });
 
                 // 阻止面板内部点击事件冒泡
-                themePanel.addEventListener('click', function(e) {
+                themePanel.addEventListener('click', function (e) {
                     e.stopPropagation();
                 });
 
                 // 主题选项点击
                 document.querySelectorAll('.theme-option').forEach(option => {
-                    option.addEventListener('click', function() {
+                    option.addEventListener('click', function () {
                         const theme = this.dataset.theme;
                         // 保存到localStorage
                         localStorage.setItem('selectedTheme', theme);
@@ -657,7 +670,7 @@
 
         // 搜索 - 优化性能，使用防抖
         let searchTimer = null;
-        document.getElementById('searchInput').addEventListener('input', function(e) {
+        document.getElementById('searchInput').addEventListener('input', function (e) {
             clearTimeout(searchTimer);
             searchTimer = setTimeout(() => {
                 currentSearch = e.target.value.toLowerCase();
@@ -687,7 +700,7 @@
         }
 
         // 排序
-        document.getElementById('sortBtn').addEventListener('click', function() {
+        document.getElementById('sortBtn').addEventListener('click', function () {
             const sorts = [
                 { value: 'date-desc', label: '最新发布' },
                 { value: 'date-asc', label: '最旧发布' },
@@ -701,7 +714,7 @@
         });
 
         // 刷新（清除缓存）
-        document.getElementById('refreshBtn').addEventListener('click', async function() {
+        document.getElementById('refreshBtn').addEventListener('click', async function () {
             const originalText = this.innerHTML;
             const originalClass = this.className;
 
@@ -758,7 +771,7 @@
         }
 
         // 编辑博客
-        window.editNote = function(noteId, editKey, event) {
+        window.editNote = function (noteId, editKey, event) {
             event.stopPropagation(); // 阻止事件冒泡
             const inputKey = prompt('请输入修改密钥:');
             if (inputKey === null) return;  // 用户取消

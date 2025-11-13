@@ -3,7 +3,7 @@ window.APP_CONFIG = {
     // 头像配置
     avatar: {
         // 可以是相对路径、绝对路径或在线图片URL
-        src: 'img/avatar.jpg',
+        src: 'assets/img/avatar.jpg',
         size: {
             small: '36px',    // 导航栏小头像
             medium: '48px',   // 中等头像

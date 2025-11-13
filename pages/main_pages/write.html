@@ -7,16 +7,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>写博客 - 个人博客网站</title>
     <!-- Favicon -->
-    <link rel="icon" type="image/jpeg" href="img/favicon-16.jpg" sizes="16x16" id="favicon-link">
-    <link rel="icon" type="image/jpeg" href="img/favicon-32.jpg" sizes="32x32">
+    <link rel="icon" type="image/jpeg" href="/assets/img/favicon-16.jpg" sizes="16x16" id="favicon-link">
+    <link rel="icon" type="image/jpeg" href="/assets/img/favicon-32.jpg" sizes="32x32">
     <script>
         // 设置favicon为圆形
-        (function() {
+        (function () {
             const favicon = document.getElementById('favicon-link');
             if (favicon) {
                 const img = new Image();
                 img.crossOrigin = 'anonymous';
-                img.onload = function() {
+                img.onload = function () {
                     const canvas = document.createElement('canvas');
                     const size = 32;
                     canvas.width = size;
@@ -28,18 +28,18 @@
                     ctx.drawImage(img, 0, 0, size, size);
                     favicon.href = canvas.toDataURL('image/png');
                 };
-                img.src = 'img/favicon-32.jpg';
+                img.src = '/assets/img/favicon-32.jpg';
             }
         })();
     </script>
-    <link rel="stylesheet" href="style.css?v=2023111900">
+    <link rel="stylesheet" href="/assets/css/style.css?v=2023111900">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="config.js?v=1762755000"></script>
-    <script src="click-effect.js"></script>
-    <script src="js/fall-effect.js"></script>
+    <script src="/assets/js/config.js?v=1762755000"></script>
+    <script src="/assets/js/click-effect.js"></script>
+    <script src="/assets/js/fall-effect.js"></script>
     <script>
         // 页面加载前就设置主题，避免闪烁
-        (function() {
+        (function () {
             const savedTheme = localStorage.getItem('selectedTheme') || 'warm';
             document.documentElement.setAttribute('data-theme', savedTheme);
         })();
@@ -59,15 +59,15 @@
             </div>
 
             <nav class="nav-menu">
-                <a href="index.html" class="nav-item">
+                <a href="/index.html" class="nav-item">
                     <i class="fas fa-home"></i>
                     <span>首页</span>
                 </a>
-                <a href="notes.html" class="nav-item">
+                <a href="/pages/main_pages/notes.html" class="nav-item">
                     <i class="fas fa-sticky-note"></i>
                     <span>所有博客</span>
                 </a>
-                <a href="write.html" class="nav-item active">
+                <a href="/pages/main_pages/write.html" class="nav-item active">
                     <i class="fas fa-pen"></i>
                     <span>写博客</span>
                 </a>
@@ -100,8 +100,10 @@
                         </div>
                     </div>
                 </div>
-                <a href="profile.html" class="user-info" style="text-decoration: none; color: inherit;">
-                    <img src="img/avatar.jpg" class="user-avatar" id="userAvatar" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;" data-config="avatar">
+                <a href="/pages/main_pages/profile.html" class="user-info"
+                    style="text-decoration: none; color: inherit;">
+                    <img src="/assets/img/avatar.jpg" class="user-avatar" id="userAvatar"
+                        style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;">
                     <div class="user-details">
                         <div class="user-name" id="userName">Thunder</div>
                         <div class="user-email" id="userEmail">thunder@example.com</div>
@@ -126,68 +128,96 @@
 
                 <!-- 写博客表单 -->
                 <div class="card" style="padding: 32px;">
-            <form id="noteForm">
-                <!-- 标题 -->
-                <div style="margin-bottom: 24px;">
-                    <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: var(--text-primary);">标题 <span style="color: var(--danger);">*</span></label>
-                    <input type="text" id="title" required style="width: 100%; padding: 12px 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 15px; transition: border-color 0.3s ease;" placeholder="输入博客标题...">
-                </div>
+                    <form id="noteForm">
+                        <!-- 标题 -->
+                        <div style="margin-bottom: 24px;">
+                            <label
+                                style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: var(--text-primary);">标题
+                                <span style="color: var(--danger);">*</span></label>
+                            <input type="text" id="title" required
+                                style="width: 100%; padding: 12px 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 15px; transition: border-color 0.3s ease;"
+                                placeholder="输入博客标题...">
+                        </div>
 
-                <!-- 摘要 -->
-                <div style="margin-bottom: 24px;">
-                    <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: var(--text-primary);">摘要</label>
-                    <textarea id="excerpt" rows="3" style="width: 100%; padding: 12px 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 15px; line-height: 1.6; resize: vertical; font-family: inherit;" placeholder="简单描述一下这篇博客的内容..."></textarea>
-                </div>
+                        <!-- 摘要 -->
+                        <div style="margin-bottom: 24px;">
+                            <label
+                                style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: var(--text-primary);">摘要</label>
+                            <textarea id="excerpt" rows="3"
+                                style="width: 100%; padding: 12px 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 15px; line-height: 1.6; resize: vertical; font-family: inherit;"
+                                placeholder="简单描述一下这篇博客的内容..."></textarea>
+                        </div>
 
-                <!-- 标签 -->
-                <div style="margin-bottom: 24px;">
-                    <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: var(--text-primary);">标签</label>
-                    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;" id="tagList"></div>
-                    <input type="text" id="tagInput" style="width: 100%; padding: 12px 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 15px;" placeholder="输入标签后按回车添加...">
-                    <p style="font-size: 12px; color: var(--text-tertiary); margin-top: 6px;">每完成一个标签，用回车键添加（Enter）</p>
-                </div>
+                        <!-- 标签 -->
+                        <div style="margin-bottom: 24px;">
+                            <label
+                                style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: var(--text-primary);">标签</label>
+                            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;" id="tagList">
+                            </div>
+                            <input type="text" id="tagInput"
+                                style="width: 100%; padding: 12px 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 15px;"
+                                placeholder="输入标签后按回车添加...">
+                            <p style="font-size: 12px; color: var(--text-tertiary); margin-top: 6px;">
+                                每完成一个标签，用回车键添加（Enter）</p>
+                        </div>
 
-                <!-- 内容 -->
-                <div style="margin-bottom: 24px;">
-                    <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: var(--text-primary);">内容 <span style="color: var(--danger);">*</span></label>
-                    <textarea id="content" required rows="16" style="width: 100%; padding: 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 15px; line-height: 1.8; resize: vertical; font-family: 'Monaco', 'Menlo', 'Courier New', monospace;" placeholder="使用 HTML 格式编写您的博客..."></textarea>
-                    <p style="font-size: 12px; color: var(--text-tertiary); margin-top: 6px;">支持 HTML 标签，例如：&lt;h1&gt;, &lt;h2&gt;, &lt;p&gt;, &lt;code&gt;, &lt;pre&gt;, &lt;ul&gt;, &lt;ol&gt;, &lt;li&gt;, &lt;strong&gt;, &lt;em&gt;, &lt;blockquote&gt;</p>
-                </div>
+                        <!-- 内容 -->
+                        <div style="margin-bottom: 24px;">
+                            <label
+                                style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: var(--text-primary);">内容
+                                <span style="color: var(--danger);">*</span></label>
+                            <textarea id="content" required rows="16"
+                                style="width: 100%; padding: 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 15px; line-height: 1.8; resize: vertical; font-family: 'Monaco', 'Menlo', 'Courier New', monospace;"
+                                placeholder="使用 HTML 格式编写您的博客..."></textarea>
+                            <p style="font-size: 12px; color: var(--text-tertiary); margin-top: 6px;">支持 HTML
+                                标签，例如：&lt;h1&gt;, &lt;h2&gt;, &lt;p&gt;, &lt;code&gt;, &lt;pre&gt;, &lt;ul&gt;,
+                                &lt;ol&gt;, &lt;li&gt;, &lt;strong&gt;, &lt;em&gt;, &lt;blockquote&gt;</p>
+                        </div>
 
-                <!-- 作者标识 -->
-                <div style="margin-bottom: 24px;">
-                    <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: var(--text-primary);">作者标识（可选）</label>
-                    <input type="text" id="authorKey" style="width: 100%; padding: 12px 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 15px;" placeholder="用于标识作者身份（可选）">
-                </div>
+                        <!-- 作者标识 -->
+                        <div style="margin-bottom: 24px;">
+                            <label
+                                style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: var(--text-primary);">作者标识（可选）</label>
+                            <input type="text" id="authorKey"
+                                style="width: 100%; padding: 12px 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 15px;"
+                                placeholder="用于标识作者身份（可选）">
+                        </div>
 
-                <!-- 修改密钥 -->
-                <div style="margin-bottom: 32px;">
-                    <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: var(--text-primary);">
-                        修改密钥 <span style="font-size: 12px; color: var(--text-tertiary); font-weight: 400;">（可选，用于修改此博客）</span>
-                    </label>
-                    <input type="password" id="editKey" style="width: 100%; padding: 12px 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 15px;" placeholder="设置一个修改密钥以备后续修改（可选）">
-                    <!-- 保存原始editKey的隐藏字段 -->
-                    <input type="hidden" id="originalEditKey" value="">
-                    <p style="font-size: 12px; color: var(--text-tertiary); margin-top: 6px;">⚠️ 如果设置了修改密钥，修改此博客时需要输入相同密钥</p>
-                </div>
+                        <!-- 修改密钥 -->
+                        <div style="margin-bottom: 32px;">
+                            <label
+                                style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: var(--text-primary);">
+                                修改密钥 <span
+                                    style="font-size: 12px; color: var(--text-tertiary); font-weight: 400;">（可选，用于修改此博客）</span>
+                            </label>
+                            <input type="password" id="editKey"
+                                style="width: 100%; padding: 12px 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 15px;"
+                                placeholder="设置一个修改密钥以备后续修改（可选）">
+                            <!-- 保存原始editKey的隐藏字段 -->
+                            <input type="hidden" id="originalEditKey" value="">
+                            <p style="font-size: 12px; color: var(--text-tertiary); margin-top: 6px;">⚠️
+                                如果设置了修改密钥，修改此博客时需要输入相同密钥</p>
+                        </div>
 
-                <!-- 提交按钮 -->
-                <div style="display: flex; gap: 12px; align-items: center;">
-                    <button type="submit" id="submitBtn" style="padding: 12px 32px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; box-shadow: var(--shadow-sm);">
-                        <i class="fas fa-paper-plane"></i> 发布博客
-                    </button>
-                    <button type="button" onclick="clearForm()" style="padding: 12px 32px; background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 8px; font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.2s ease;">
-                        <i class="fas fa-eraser"></i> 清空
-                    </button>
-                    <span id="status" style="font-size: 13px; color: var(--text-secondary);"></span>
-                </div>
-            </form>
+                        <!-- 提交按钮 -->
+                        <div style="display: flex; gap: 12px; align-items: center;">
+                            <button type="submit" id="submitBtn"
+                                style="padding: 12px 32px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; box-shadow: var(--shadow-sm);">
+                                <i class="fas fa-paper-plane"></i> 发布博客
+                            </button>
+                            <button type="button" onclick="clearForm()"
+                                style="padding: 12px 32px; background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 8px; font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.2s ease;">
+                                <i class="fas fa-eraser"></i> 清空
+                            </button>
+                            <span id="status" style="font-size: 13px; color: var(--text-secondary);"></span>
+                        </div>
+                    </form>
                 </div>
             </div>
         </main>
     </div>
 
-    <script src="github-api.js?v=1762760999"></script>
+    <script src="/assets/js/github-api.js"></script>
 
     <script>
         // 配置加密token
@@ -221,7 +251,7 @@
         // 标签管理
         let tags = [];
 
-        document.getElementById('tagInput').addEventListener('keydown', function(e) {
+        document.getElementById('tagInput').addEventListener('keydown', function (e) {
             if (e.key === 'Enter' || e.key === ',') {
                 e.preventDefault();
                 const value = this.value.trim();
@@ -233,7 +263,7 @@
         });
 
         // 页面加载时初始化
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // 页面加载完成
         });
 
@@ -427,7 +457,7 @@
         }
 
         // 提交表单
-        document.getElementById('noteForm').addEventListener('submit', async function(e) {
+        document.getElementById('noteForm').addEventListener('submit', async function (e) {
             e.preventDefault();
             await handleSubmit(false);
         });
@@ -453,7 +483,7 @@
         }
 
         // 页面加载完成后初始化
-        document.addEventListener('DOMContentLoaded', async function() {
+        document.addEventListener('DOMContentLoaded', async function () {
             // 导航栏隐藏/显示功能
             const sidebar = document.querySelector('.sidebar');
             const mainContent = document.querySelector('.main-content');
@@ -469,7 +499,7 @@
             }
 
             // 隐藏按钮点击事件
-            toggleBtn.addEventListener('click', function() {
+            toggleBtn.addEventListener('click', function () {
                 sidebar.classList.add('hidden');
                 mainContent.classList.add('full-width');
                 showBtn.style.display = 'flex';
@@ -477,7 +507,7 @@
             });
 
             // 显示按钮点击事件
-            showBtn.addEventListener('click', function() {
+            showBtn.addEventListener('click', function () {
                 sidebar.classList.remove('hidden');
                 mainContent.classList.remove('full-width');
                 showBtn.style.display = 'none';
@@ -499,24 +529,24 @@
             });
 
             // 点击按钮切换面板显示
-            themeToggleBtn.addEventListener('click', function(e) {
+            themeToggleBtn.addEventListener('click', function (e) {
                 e.stopPropagation();
                 themePanel.classList.toggle('show');
             });
 
             // 点击其他地方关闭面板
-            document.addEventListener('click', function() {
+            document.addEventListener('click', function () {
                 themePanel.classList.remove('show');
             });
 
             // 阻止面板内部点击事件冒泡
-            themePanel.addEventListener('click', function(e) {
+            themePanel.addEventListener('click', function (e) {
                 e.stopPropagation();
             });
 
             // 主题选项点击
             document.querySelectorAll('.theme-option').forEach(option => {
-                option.addEventListener('click', function() {
+                option.addEventListener('click', function () {
                     const theme = this.dataset.theme;
                     // 保存到localStorage
                     localStorage.setItem('selectedTheme', theme);
