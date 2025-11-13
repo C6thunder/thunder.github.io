@@ -36,6 +36,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="config.js?v=1762755000"></script>
     <script src="click-effect.js"></script>
+    <script src="js/fall-effect.js"></script>
     <script>
         // 页面加载前就设置主题，避免闪烁
         (function() {
@@ -131,6 +132,36 @@
                         <h1 style="font-size: 42px; font-weight: 700; margin: 0 0 12px 0; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);">欢迎回来 👋</h1>
                         <p style="font-size: 16px; margin: 0; opacity: 0.95; text-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);">今天是 <span id="todayDate"></span></p>
                         <p style="font-size: 16px; margin: 8px 0 0 0; opacity: 0.9;">继续你的创作之旅，记录生活中的美好瞬间</p>
+                    </div>
+                </div>
+
+                <!-- 飘落效果控制面板 -->
+                <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 32px; box-shadow: var(--shadow-sm);">
+                    <h2 style="font-size: 20px; color: var(--text-primary); margin: 0 0 16px 0; display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-magic" style="color: var(--primary);"></i>
+                        飘落效果
+                        <span style="font-size: 12px; color: var(--text-tertiary); margin-left: 10px; font-weight: normal;">为您的页面增添生动色彩</span>
+                    </h2>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin: 0 0 16px 0;">选择不同的飘落主题，会根据当前页面主题自动适配最佳配色</p>
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                        <button class="fall-btn active" data-theme="sakura" style="padding: 10px 20px; background: var(--primary); border: none; border-radius: 8px; color: white; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                            <i class="fas fa-seedling" style="margin-right: 6px;"></i>樱花
+                        </button>
+                        <button class="fall-btn" data-theme="snow" style="padding: 10px 20px; background: var(--primary); border: none; border-radius: 8px; color: white; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                            <i class="fas fa-snowflake" style="margin-right: 6px;"></i>雪花
+                        </button>
+                        <button class="fall-btn" data-theme="leaf" style="padding: 10px 20px; background: var(--primary); border: none; border-radius: 8px; color: white; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                            <i class="fas fa-leaf" style="margin-right: 6px;"></i>枫叶
+                        </button>
+                        <button class="fall-btn" data-theme="heart" style="padding: 10px 20px; background: var(--primary); border: none; border-radius: 8px; color: white; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                            <i class="fas fa-heart" style="margin-right: 6px;"></i>爱心
+                        </button>
+                        <button class="fall-btn" data-theme="star" style="padding: 10px 20px; background: var(--primary); border: none; border-radius: 8px; color: white; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                            <i class="fas fa-star" style="margin-right: 6px;"></i>星星
+                        </button>
+                        <button class="fall-btn" data-theme="off" style="padding: 10px 20px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-secondary); font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                            <i class="fas fa-times" style="margin-right: 6px;"></i>关闭
+                        </button>
                     </div>
                 </div>
 
@@ -296,6 +327,10 @@
                     this.classList.add('active');
                     // 选择后关闭面板
                     themePanel.classList.remove('show');
+
+                    // 触发主题切换事件，通知飘落效果系统
+                    const event = new CustomEvent('themeChanged', { detail: { theme: theme } });
+                    document.dispatchEvent(event);
                 });
             });
         });
@@ -338,7 +373,39 @@
             background: var(--card-bg);
             box-shadow: var(--shadow-sm);
         }
+
+        .fall-btn.active {
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3), 0 0 20px rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        #fallCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999 !important;
+            display: block !important;
+        }
+
+        .main-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 飘落效果控制面板在主内容之上 */
+        .main-content > div:first-of-type {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* 飘落效果按钮样式 */
+        .fall-btn.active {
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3), 0 0 20px rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
     </style>
 </body>
-
 </html>
