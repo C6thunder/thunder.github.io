@@ -7,8 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>个人博客网站 - 首页</title>
     <!-- Favicon -->
-    <link rel="icon" type="image/jpeg" href="assets/img/favicon-16.jpg" sizes="16x16" id="favicon-link">
-    <link rel="icon" type="image/jpeg" href="assets/img/favicon-32.jpg" sizes="32x32">
     <script>
         // 设置favicon为圆形
         (function () {
@@ -32,6 +30,8 @@
             }
         })();
     </script>
+    <link rel="icon" type="image/jpeg" href="assets/img/favicon-16.jpg" sizes="16x16" id="favicon-link">
+    <link rel="icon" type="image/jpeg" href="assets/img/favicon-32.jpg" sizes="32x32">
     <link rel="stylesheet" href="assets/css/style.css?v=2023111900">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="assets/js/config.js?v=1762755000"></script>
@@ -331,7 +331,7 @@
 
             // 卡片点击事件（使用事件委托）
             document.querySelectorAll('.card-hover').forEach(card => {
-                card.addEventListener('click', function() {
+                card.addEventListener('click', function () {
                     const href = this.getAttribute('data-href');
                     if (href) {
                         window.location.href = href;
@@ -339,12 +339,12 @@
                 });
 
                 // 鼠标悬停效果
-                card.addEventListener('mouseenter', function() {
+                card.addEventListener('mouseenter', function () {
                     this.style.transform = 'translateY(-4px)';
                     this.style.boxShadow = '0 12px 24px rgba(0, 0, 0, 0.15)';
                 });
 
-                card.addEventListener('mouseleave', function() {
+                card.addEventListener('mouseleave', function () {
                     this.style.transform = 'translateY(0)';
                     this.style.boxShadow = 'var(--shadow-sm)';
                 });

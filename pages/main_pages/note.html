@@ -7,8 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>博客详情 - 个人博客网站</title>
     <!-- Favicon -->
-    <link rel="icon" type="image/jpeg" href="../../assets/img/favicon-16.jpg" sizes="16x16" id="favicon-link">
-    <link rel="icon" type="image/jpeg" href="../../assets/img/favicon-32.jpg" sizes="32x32">
     <script>
         // 设置favicon为圆形
         (function () {
@@ -39,6 +37,8 @@
             }
         })();
     </script>
+    <link rel="icon" type="image/jpeg" href="../../assets/img/favicon-16.jpg" sizes="16x16" id="favicon-link">
+    <link rel="icon" type="image/jpeg" href="../../assets/img/favicon-32.jpg" sizes="32x32">
     <link rel="stylesheet" href="../../assets/css/style.css?v=2023111900">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -177,7 +177,8 @@
                     <div id="noteTags" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px;"></div>
 
                     <!-- 博客正文 -->
-                    <div id="noteContent" style="font-size: 16px; line-height: 1.8; color: var(--text-primary); background: transparent; border-radius: 8px; overflow: hidden;">
+                    <div id="noteContent"
+                        style="font-size: 16px; line-height: 1.8; color: var(--text-primary); background: transparent; border-radius: 8px; overflow: hidden;">
                         <div style="text-align: center; padding: 60px 20px; color: var(--text-secondary);">
                             <i class="fas fa-spinner fa-spin" style="font-size: 32px; margin-bottom: 16px;"></i>
                             <p>正在加载博客内容...</p>
