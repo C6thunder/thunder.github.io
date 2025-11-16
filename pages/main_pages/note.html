@@ -7,8 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>博客详情 - 个人博客网站</title>
     <!-- Favicon -->
-    <link rel="icon" type="image/jpeg" href="/assets/img/favicon-16.jpg" sizes="16x16" id="favicon-link">
-    <link rel="icon" type="image/jpeg" href="/assets/img/favicon-32.jpg" sizes="32x32">
+    <link rel="icon" type="image/jpeg" href="../../assets/img/favicon-16.jpg" sizes="16x16" id="favicon-link">
+    <link rel="icon" type="image/jpeg" href="../../assets/img/favicon-32.jpg" sizes="32x32">
     <script>
         // 设置favicon为圆形
         (function () {
@@ -35,16 +35,16 @@
                     // 更新favicon
                     favicon.href = canvas.toDataURL('image/png');
                 };
-                img.src = '/assets/img/favicon-32.jpg';
+                img.src = '../../assets/img/favicon-32.jpg';
             }
         })();
     </script>
-    <link rel="stylesheet" href="/assets/css/style.css?v=2023111900">
+    <link rel="stylesheet" href="../../assets/css/style.css?v=2023111900">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="/assets/js/config.js?v=1762755000"></script>
-    <script src="/assets/js/click-effect.js"></script>
-    <script src="/assets/js/fall-effect.js"></script>
+    <script src="../../assets/js/config.js?v=1762755000"></script>
+    <script src="../../assets/js/click-effect.js"></script>
+    <script src="../../assets/js/fall-effect.js"></script>
     <script>
         // 页面加载前就设置主题，避免闪烁
         (function () {
@@ -109,7 +109,7 @@
                     </div>
                 </div>
                 <a href="profile.html" class="user-info" style="text-decoration: none; color: inherit;">
-                    <img src="/assets/img/avatar.jpg" class="user-avatar" id="userAvatar"
+                    <img src="../../assets/img/avatar.jpg" class="user-avatar" id="userAvatar"
                         style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;">
                     <div class="user-details">
                         <div class="user-name" id="userName">Thunder</div>
@@ -138,7 +138,13 @@
                     <button class="btn btn-secondary" id="editBtn" style="display: none;">
                         <i class="fas fa-edit"></i> 编辑
                     </button>
-                    <button class="btn btn-secondary" id="shareBtn">
+                    <button class="btn btn-danger" id="deleteBtn" style="display: none; margin-left: 8px;">
+                        <i class="fas fa-trash"></i> 删除
+                    </button>
+                    <button class="btn btn-secondary" id="viewRawBtn" style="margin-left: 8px; display: none;">
+                        <i class="fas fa-code"></i> 源码
+                    </button>
+                    <button class="btn btn-secondary" id="shareBtn" style="margin-left: 8px;">
                         <i class="fas fa-share"></i> 分享
                     </button>
                 </div>
@@ -171,7 +177,7 @@
                     <div id="noteTags" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px;"></div>
 
                     <!-- 博客正文 -->
-                    <div id="noteContent" style="font-size: 16px; line-height: 1.8; color: var(--text-primary);">
+                    <div id="noteContent" style="font-size: 16px; line-height: 1.8; color: var(--text-primary); background: transparent; border-radius: 8px; overflow: hidden;">
                         <div style="text-align: center; padding: 60px 20px; color: var(--text-secondary);">
                             <i class="fas fa-spinner fa-spin" style="font-size: 32px; margin-bottom: 16px;"></i>
                             <p>正在加载博客内容...</p>
@@ -216,7 +222,7 @@
         </main>
     </div>
 
-    <script src="/assets/js/github-api.js?v=1762760999"></script>
+    <script src="../../assets/js/github-api.js?v=1762760999"></script>
 
     <script>
         // 清除 Service Worker 缓存
@@ -386,11 +392,21 @@
                 document.getElementById('noteDate').textContent = formatDate(note.date);
                 document.getElementById('noteAuthor').textContent = note.authorKey || '匿名';
 
-                // 显示编辑按钮（如果有修改密钥，说明允许编辑）
+                // 显示编辑按钮（所有博客都可以编辑，只是有editKey的需要验证）
                 const editBtn = document.getElementById('editBtn');
-                if (note.editKey) {
-                    editBtn.style.display = 'inline-flex';
-                    editBtn.onclick = () => showEditDialog(note);
+                editBtn.style.display = 'inline-flex';
+                editBtn.onclick = () => showEditDialog(note);
+
+                // 显示删除按钮（所有博客都可以删除，但有editKey的需要验证）
+                const deleteBtn = document.getElementById('deleteBtn');
+                deleteBtn.style.display = 'inline-flex';
+                deleteBtn.onclick = () => showDeleteDialog(note);
+
+                // 显示查看源码按钮（仅对HTML类型博客显示）
+                const viewRawBtn = document.getElementById('viewRawBtn');
+                if (note.type === 'html' && note.content.startsWith('notecontent/')) {
+                    viewRawBtn.style.display = 'inline-flex';
+                    viewRawBtn.onclick = () => viewNoteSource(note);
                 }
 
                 // 渲染标签
@@ -516,16 +532,87 @@
 
         // 显示编辑对话框
         function showEditDialog(note) {
-            const editKey = prompt('请输入修改密钥:');
-            if (editKey === null) return;  // 用户取消
+            // 如果博客设置了editKey，需要验证
+            if (note.editKey) {
+                const editKey = prompt('请输入修改密钥:');
+                if (editKey === null) return;  // 用户取消
 
-            if (editKey !== note.editKey) {
-                alert('修改密钥错误！');
-                return;
+                if (editKey !== note.editKey) {
+                    alert('修改密钥错误！');
+                    return;
+                }
+            } else {
+                // 如果没有editKey，显示安全提示
+                alert('⚠️ 此博客未设置修改密钥，任何人都可以编辑！\n\n建议为重要博客设置修改密钥以提高安全性。');
             }
 
             // 跳转到编辑页面，携带博客ID
             window.location.href = `write.html?edit=${note.id}`;
+        }
+
+        // 显示删除对话框
+        function showDeleteDialog(note) {
+            // 如果博客设置了editKey，需要验证
+            if (note.editKey) {
+                const editKey = prompt('请输入修改密钥以确认删除:');
+                if (editKey === null) return;  // 用户取消
+
+                if (editKey !== note.editKey) {
+                    alert('修改密钥错误！');
+                    return;
+                }
+            } else {
+                // 如果没有editKey，显示安全提示
+                if (!confirm(`⚠️ 此博客未设置修改密钥，任何人都可以删除！\n\n确定要删除博客「${note.title}」吗？此操作不可撤销！`)) {
+                    return;
+                }
+            }
+
+            // 执行删除
+            deleteNote(note.id);
+        }
+
+        // 删除博客
+        async function deleteNote(noteId) {
+            try {
+                await waitForGitHubConfig();
+
+                // 获取博客信息
+                const result = await window.githubNoteManager.getNoteById(noteId);
+                if (!result) {
+                    alert('博客不存在！');
+                    return;
+                }
+
+                const note = result.note;
+
+                // 如果是HTML类型的博客，删除对应的HTML文件
+                if (note.type === 'html' && note.content && note.content.startsWith('notecontent/')) {
+                    // 注意：GitHub API没有直接的删除方法，需要通过编辑文件内容为空或删除文件实现
+                    // 这里我们先标记为删除，实际项目中可能需要服务端支持
+                    console.log('需要删除文件:', note.content);
+                }
+
+                // 从notes.json中移除博客
+                const allNotes = await window.githubNoteManager.scanAllNotes();
+                const updatedNotes = allNotes.filter(n => n.id !== noteId);
+
+                // 更新notes.json
+                const notesData = {
+                    notes: updatedNotes,
+                    version: '3.0',
+                    lastUpdated: new Date().toISOString()
+                };
+
+                await window.githubNoteManager.saveFile('notes.json', notesData, `删除博客: ${note.title}`);
+
+                alert('删除成功！');
+                window.location.href = 'notes.html';
+
+            } catch (error) {
+                console.error('删除博客失败:', error);
+                alert('删除失败: ' + error.message);
+            }
         }
 
         // 工具函数
@@ -546,63 +633,86 @@
 
             if (note.type === 'html' && note.content.startsWith('notecontent/')) {
                 console.log('📝 使用 GitHub API 获取文件:', note.content);
-                // 等待 GitHub API 初始化
-                if (typeof githubNoteManager === 'undefined' || !githubNoteManager.config.token) {
-                    await new Promise(resolve => {
-                        const checkToken = () => {
-                            if (githubNoteManager && githubNoteManager.config.token) {
-                                resolve();
-                            } else {
-                                setTimeout(checkToken, 100);
-                            }
-                        };
-                        checkToken();
-                    });
-                }
 
                 try {
                     // 通过 GitHub API 获取 HTML 文件内容
-                    const html = await githubNoteManager.getRawFile(note.content);
+                    const html = await window.githubNoteManager.getRawFile(note.content);
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(html, 'text/html');
 
                     // 提取body内容
-                    const bodyContent = doc.body.innerHTML;
+                    const bodyContent = doc.body ? doc.body.innerHTML : html;
 
-                    // 提取所有style标签内容
+                    // 创建容器，保持主题背景色
+                    const container = document.createElement('div');
+                    container.className = 'note-html-container';
+                    container.style.cssText = `
+                        width: 100%;
+                        margin: 0;
+                        padding: 20px;
+                        background: transparent;
+                        border-radius: 8px;
+                        min-height: 50px;
+                    `;
+                    container.innerHTML = bodyContent;
+
+                    // 清空并添加容器
+                    contentDiv.innerHTML = '';
+                    contentDiv.appendChild(container);
+
+                    // 提取并添加style（仅对可能有问题的选择器进行限制）
                     const styles = doc.querySelectorAll('style');
-                    let styleText = '';
-                    styles.forEach(style => {
-                        styleText += style.textContent + '\n';
-                    });
+                    if (styles.length > 0) {
+                        let allStyles = '';
+                        styles.forEach(style => {
+                            allStyles += style.textContent + '\n';
+                        });
 
-                    // 包裹在容器中
-                    contentDiv.innerHTML = `<div class="note-html-content">${bodyContent}</div>`;
+                        // 只对极少数可能破坏页面的选择器进行限制
+                        const criticalStyle = document.createElement('style');
+                        criticalStyle.setAttribute('data-note-critical', 'true');
+                        criticalStyle.textContent = `
+                            /* 容器自身样式 */
+                            .note-html-container {
+                                background: transparent !important;
+                                color: inherit !important;
+                            }
 
-                    // 添加隔离样式
-                    if (styleText) {
-                        const styleElement = document.createElement('style');
-                        styleElement.setAttribute('data-note-content', 'true');
-                        styleElement.textContent = `
-                                #noteContent {
-                                    position: relative;
-                                    z-index: 1;
-                                }
-                                #noteContent .note-html-content {
-                                    margin: 0 !important;
-                                    padding: 0 !important;
-                                    background: transparent !important;
-                                    min-height: auto !important;
-                                }
-                                ${styleText.replace(/body\s*\{/g, '#noteContent .note-html-content {')}
-                                #noteContent ~ * { position: relative; z-index: 10; }
-                            `;
-                        document.querySelectorAll('style[data-note-content]').forEach(s => s.remove());
-                        document.head.appendChild(styleElement);
+                            /* 只限制极少数可能破坏页面的选择器 */
+                            .note-html-container html,
+                            .note-html-container body {
+                                position: relative !important;
+                                width: auto !important;
+                                height: auto !important;
+                                overflow: visible !important;
+                                margin: 0 !important;
+                                padding: 0 !important;
+                                background: transparent !important;
+                            }
+
+                            /* 限制可能导致全屏的样式 */
+                            .note-html-container [style*="position: fixed"],
+                            .note-html-container [style*="position: absolute"][style*="top: 0"],
+                            .note-html-container [style*="position: absolute"][style*="left: 0"] {
+                                position: relative !important;
+                            }
+
+                            /* 确保内容不撑破页面 */
+                            .note-html-container * {
+                                max-width: 100%;
+                                box-sizing: border-box;
+                            }
+
+                            /* 原始样式（只应用到容器内部） */
+                            ${allStyles.replace(/(^|[^a-zA-Z0-9_-])(html|body)\s*\{/g, '$1.note-html-container $2 \{')}
+                        `;
+                        // 移除旧样式
+                        document.querySelectorAll('style[data-note-critical]').forEach(s => s.remove());
+                        document.head.appendChild(criticalStyle);
                     }
                 } catch (error) {
                     console.error('加载 HTML 文件失败:', error);
-                    contentDiv.innerHTML = '<p style="color: var(--danger);">加载内容失败</p>';
+                    contentDiv.innerHTML = '<p style="color: var(--danger);">加载内容失败: ' + error.message + '</p>';
                 }
             } else if (note.type === 'markdown') {
                 // Markdown 格式
@@ -610,6 +720,51 @@
             } else {
                 // 其他类型
                 contentDiv.innerHTML = note.content;
+            }
+        }
+
+        // 查看源码
+        async function viewNoteSource(note) {
+            if (note.type === 'html' && note.content.startsWith('notecontent/')) {
+                try {
+                    // 获取原始HTML内容
+                    const html = await window.githubNoteManager.getRawFile(note.content);
+                    // 在新窗口中打开
+                    const newWindow = window.open('', '_blank');
+                    newWindow.document.write(`
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <meta charset="UTF-8">
+                            <title>${escapeHtml(note.title)} - 源码</title>
+                            <style>
+                                body {
+                                    font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+                                    padding: 20px;
+                                    background: #f5f5f5;
+                                    margin: 0;
+                                }
+                                pre {
+                                    background: white;
+                                    padding: 20px;
+                                    border-radius: 5px;
+                                    overflow-x: auto;
+                                }
+                                code {
+                                    font-size: 14px;
+                                    line-height: 1.5;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <pre><code>${escapeHtml(html)}</code></pre>
+                        </body>
+                        </html>
+                    `);
+                    newWindow.document.close();
+                } catch (error) {
+                    alert('获取源码失败: ' + error.message);
+                }
             }
         }
 

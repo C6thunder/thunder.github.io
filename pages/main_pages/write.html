@@ -7,8 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>写博客 - 个人博客网站</title>
     <!-- Favicon -->
-    <link rel="icon" type="image/jpeg" href="/assets/img/favicon-16.jpg" sizes="16x16" id="favicon-link">
-    <link rel="icon" type="image/jpeg" href="/assets/img/favicon-32.jpg" sizes="32x32">
+    <link rel="icon" type="image/jpeg" href="../../assets/img/favicon-16.jpg" sizes="16x16" id="favicon-link">
+    <link rel="icon" type="image/jpeg" href="../../assets/img/favicon-32.jpg" sizes="32x32">
     <script>
         // 设置favicon为圆形
         (function () {
@@ -28,15 +28,15 @@
                     ctx.drawImage(img, 0, 0, size, size);
                     favicon.href = canvas.toDataURL('image/png');
                 };
-                img.src = '/assets/img/favicon-32.jpg';
+                img.src = '../../assets/img/favicon-32.jpg';
             }
         })();
     </script>
-    <link rel="stylesheet" href="/assets/css/style.css?v=2023111900">
+    <link rel="stylesheet" href="../../assets/css/style.css?v=2023111900">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="/assets/js/config.js?v=1762755000"></script>
-    <script src="/assets/js/click-effect.js"></script>
-    <script src="/assets/js/fall-effect.js"></script>
+    <script src="../../assets/js/config.js?v=1762755000"></script>
+    <script src="../../assets/js/click-effect.js"></script>
+    <script src="../../assets/js/fall-effect.js"></script>
     <script>
         // 页面加载前就设置主题，避免闪烁
         (function () {
@@ -100,9 +100,9 @@
                         </div>
                     </div>
                 </div>
-                <a href="/pages/main_pages/profile.html" class="user-info"
+                <a href="profile.html" class="user-info"
                     style="text-decoration: none; color: inherit;">
-                    <img src="/assets/img/avatar.jpg" class="user-avatar" id="userAvatar"
+                    <img src="../../assets/img/avatar.jpg" class="user-avatar" id="userAvatar"
                         style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;">
                     <div class="user-details">
                         <div class="user-name" id="userName">Thunder</div>
@@ -195,8 +195,10 @@
                                 placeholder="设置一个修改密钥以备后续修改（可选）">
                             <!-- 保存原始editKey的隐藏字段 -->
                             <input type="hidden" id="originalEditKey" value="">
-                            <p style="font-size: 12px; color: var(--text-tertiary); margin-top: 6px;">⚠️
-                                如果设置了修改密钥，修改此博客时需要输入相同密钥</p>
+                            <p style="font-size: 12px; color: var(--text-tertiary); margin-top: 6px;">
+                                💡 <strong>建议设置修改密钥</strong>，以防止他人随意编辑或删除您的博客。<br>
+                                ⚠️ 如果设置了修改密钥，修改或删除此博客时需要输入相同密钥
+                            </p>
                         </div>
 
                         <!-- 提交按钮 -->
@@ -217,7 +219,7 @@
         </main>
     </div>
 
-    <script src="/assets/js/github-api.js"></script>
+    <script src="../../assets/js/github-api.js"></script>
 
     <script>
         // 配置加密token
@@ -633,14 +635,14 @@
                     await handleSubmit(true);
                 };
 
-                // 如果博客有editKey，显示提示
+                // 显示编辑密钥提示
                 if (note.editKey) {
                     const status = document.getElementById('status');
                     status.innerHTML = `<span style="color: var(--warning);">⚠️ 此博客已设置修改密钥，请输入正确密钥以保存修改</span>`;
                 } else {
-                    // 如果没有设置密钥，显示友好提示
+                    // 如果没有设置密钥，显示安全提示
                     const status = document.getElementById('status');
-                    status.innerHTML = `<span style="color: var(--success);">✅ 此博客未设置修改密钥，可直接编辑</span>`;
+                    status.innerHTML = `<span style="color: var(--danger);">⚠️ 此博客未设置修改密钥，任何人都可以编辑和删除！建议设置修改密钥提高安全性</span>`;
                 }
             } catch (error) {
                 console.error('加载博客失败:', error);

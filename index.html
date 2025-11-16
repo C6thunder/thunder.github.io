@@ -7,8 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>个人博客网站 - 首页</title>
     <!-- Favicon -->
-    <link rel="icon" type="image/jpeg" href="/assets/img/favicon-16.jpg" sizes="16x16" id="favicon-link">
-    <link rel="icon" type="image/jpeg" href="/assets/img/favicon-32.jpg" sizes="32x32">
+    <link rel="icon" type="image/jpeg" href="assets/img/favicon-16.jpg" sizes="16x16" id="favicon-link">
+    <link rel="icon" type="image/jpeg" href="assets/img/favicon-32.jpg" sizes="32x32">
     <script>
         // 设置favicon为圆形
         (function () {
@@ -28,15 +28,15 @@
                     ctx.drawImage(img, 0, 0, size, size);
                     favicon.href = canvas.toDataURL('image/png');
                 };
-                img.src = '/assets/img/favicon-32.jpg';
+                img.src = 'assets/img/favicon-32.jpg';
             }
         })();
     </script>
-    <link rel="stylesheet" href="/assets/css/style.css?v=2023111900">
+    <link rel="stylesheet" href="assets/css/style.css?v=2023111900">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="/assets/js/config.js?v=1762755000"></script>
-    <script src="/assets/js/click-effect.js"></script>
-    <script src="/assets/js/fall-effect.js"></script>
+    <script src="assets/js/config.js?v=1762755000"></script>
+    <script src="assets/js/click-effect.js"></script>
+    <script src="assets/js/fall-effect.js"></script>
     <script>
         // 页面加载前就设置主题，避免闪烁
         (function () {
@@ -63,11 +63,11 @@
                     <i class="fas fa-home"></i>
                     <span>首页</span>
                 </a>
-                <a href="/pages/main_pages/notes.html" class="nav-item">
+                <a href="pages/main_pages/notes.html" class="nav-item">
                     <i class="fas fa-sticky-note"></i>
                     <span>所有博客</span>
                 </a>
-                <a href="/pages/main_pages/write.html" class="nav-item">
+                <a href="pages/main_pages/write.html" class="nav-item">
                     <i class="fas fa-pen"></i>
                     <span>写博客</span>
                 </a>
@@ -100,9 +100,9 @@
                         </div>
                     </div>
                 </div>
-                <a href="/pages/main_pages/profile.html" class="user-info"
+                <a href="pages/main_pages/profile.html" class="user-info"
                     style="text-decoration: none; color: inherit;">
-                    <img src="/assets/img/avatar.jpg" class="user-avatar" id="userAvatar"
+                    <img src="assets/img/avatar.jpg" class="user-avatar" id="userAvatar"
                         style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;">
                     <div class="user-details">
                         <div class="user-name" id="userName">Thunder</div>
@@ -188,7 +188,7 @@
                 <div
                     style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 32px;">
                     <!-- 写博客卡片 -->
-                    <div class="card-hover" data-href="/pages/main_pages/write.html"
+                    <div class="card-hover" data-href="pages/main_pages/write.html"
                         style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; transition: all 0.3s ease; cursor: pointer; box-shadow: var(--shadow-sm);">
                         <div
                             style="width: 48px; height: 48px; background: linear-gradient(135deg, var(--primary), #764ba2); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; margin-bottom: 16px;">
@@ -200,7 +200,7 @@
                     </div>
 
                     <!-- 浏览博客卡片 -->
-                    <div class="card-hover" data-href="/pages/main_pages/notes.html"
+                    <div class="card-hover" data-href="pages/main_pages/notes.html"
                         style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; transition: all 0.3s ease; cursor: pointer; box-shadow: var(--shadow-sm);">
                         <div
                             style="width: 48px; height: 48px; background: linear-gradient(135deg, #f093fb, #f5576c); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; margin-bottom: 16px;">
@@ -212,7 +212,7 @@
                     </div>
 
                     <!-- 个人信息卡片 -->
-                    <div class="card-hover" data-href="/pages/main_pages/profile.html"
+                    <div class="card-hover" data-href="pages/main_pages/profile.html"
                         style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; transition: all 0.3s ease; cursor: pointer; box-shadow: var(--shadow-sm);">
                         <div
                             style="width: 48px; height: 48px; background: linear-gradient(135deg, #4facfe, #00f2fe); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; margin-bottom: 16px;">
